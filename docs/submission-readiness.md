@@ -42,6 +42,8 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 - Testnet/CU evidence runbook and collector:
   `docs/testnet-evidence-runbook.md` and
   `scripts/collect-prize-evidence.py`.
+- Hosted LEZ testnet compatibility evidence script:
+  `scripts/lez-testnet-compatibility-evidence.sh`.
 - Three-agent deployment profile generator:
   `scripts/prepare-three-agent-deployment.sh`.
 - Pinned scaffold-localnet LEZ runtime repair:
@@ -146,6 +148,39 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   This creates `.local/testnet-agents/latest/manifest.json` plus Storage,
   Messaging, and Blockchain agent directories with `agent-config.json` and
   `deploy.sh` wrappers.
+- Hosted LEZ testnet reachability checked on 2026-06-19 UTC:
+  `./scripts/lez-testnet-compatibility-evidence.sh`.
+  The endpoint `https://testnet.lez.logos.co/` returned healthy JSON-RPC
+  responses, `chain-info current-block-id` returned block `61095`, and the
+  wallet read/list commands succeeded with `RISC0_DEV_MODE=0`.
+
+## Current Hosted Testnet Blocker
+
+- Hosted-testnet transaction evidence is currently blocked by LEZ artifact
+  mismatch, not by the agent module. The current public LEZ wallet built from
+  `logos-execution-zone` commit `feb6cb7` fails `wallet check-health` against
+  `https://testnet.lez.logos.co/` with:
+  `Local ID for authenticated transfer program is different from remote`.
+- The same compatibility run records that all five builtin program IDs differ:
+  `authenticated_transfer`, `token`, `pinata`, `amm`, and
+  `privacy_preserving_circuit`. Because wallet `check-health` fails, submitting
+  hosted-testnet transfers from this binary would not be valid prize evidence.
+- Targeted branch-artifact scan found no match for the hosted testnet
+  `authenticated_transfer` ID among the fetched public branches checked:
+  `origin/main`, `origin/fix/program-ids`,
+  `origin/programs-elfs-deployments-circuits-fix`,
+  `origin/Pravdyvy/programs-elfs-deployments`,
+  `origin/Pravdyvy/hardcoded-initial-state`,
+  `origin/fix/add-amm-to-rpc-endpoint`,
+  `origin/fix/increase-wallet-polling-timeout`,
+  `origin/fix/update-wallet-output-examples`,
+  `origin/schouhy/finish-auth-transfer-ffi-functionality`,
+  `origin/schouhy/fix-wallet`, `origin/schouhy/protocol-fixes`, and
+  `origin/schouhy/standalone-sequencer-with-mock`.
+- Required external input before real hosted-testnet tx hashes can be produced:
+  the exact LEZ wallet/artifact commit for `https://testnet.lez.logos.co/`, a
+  prebuilt matching wallet binary, or a testnet redeploy aligned to the public
+  wallet artifacts.
 
 ## Evidence Still Required
 

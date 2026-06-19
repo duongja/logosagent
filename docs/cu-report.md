@@ -12,3 +12,15 @@ submission.
 | `program.deploy` | TBD | deployment tx | TBD | TBD | from `agent_lez deploy` using `wallet deploy-program`; current local program smoke uses `sha256-fallback` |
 | `program.call` public | TBD | selected demo program | TBD | TBD | include instruction params; current stable local proof uses the wallet health facade |
 | `agent.task` payment | TBD | token transfer | TBD | TBD | pay declared skill price and report CU from the accepted tx |
+
+## Hosted Testnet CU Status
+
+Hosted-testnet CU/tx evidence is gated by wallet compatibility. On 2026-06-19
+UTC, `./scripts/lez-testnet-compatibility-evidence.sh` reached
+`https://testnet.lez.logos.co/`, read block `61095`, and ran wallet commands
+with `RISC0_DEV_MODE=0`, but `wallet check-health` exited `101` because the
+remote builtin program IDs differ from the local public LEZ wallet artifacts.
+
+Do not fill hosted-testnet CU rows from this endpoint until
+`summary.json.transaction_submission_allowed` is `true`; otherwise any tx hash
+would be from an incompatible wallet build and not valid prize evidence.

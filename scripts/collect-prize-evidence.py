@@ -228,6 +228,35 @@ def summarize_three_agent_manifest(path):
     return summary
 
 
+def summarize_testnet_compatibility(path):
+    summary = {
+        "path": str(path) if path else "",
+        "exists": bool(path and path.exists()),
+        "ok": False,
+        "endpoint_health_ok": False,
+        "transaction_submission_allowed": False,
+        "current_block_id": "",
+        "check_health_exit_code": "",
+        "program_id_matches": {},
+        "testnet_url": "",
+    }
+    if not path or not path.exists():
+        return summary
+    payload = load_json(path / "summary.json")
+    if not isinstance(payload, dict):
+        return summary
+    summary.update({
+        "ok": bool(payload.get("ok")),
+        "endpoint_health_ok": bool(payload.get("endpoint_health_ok")),
+        "transaction_submission_allowed": bool(payload.get("transaction_submission_allowed")),
+        "current_block_id": str(payload.get("current_block_id", "")),
+        "check_health_exit_code": str(payload.get("check_health_exit_code", "")),
+        "program_id_matches": dict(payload.get("program_id_matches") or {}),
+        "testnet_url": str(payload.get("testnet_url", "")),
+    })
+    return summary
+
+
 def summarize_basecamp_profile_install(path):
     summary = {
         "path": str(path) if path else "",
@@ -284,6 +313,23 @@ def markdown_report(report):
     else:
         lines.append("- No three-agent deployment manifest found.")
 
+    compatibility = report.get("testnet_compatibility", {})
+    if compatibility.get("path") or report["network"].lower() in {"testnet", "devnet"}:
+        lines.extend(["", "## Hosted Testnet Compatibility", ""])
+        lines.append(f"- Run: `{compatibility.get('path', '')}`")
+        lines.append(f"- Exists: `{compatibility.get('exists', False)}`")
+        lines.append(f"- Endpoint: `{compatibility.get('testnet_url', '')}`")
+        lines.append(f"- Endpoint health OK: `{compatibility.get('endpoint_health_ok', False)}`")
+        lines.append(f"- Current block: `{compatibility.get('current_block_id', '')}`")
+        lines.append(f"- Wallet check-health exit: `{compatibility.get('check_health_exit_code', '')}`")
+        lines.append(
+            f"- Transaction submission allowed: `{compatibility.get('transaction_submission_allowed', False)}`"
+        )
+        matches = compatibility.get("program_id_matches") or {}
+        if matches:
+            for program, matched in matches.items():
+                lines.append(f"- Program ID match `{program}`: `{matched}`")
+
     basecamp_install = report.get("basecamp_profile_install", {})
     lines.extend(["", "## Basecamp Profile Install", ""])
     lines.append(f"- Run: `{basecamp_install.get('path', '')}`")
@@ -338,6 +384,7 @@ def main():
     parser.add_argument("--a2a-run")
     parser.add_argument("--program-run")
     parser.add_argument("--preflight-run")
+    parser.add_argument("--testnet-compatibility-run")
     parser.add_argument("--basecamp-project", default=".local/basecamp-owner-channel")
     parser.add_argument("--basecamp-profile-install-run")
     parser.add_argument("--three-agent-manifest", default=".local/testnet-agents/latest/manifest.json")
@@ -357,16 +404,22 @@ def main():
         "preflight": latest_child(root / ".local/test-runs"),
         "basecamp_profile_install": latest_child(root / ".local/basecamp-profile-install-smoke"),
     }
+    live_network = args.network.lower() in {"testnet", "devnet"}
     selected = {
-        "wallet": pathlib.Path(args.wallet_run) if args.wallet_run else defaults["wallet"],
-        "storage": pathlib.Path(args.storage_run) if args.storage_run else defaults["storage"],
-        "messaging": pathlib.Path(args.messaging_run) if args.messaging_run else defaults["messaging"],
-        "paid_a2a": pathlib.Path(args.a2a_run) if args.a2a_run else defaults["a2a"],
-        "program": pathlib.Path(args.program_run) if args.program_run else defaults["program"],
-        "preflight": pathlib.Path(args.preflight_run) if args.preflight_run else defaults["preflight"],
+        "wallet": pathlib.Path(args.wallet_run) if args.wallet_run else (None if live_network else defaults["wallet"]),
+        "storage": pathlib.Path(args.storage_run) if args.storage_run else (None if live_network else defaults["storage"]),
+        "messaging": pathlib.Path(args.messaging_run) if args.messaging_run else (None if live_network else defaults["messaging"]),
+        "paid_a2a": pathlib.Path(args.a2a_run) if args.a2a_run else (None if live_network else defaults["a2a"]),
+        "program": pathlib.Path(args.program_run) if args.program_run else (None if live_network else defaults["program"]),
+        "preflight": pathlib.Path(args.preflight_run) if args.preflight_run else (None if live_network else defaults["preflight"]),
         "basecamp": pathlib.Path(args.basecamp_project) if args.basecamp_project else None,
         "basecamp_profile_install": pathlib.Path(args.basecamp_profile_install_run) if args.basecamp_profile_install_run else defaults["basecamp_profile_install"],
     }
+    testnet_compatibility_run = (
+        pathlib.Path(args.testnet_compatibility_run)
+        if args.testnet_compatibility_run
+        else latest_child(root / ".local/testnet-evidence")
+    )
 
     artifacts = []
     for path in [
@@ -404,6 +457,7 @@ def main():
         "network": args.network,
         "artifacts": artifacts,
         "three_agent_manifest": summarize_three_agent_manifest(pathlib.Path(args.three_agent_manifest) if args.three_agent_manifest else None),
+        "testnet_compatibility": summarize_testnet_compatibility(testnet_compatibility_run),
         "basecamp_profile_install": summarize_basecamp_profile_install(selected["basecamp_profile_install"]),
         "runs": runs,
         "cu_rows": cu_rows,

@@ -13,6 +13,34 @@ and CU/cycle evidence.
 - Keep Basecamp setup/install separate from heavy Nix builds on low-memory
   machines.
 
+## Hosted LEZ Testnet Compatibility Gate
+
+Before attempting hosted-testnet transactions, run:
+
+```bash
+./scripts/lez-testnet-compatibility-evidence.sh
+```
+
+This writes `.local/testnet-evidence/<timestamp>-lez-compat/summary.json` and
+captures:
+
+- JSON-RPC endpoint health.
+- Remote builtin program IDs from `getProgramIds`.
+- Local wallet builtin program IDs from the built LEZ wallet artifacts.
+- `wallet check-health` with `RISC0_DEV_MODE=0`.
+- Read-only `chain-info current-block-id`, block details, and `account list`.
+
+Only proceed to real `wallet.send`, A2A payment, `program.deploy`, or
+`program.call` evidence when `summary.json` reports
+`"transaction_submission_allowed": true`.
+
+As of the 2026-06-19 UTC run against `https://testnet.lez.logos.co/`, the
+endpoint is healthy and read-only chain queries work, but the current public
+wallet artifacts fail `check-health` because the remote builtin program IDs do
+not match the local wallet. Hosted-testnet tx hashes are therefore blocked until
+Logos provides the exact matching LEZ wallet/artifact commit, a matching
+prebuilt wallet, or a redeployed testnet aligned to public artifacts.
+
 ## Package Evidence
 
 ```bash
