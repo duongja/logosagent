@@ -160,6 +160,17 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0`,
   and a follow-up `chain-info transaction` query returned the transaction.
   Balance evidence showed sender `3648 -> 3647` and recipient `4000 -> 4001`.
+- Verified hosted-testnet program deploy/call on 2026-06-19 UTC:
+  `hello_world_with_authorization.bin` was deployed on the hosted LEZ testnet
+  with tx hash
+  `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb`.
+  A signed public `program.call` then executed against the deployed program
+  with tx hash
+  `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`.
+  `getAccount` for
+  `Public/3XJoAbLkgSjyAnS7XngaiBdcaU54UzN67FH9Q8NGbbgT` returned account data
+  bytes for `Hola mundo!` and nonce `1`. See
+  `docs/testnet-program-evidence-20260619.md`.
 
 ## Hosted Testnet Wallet Version
 
@@ -182,10 +193,6 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 - Live Basecamp GUI setup/launch/owner-channel run against a separate Logos app
   profile. The module capture and package-manager install layers now work; the
   GUI build/launch and chat interaction still need recorded proof.
-- A stable arbitrary LEZ `program.call(program_id, instruction, params)` proof.
-  The current local proof uses the supported wallet CLI bridge with
-  `wallet_args:["check-health"]`; the LEZ `auth-transfer init` facade hangs in
-  this local environment.
 - Three LEZ testnet agent deployments:
   Storage agent, Messaging agent, Blockchain agent.
 - End-to-end testnet evidence for at least three illustrative use cases.

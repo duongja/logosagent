@@ -53,6 +53,27 @@ As of the 2026-06-19 UTC run against `https://testnet.lez.logos.co/`, the
 current public `main` wallet artifacts fail `check-health`, but LEZ tag
 `v0.1.2` passes and can produce hosted-testnet transaction evidence.
 
+## Captured Hosted Program Evidence
+
+Hosted testnet `program.deploy` and signed `program.call` evidence was captured
+on 2026-06-19 UTC with the matching `v0.1.2` LEZ checkout:
+
+- Deploy tx:
+  `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb`
+- Signed call tx:
+  `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`
+- Called account:
+  `Public/3XJoAbLkgSjyAnS7XngaiBdcaU54UzN67FH9Q8NGbbgT`
+- Account data after call: `Hola mundo!`
+
+The successful call uses `hello_world_with_authorization.bin` and a
+wallet-owned signing key. Unsigned calls against a fresh public account are not
+valid evidence on the current validator path because new-account claims require
+authorization. Also note that program deployment is deterministic; redeploying
+the same binary to the same testnet state can be dropped as
+`ProgramAlreadyExists`. For a fresh reproducible run, rebuild a unique demo
+program or deploy to a fresh local sequencer/testnet state.
+
 ## Package Evidence
 
 ```bash

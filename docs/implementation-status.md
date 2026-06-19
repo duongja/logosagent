@@ -151,6 +151,13 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
   - `program.query`, `program.call`, and `program.deploy` completed.
   - The current `program.deploy` proof uses the documented `sha256-fallback`
     program ID path until the LEZ deploy API is stable in this environment.
+- Hosted LEZ testnet program evidence captured on 2026-06-19:
+  - Deployed `hello_world_with_authorization.bin` with tx hash
+    `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb`.
+  - Submitted a signed public `program.call` with tx hash
+    `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`.
+  - `getAccount` returned data bytes for `Hola mundo!`, proving the deployed
+    program executed on hosted testnet.
 
 ## Needs Next
 
@@ -159,9 +166,6 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
 - Replace the `agent_lez` wallet-facade bridge with a true generic
   `program.call(program_id, instruction, params)` path once LEZ exposes a stable
   arbitrary-program CLI/API.
-- The LEZ wallet `auth-transfer init` facade currently hangs in this local
-  environment; the prize proof should use a stable program call path or upstream
-  guidance before demo recording.
 - Promote the live localnet harness into required CI once runtime cost and SPel
   pin drift are acceptable.
 - Run the Basecamp owner-channel path live with the Chat UI after the agent

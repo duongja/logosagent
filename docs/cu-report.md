@@ -10,8 +10,8 @@ submission.
 | `agent.task` payment local proof | local standalone sequencer | token transfer for declared A2A task price | TBD | `9dba4d55356904b077fca7181322b3d8d1f0750727076821d032c1a3d20af40f` | verified 2026-06-17; refund tx `310753b711d1325aee21106f8bd39717ba8a3546de51d18ec79aa991942f2a10`; CU still needs devnet/testnet measurement |
 | `wallet.send` hosted testnet proof | hosted LEZ testnet | authenticated transfer, public-to-public | TBD | `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0` | verified 2026-06-19 with LEZ `v0.1.2` / `cf3639d8` and `RISC0_DEV_MODE=0`; sender `3648 -> 3647`, recipient `4000 -> 4001`; CU not exposed by wallet output |
 | `wallet.send` private-owned | TBD | authenticated transfer | TBD | TBD | run with `RISC0_DEV_MODE=0` on devnet/testnet |
-| `program.deploy` | TBD | deployment tx | TBD | TBD | from `agent_lez deploy` using `wallet deploy-program`; current local program smoke uses `sha256-fallback` |
-| `program.call` public | TBD | selected demo program | TBD | TBD | include instruction params; current stable local proof uses the wallet health facade |
+| `program.deploy` hosted testnet proof | hosted LEZ testnet | `hello_world_with_authorization` deployment tx | TBD | `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb` | verified 2026-06-19 with LEZ `v0.1.2` / `cf3639d8`; RPC/wallet output does not expose CU |
+| `program.call` hosted testnet proof | hosted LEZ testnet | signed public call, instruction `Hola mundo!` | TBD | `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518` | verified 2026-06-19; `getAccount` returned data bytes for `Hola mundo!` and nonce `1`; CU not exposed by RPC/wallet output |
 | `agent.task` payment | TBD | token transfer | TBD | TBD | pay declared skill price and report CU from the accepted tx |
 
 ## Hosted Testnet CU Status

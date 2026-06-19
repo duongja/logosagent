@@ -240,6 +240,7 @@ def summarize_testnet_compatibility(path):
         "program_id_matches": {},
         "testnet_url": "",
         "wallet_transfer": {},
+        "program_evidence": {},
     }
     if not path or not path.exists():
         return summary
@@ -267,6 +268,28 @@ def summarize_testnet_compatibility(path):
             "lez_ref": str(transfer.get("lez_ref", "")),
             "lez_commit": str(transfer.get("lez_commit", "")),
             "transaction_lookup_returned_some": bool(transfer.get("transaction_lookup_returned_some")),
+        }
+    program = load_json(path / "testnet-program-evidence-summary.json")
+    if isinstance(program, dict):
+        deploy = program.get("program_deploy") or {}
+        call = program.get("program_call") or {}
+        summary["program_evidence"] = {
+            "ok": bool(program.get("ok")),
+            "risc0_dev_mode": str(program.get("risc0_dev_mode", "")),
+            "lez_ref": str(program.get("lez_ref", "")),
+            "lez_commit": str(program.get("lez_commit", "")),
+            "deploy_ok": bool(deploy.get("ok")),
+            "deploy_tx_hash": str(deploy.get("tx_hash", "")),
+            "deploy_lookup_returned_some": bool(deploy.get("transaction_lookup_returned_some")),
+            "deploy_program_binary_size": str(deploy.get("program_binary_size", "")),
+            "call_ok": bool(call.get("ok")),
+            "call_tx_hash": str(call.get("tx_hash", "")),
+            "call_lookup_returned_some": bool(call.get("transaction_lookup_returned_some")),
+            "call_program_id": str(call.get("program_id", "")),
+            "call_account_id": str(call.get("account_id", "")),
+            "call_instruction_ascii": str(call.get("instruction_ascii", "")),
+            "call_account_data_ascii": str(call.get("account_data_ascii", "")),
+            "call_account_nonce": str((call.get("account_state") or {}).get("nonce", "")),
         }
     return summary
 
@@ -353,6 +376,21 @@ def markdown_report(report):
             lines.append(
                 f"- Wallet transfer lookup returned transaction: `{transfer.get('transaction_lookup_returned_some', False)}`"
             )
+        program = compatibility.get("program_evidence") or {}
+        if program:
+            lines.append(f"- Program evidence OK: `{program.get('ok', False)}`")
+            lines.append(f"- Program deploy tx: `{program.get('deploy_tx_hash', '')}`")
+            lines.append(
+                f"- Program deploy lookup returned transaction: `{program.get('deploy_lookup_returned_some', False)}`"
+            )
+            lines.append(f"- Program call tx: `{program.get('call_tx_hash', '')}`")
+            lines.append(
+                f"- Program call lookup returned transaction: `{program.get('call_lookup_returned_some', False)}`"
+            )
+            lines.append(f"- Program call account: `{program.get('call_account_id', '')}`")
+            lines.append(f"- Program call instruction: `{program.get('call_instruction_ascii', '')}`")
+            lines.append(f"- Program call account data: `{program.get('call_account_data_ascii', '')}`")
+            lines.append(f"- Program evidence RISC0_DEV_MODE: `{program.get('risc0_dev_mode', '')}`")
 
     basecamp_install = report.get("basecamp_profile_install", {})
     lines.extend(["", "## Basecamp Profile Install", ""])
@@ -466,9 +504,16 @@ def main():
     runs_by_label = {run["label"]: run for run in runs}
     compatibility_summary = summarize_testnet_compatibility(testnet_compatibility_run)
     compatibility_wallet_transfer = compatibility_summary.get("wallet_transfer") or {}
+    compatibility_program = compatibility_summary.get("program_evidence") or {}
     wallet_tx = first_tx(runs_by_label["wallet"])
     if wallet_tx == "TBD" and compatibility_wallet_transfer.get("ok"):
         wallet_tx = compatibility_wallet_transfer.get("tx_hash") or "TBD"
+    program_deploy_tx = first_tx(runs_by_label["program"])
+    if program_deploy_tx == "TBD" and compatibility_program.get("deploy_ok"):
+        program_deploy_tx = compatibility_program.get("deploy_tx_hash") or "TBD"
+    program_call_tx = "TBD"
+    if compatibility_program.get("call_ok"):
+        program_call_tx = compatibility_program.get("call_tx_hash") or "TBD"
     paid_a2a_payment_tx = first_tx(runs_by_label["paid_a2a"], "payment")
     paid_a2a_refund_tx = first_tx(runs_by_label["paid_a2a"], "refund")
 
@@ -476,8 +521,8 @@ def main():
         {"operation": "wallet.send", "network": args.network, "tx_hash": wallet_tx, "cu": "TBD", "notes": "fill from devnet/testnet explorer or sequencer output"},
         {"operation": "agent.task payment", "network": args.network, "tx_hash": paid_a2a_payment_tx, "cu": "TBD", "notes": "LEZ payment attached to A2A task receipt"},
         {"operation": "agent.task refund", "network": args.network, "tx_hash": paid_a2a_refund_tx, "cu": "TBD", "notes": "LEZ refund attached to A2A cancellation receipt when present"},
-        {"operation": "program.deploy", "network": args.network, "tx_hash": "TBD", "cu": "TBD", "notes": "record deploy tx hash when LEZ deploy output exposes it"},
-        {"operation": "program.call", "network": args.network, "tx_hash": "TBD", "cu": "TBD", "notes": "record selected demo program instruction"},
+        {"operation": "program.deploy", "network": args.network, "tx_hash": program_deploy_tx, "cu": "TBD", "notes": "hosted testnet ProgramDeploymentTransaction; CU not exposed by wallet/RPC output"},
+        {"operation": "program.call", "network": args.network, "tx_hash": program_call_tx, "cu": "TBD", "notes": "hosted testnet signed public call; account data confirms instruction output"},
     ]
 
     report = {
