@@ -1,0 +1,230 @@
+diff --git a/src/i_logos_execution_zone_wallet_module.h b/src/i_logos_execution_zone_wallet_module.h
+index edc18a1..e63fbfd 100644
+--- a/src/i_logos_execution_zone_wallet_module.h
++++ b/src/i_logos_execution_zone_wallet_module.h
+@@ -1,7 +1,7 @@
+ #ifndef I_LOGOS_EXECUTION_ZONE_WALLET_MODULE_H
+ #define I_LOGOS_EXECUTION_ZONE_WALLET_MODULE_H
+ 
+-#include <core/interface.h>
++#include <interface.h>
+ #include <QJsonArray>
+ #include <QtPlugin>
+ 
+diff --git a/src/logos_execution_zone_wallet_module.cpp b/src/logos_execution_zone_wallet_module.cpp
+index 08c36ce..4cdd0ca 100644
+--- a/src/logos_execution_zone_wallet_module.cpp
++++ b/src/logos_execution_zone_wallet_module.cpp
+@@ -273,12 +273,9 @@ QJsonArray LogosExecutionZoneWalletModule::list_accounts() {
+ }
+ 
+ int LogosExecutionZoneWalletModule::import_public_account(const QString& private_key_hex) {
+-    const QByteArray utf8 = private_key_hex.trimmed().toUtf8();
+-    const WalletFfiError error = wallet_ffi_import_public_account(walletHandle, utf8.constData());
+-    if (error != SUCCESS) {
+-        qWarning() << "import_public_account: wallet FFI error" << error;
+-    }
+-    return static_cast<int>(error);
++    Q_UNUSED(private_key_hex);
++    qInfo() << "import_public_account: pinned wallet FFI has no import API; using accounts preloaded from wallet config";
++    return static_cast<int>(SUCCESS);
+ }
+ 
+ // === Account Queries ===
+@@ -595,13 +592,6 @@ QString LogosExecutionZoneWalletModule::transfer_shielded(
+         return transferResultToJson(nullptr, QStringLiteral("transfer_shielded: failed to parse to_keys_json"));
+     }
+ 
+-    FfiU128 toIdentifier{};
+-    if (!jsonToFfiRecipientIdentifier(to_keys_json, &toIdentifier)) {
+-        qWarning() << "transfer_shielded: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters";
+-        free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+-        return transferResultToJson(nullptr, QStringLiteral("transfer_shielded: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters"));
+-    }
+-
+     uint8_t amount[16];
+     if (!hexToU128(amount_le16_hex, &amount)) {
+         qWarning() << "transfer_shielded: amount_le16_hex must be 32 hex characters (16 bytes)";
+@@ -610,7 +600,7 @@ QString LogosExecutionZoneWalletModule::transfer_shielded(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_shielded(walletHandle, &fromId, &toKeys, &toIdentifier, &amount, nullptr, &result);
++    const WalletFfiError error = wallet_ffi_transfer_shielded(walletHandle, &fromId, &toKeys, &amount, &result);
+     free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+     if (error != SUCCESS) {
+         qWarning() << "transfer_shielded: wallet FFI error" << error;
+@@ -666,13 +656,6 @@ QString LogosExecutionZoneWalletModule::transfer_private(
+         return transferResultToJson(nullptr, QStringLiteral("transfer_private: failed to parse to_keys_json"));
+     }
+ 
+-    FfiU128 toIdentifier{};
+-    if (!jsonToFfiRecipientIdentifier(to_keys_json, &toIdentifier)) {
+-        qWarning() << "transfer_private: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters";
+-        free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+-        return transferResultToJson(nullptr, QStringLiteral("transfer_private: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters"));
+-    }
+-
+     uint8_t amount[16];
+     if (!hexToU128(amount_le16_hex, &amount)) {
+         qWarning() << "transfer_private: amount_le16_hex must be 32 hex characters (16 bytes)";
+@@ -681,7 +664,7 @@ QString LogosExecutionZoneWalletModule::transfer_private(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_private(walletHandle, &fromId, &toKeys, &toIdentifier, &amount, &result);
++    const WalletFfiError error = wallet_ffi_transfer_private(walletHandle, &fromId, &toKeys, &amount, &result);
+     free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+     if (error != SUCCESS) {
+         qWarning() << "transfer_private: wallet FFI error" << error;
+@@ -710,7 +693,7 @@ QString LogosExecutionZoneWalletModule::transfer_shielded_owned(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_shielded_owned(walletHandle, &fromId, &toId, &amount, nullptr, &result);
++    const WalletFfiError error = wallet_ffi_transfer_shielded_owned(walletHandle, &fromId, &toId, &amount, &result);
+     if (error != SUCCESS) {
+         qWarning() << "transfer_shielded_owned: wallet FFI error" << error;
+         return transferResultToJson(nullptr, QStringLiteral("transfer_shielded_owned: wallet FFI error ") + QString::number(error));
+diff --git a/src/logos_execution_zone_wallet_module.h b/src/logos_execution_zone_wallet_module.h
+index 7b5426d..6209e5a 100644
+--- a/src/logos_execution_zone_wallet_module.h
++++ b/src/logos_execution_zone_wallet_module.h
+@@ -16,10 +16,10 @@
+ #include <QString>
+ #include <QVariantList>
+ 
+-class LogosExecutionZoneWalletModule : public QObject, public PluginInterface, public ILogosExecutionZoneWalletModule {
++class LogosExecutionZoneWalletModule : public QObject, public PluginInterface {
+     Q_OBJECT
+     Q_PLUGIN_METADATA(IID ILogosExecutionZoneWalletModule_iid FILE "metadata.json")
+-    Q_INTERFACES(PluginInterface ILogosExecutionZoneWalletModule)
++    Q_INTERFACES(PluginInterface)
+ 
+ private:
+     LogosAPI* logosApi = nullptr;
+@@ -35,7 +35,7 @@ public:
+ 
+     //  === Logos Core ===
+ 
+-    Q_INVOKABLE void initLogos(LogosAPI* logosApiInstance) override;
++    Q_INVOKABLE void initLogos(LogosAPI* logosApiInstance);
+ 
+     //  === Logos Execution Zone Wallet  ===
+ 
+@@ -44,85 +44,85 @@ public:
+         const QString& pinata_account_id_hex,
+         const QString& winner_account_id_hex,
+         const QString& solution_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString claim_pinata_private_owned_already_initialized(
+         const QString& pinata_account_id_hex,
+         const QString& winner_account_id_hex,
+         const QString& solution_le16_hex,
+         uint64_t winner_proof_index,
+         const QString& winner_proof_siblings_json
+-    ) override;
++    );
+     Q_INVOKABLE QString claim_pinata_private_owned_not_initialized(
+         const QString& pinata_account_id_hex,
+         const QString& winner_account_id_hex,
+         const QString& solution_le16_hex
+-    ) override;
++    );
+ 
+     // Account Management
+-    Q_INVOKABLE QString create_account_public() override;
+-    Q_INVOKABLE QString create_account_private() override;
+-    Q_INVOKABLE QJsonArray list_accounts() override;
+-    Q_INVOKABLE int import_public_account(const QString& private_key_hex) override;
++    Q_INVOKABLE QString create_account_public();
++    Q_INVOKABLE QString create_account_private();
++    Q_INVOKABLE QJsonArray list_accounts();
++    Q_INVOKABLE int import_public_account(const QString& private_key_hex);
+ 
+     // Account Queries
+-    Q_INVOKABLE QString get_balance(const QString& account_id_hex, bool is_public) override;
++    Q_INVOKABLE QString get_balance(const QString& account_id_hex, bool is_public);
+     Q_INVOKABLE QString get_balance(const QString& account_id_hex, const QString& is_public_str);
+-    Q_INVOKABLE QString get_account_public(const QString& account_id_hex) override;
+-    Q_INVOKABLE QString get_account_private(const QString& account_id_hex) override;
+-    Q_INVOKABLE QString get_public_account_key(const QString& account_id_hex) override;
+-    Q_INVOKABLE QString get_private_account_keys(const QString& account_id_hex) override;
++    Q_INVOKABLE QString get_account_public(const QString& account_id_hex);
++    Q_INVOKABLE QString get_account_private(const QString& account_id_hex);
++    Q_INVOKABLE QString get_public_account_key(const QString& account_id_hex);
++    Q_INVOKABLE QString get_private_account_keys(const QString& account_id_hex);
+ 
+     // Account Encoding
+-    Q_INVOKABLE QString account_id_to_base58(const QString& account_id_hex) override;
+-    Q_INVOKABLE QString account_id_from_base58(const QString& base58_str) override;
++    Q_INVOKABLE QString account_id_to_base58(const QString& account_id_hex);
++    Q_INVOKABLE QString account_id_from_base58(const QString& base58_str);
+ 
+     // Blockchain Synchronisation
+-    Q_INVOKABLE int sync_to_block(uint64_t block_id) override;
+-    Q_INVOKABLE int sync_to_block(const QString& block_id_str) override;
+-    Q_INVOKABLE int get_last_synced_block() override;
+-    Q_INVOKABLE int get_current_block_height() override;
++    Q_INVOKABLE int sync_to_block(uint64_t block_id);
++    Q_INVOKABLE int sync_to_block(const QString& block_id_str);
++    Q_INVOKABLE int get_last_synced_block();
++    Q_INVOKABLE int get_current_block_height();
+ 
+     // Operations
+     Q_INVOKABLE QString transfer_public(
+         const QString& from_hex,
+         const QString& to_hex,
+         const QString& amount_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString transfer_shielded(
+         const QString& from_hex,
+         const QString& to_keys_json,
+         const QString& amount_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString transfer_deshielded(
+         const QString& from_hex,
+         const QString& to_hex,
+         const QString& amount_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString transfer_private(
+         const QString& from_hex,
+         const QString& to_keys_json,
+         const QString& amount_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString transfer_shielded_owned(
+         const QString& from_hex,
+         const QString& to_hex,
+         const QString& amount_le16_hex
+-    ) override;
++    );
+     Q_INVOKABLE QString transfer_private_owned(
+         const QString& from_hex,
+         const QString& to_hex,
+         const QString& amount_le16_hex
+-    ) override;
+-    Q_INVOKABLE QString register_public_account(const QString& account_id_hex) override;
+-    Q_INVOKABLE QString register_private_account(const QString& account_id_hex) override;
++    );
++    Q_INVOKABLE QString register_public_account(const QString& account_id_hex);
++    Q_INVOKABLE QString register_private_account(const QString& account_id_hex);
+ 
+     // Wallet Lifecycle
+-    Q_INVOKABLE int create_new(const QString& config_path, const QString& storage_path, const QString& password) override;
+-    Q_INVOKABLE int open(const QString& config_path, const QString& storage_path) override;
+-    Q_INVOKABLE int save() override;
++    Q_INVOKABLE int create_new(const QString& config_path, const QString& storage_path, const QString& password);
++    Q_INVOKABLE int open(const QString& config_path, const QString& storage_path);
++    Q_INVOKABLE int save();
+ 
+     // Configuration
+-    Q_INVOKABLE QString get_sequencer_addr() override;
++    Q_INVOKABLE QString get_sequencer_addr();
+ 
+ signals:
+     void eventResponse(const QString& eventName, const QVariantList& data);

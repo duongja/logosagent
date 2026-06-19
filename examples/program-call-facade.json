@@ -1,0 +1,8 @@
+{
+  "program": "auth-transfer",
+  "instruction": "init",
+  "params": {
+    "account_id": "Public/account-id"
+  },
+  "amount": "0"
+}

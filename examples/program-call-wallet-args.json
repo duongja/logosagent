@@ -1,0 +1,9 @@
+{
+  "wallet_args": [
+    "auth-transfer",
+    "init",
+    "--account-id",
+    "Public/account-id"
+  ],
+  "amount": "0"
+}

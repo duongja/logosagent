@@ -1,0 +1,6 @@
+{
+  "agent_address": "peer-agent-address",
+  "skill": "meta.status",
+  "params": {},
+  "amount": "0"
+}

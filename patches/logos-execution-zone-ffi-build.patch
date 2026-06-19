@@ -1,0 +1,30 @@
+diff --git a/flake.nix b/flake.nix
+index b4adfe7..2d8061d 100644
+--- a/flake.nix
++++ b/flake.nix
+@@ -98,6 +98,7 @@
+               pkgs.pkg-config
+               pkgs.clang
+               pkgs.llvmPackages.libclang.lib
++              pkgs.python3
+               pkgs.gnutar  # Required for crane's archive operations (macOS tar lacks --sort)
+             ];
+             LIBCLANG_PATH = "${pkgs.llvmPackages.libclang.lib}/lib";
+@@ -125,7 +126,7 @@
+               cargoExtraArgs = "-p wallet-ffi";
+               postInstall = ''
+                 mkdir -p $out/include
+-                cp wallet-ffi/wallet_ffi.h $out/include/
++                cp lez/wallet-ffi/wallet_ffi.h $out/include/
+               ''
+               + pkgs.lib.optionalString pkgs.stdenv.isDarwin ''
+                 install_name_tool -id @rpath/libwallet_ffi.dylib $out/lib/libwallet_ffi.dylib
+@@ -141,7 +142,7 @@
+               cargoExtraArgs = "-p indexer_ffi";
+               postInstall = ''
+                 mkdir -p $out/include
+-                cp indexer/ffi/indexer_ffi.h $out/include/
++                cp lez/indexer/ffi/indexer_ffi.h $out/include/
+               ''
+               + pkgs.lib.optionalString pkgs.stdenv.isDarwin ''
+                 install_name_tool -id @rpath/libindexer_ffi.dylib $out/lib/libindexer_ffi.dylib

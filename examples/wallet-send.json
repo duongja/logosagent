@@ -1,0 +1,5 @@
+{
+  "recipient": "recipient-account-id-hex",
+  "amount": "1",
+  "mode": "private_owned"
+}

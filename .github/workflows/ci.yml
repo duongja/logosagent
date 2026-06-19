@@ -1,0 +1,80 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      full_logos_build:
+        description: "Run the full Logos dependency/package build"
+        required: false
+        default: "false"
+      localnet_integration:
+        description: "Run the standalone LEZ localnet integration harness"
+        required: false
+        default: "false"
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Run submission preflight
+        run: ./scripts/preflight-submission.sh
+
+  nix-fast:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Bootstrap Logos workspace
+        run: ./scripts/bootstrap-workspace.sh
+
+      - name: Run fast C++ tests
+        run: nix build --impure .#unit-tests-fast -L
+
+  nix-full:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch' && inputs.full_logos_build == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Bootstrap Logos workspace
+        run: ./scripts/bootstrap-workspace.sh
+
+      - name: Run full Logos module tests
+        run: nix build --impure .#unit-tests -L
+
+      - name: Build LGX package
+        run: nix build --impure .#lgx -L
+
+  localnet-integration:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch' && inputs.localnet_integration == 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Bootstrap Logos workspace
+        run: ./scripts/bootstrap-workspace.sh
+
+      - name: Build scaffold CLI
+        run: cargo build --release --bin logos-scaffold
+        working-directory: ../scaffold
+
+      - name: Run localnet integration harness
+        run: SCAFFOLD_BIN=../scaffold/target/release/logos-scaffold ./scripts/localnet-integration.sh --setup --prebuilt

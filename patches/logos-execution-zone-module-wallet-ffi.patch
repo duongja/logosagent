@@ -1,0 +1,113 @@
+diff --git a/src/logos_execution_zone_wallet_module.cpp b/src/logos_execution_zone_wallet_module.cpp
+index aed6c09..08c36ce 100644
+--- a/src/logos_execution_zone_wallet_module.cpp
++++ b/src/logos_execution_zone_wallet_module.cpp
+@@ -46,6 +46,9 @@ static constexpr auto NullifierPublicKey = "nullifier_public_key";
+ static constexpr auto ViewingPublicKey = "viewing_public_key";
+ static constexpr auto AccountId = "account_id";
+ static constexpr auto IsPublic = "is_public";
++static constexpr auto Identifier = "identifier";
++static constexpr auto ToIdentifier = "to_identifier";
++static constexpr auto IdentifierLe16Hex = "identifier_le16_hex";
+ } // namespace JsonKeys
+ 
+ static bool hexToBytes(const QString& hex, QByteArray& output_bytes, int expectedLength = -1) {
+@@ -69,6 +72,16 @@ static bool hexToU128(const QString& hex, uint8_t (*output)[16]) {
+     return true;
+ }
+ 
++static bool hexToFfiU128(const QString& hex, FfiU128* output) {
++    if (output == nullptr)
++        return false;
++    QByteArray buffer;
++    if (!hexToBytes(hex, buffer, 16))
++        return false;
++    memcpy(output->data, buffer.constData(), 16);
++    return true;
++}
++
+ static QString bytes32ToHex(const FfiBytes32& bytes) {
+     return bytesToHex(bytes.data, 32);
+ }
+@@ -152,6 +165,26 @@ static bool jsonToFfiPrivateAccountKeys(const QString& json, FfiPrivateAccountKe
+     return true;
+ }
+ 
++static bool jsonToFfiRecipientIdentifier(const QString& json, FfiU128* output_identifier) {
++    QJsonDocument doc = QJsonDocument::fromJson(json.toUtf8());
++    if (!doc.isObject())
++        return false;
++    const QVariantMap map = doc.object().toVariantMap();
++
++    QString identifierHex;
++    if (map.contains(JsonKeys::Identifier)) {
++        identifierHex = map[JsonKeys::Identifier].toString();
++    } else if (map.contains(JsonKeys::ToIdentifier)) {
++        identifierHex = map[JsonKeys::ToIdentifier].toString();
++    } else if (map.contains(JsonKeys::IdentifierLe16Hex)) {
++        identifierHex = map[JsonKeys::IdentifierLe16Hex].toString();
++    } else {
++        return false;
++    }
++
++    return hexToFfiU128(identifierHex, output_identifier);
++}
++
+ // Parses a JSON array of 32-byte hex strings into a contiguous byte buffer of siblings.
+ // Returns true on success, with out_len set to the number of siblings and out_bytes sized to out_len*32.
+ static bool jsonArrayHexToSiblings32(const QString& json_array_str, QByteArray& out_bytes, uintptr_t& out_len) {
+@@ -553,6 +586,13 @@ QString LogosExecutionZoneWalletModule::transfer_shielded(
+         return transferResultToJson(nullptr, QStringLiteral("transfer_shielded: failed to parse to_keys_json"));
+     }
+ 
++    FfiU128 toIdentifier{};
++    if (!jsonToFfiRecipientIdentifier(to_keys_json, &toIdentifier)) {
++        qWarning() << "transfer_shielded: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters";
++        free(const_cast<uint8_t*>(toKeys.viewing_public_key));
++        return transferResultToJson(nullptr, QStringLiteral("transfer_shielded: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters"));
++    }
++
+     uint8_t amount[16];
+     if (!hexToU128(amount_le16_hex, &amount)) {
+         qWarning() << "transfer_shielded: amount_le16_hex must be 32 hex characters (16 bytes)";
+@@ -561,7 +601,7 @@ QString LogosExecutionZoneWalletModule::transfer_shielded(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_shielded(walletHandle, &fromId, &toKeys, &amount, &result);
++    const WalletFfiError error = wallet_ffi_transfer_shielded(walletHandle, &fromId, &toKeys, &toIdentifier, &amount, nullptr, &result);
+     free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+     if (error != SUCCESS) {
+         qWarning() << "transfer_shielded: wallet FFI error" << error;
+@@ -617,6 +657,13 @@ QString LogosExecutionZoneWalletModule::transfer_private(
+         return transferResultToJson(nullptr, QStringLiteral("transfer_private: failed to parse to_keys_json"));
+     }
+ 
++    FfiU128 toIdentifier{};
++    if (!jsonToFfiRecipientIdentifier(to_keys_json, &toIdentifier)) {
++        qWarning() << "transfer_private: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters";
++        free(const_cast<uint8_t*>(toKeys.viewing_public_key));
++        return transferResultToJson(nullptr, QStringLiteral("transfer_private: to_keys_json must include identifier, to_identifier, or identifier_le16_hex as 32 hex characters"));
++    }
++
+     uint8_t amount[16];
+     if (!hexToU128(amount_le16_hex, &amount)) {
+         qWarning() << "transfer_private: amount_le16_hex must be 32 hex characters (16 bytes)";
+@@ -625,7 +672,7 @@ QString LogosExecutionZoneWalletModule::transfer_private(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_private(walletHandle, &fromId, &toKeys, &amount, &result);
++    const WalletFfiError error = wallet_ffi_transfer_private(walletHandle, &fromId, &toKeys, &toIdentifier, &amount, &result);
+     free(const_cast<uint8_t*>(toKeys.viewing_public_key));
+     if (error != SUCCESS) {
+         qWarning() << "transfer_private: wallet FFI error" << error;
+@@ -654,7 +701,7 @@ QString LogosExecutionZoneWalletModule::transfer_shielded_owned(
+     }
+ 
+     FfiTransferResult result{};
+-    const WalletFfiError error = wallet_ffi_transfer_shielded_owned(walletHandle, &fromId, &toId, &amount, &result);
++    const WalletFfiError error = wallet_ffi_transfer_shielded_owned(walletHandle, &fromId, &toId, &amount, nullptr, &result);
+     if (error != SUCCESS) {
+         qWarning() << "transfer_shielded_owned: wallet FFI error" << error;
+         return transferResultToJson(nullptr, QStringLiteral("transfer_shielded_owned: wallet FFI error ") + QString::number(error));

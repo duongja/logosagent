@@ -1,0 +1,294 @@
+#!/usr/bin/env python3
+import argparse
+import json
+import os
+import pathlib
+import subprocess
+import sys
+import time
+
+
+def load_json_arg(value):
+    if value is None:
+        return {}
+    if value.startswith("@"):
+        return json.loads(pathlib.Path(value[1:]).read_text())
+    try:
+        return json.loads(value)
+    except json.JSONDecodeError:
+        path = pathlib.Path(value)
+        if path.exists():
+            return json.loads(path.read_text())
+        raise
+
+
+def run(cmd, check=True):
+    proc = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if check and proc.returncode != 0:
+        sys.stderr.write(proc.stderr)
+        raise SystemExit(proc.returncode)
+    return proc.stdout.strip()
+
+
+def logoscore_args(args):
+    cmd = [args.logoscore]
+    if args.config_dir:
+        cmd.extend(["--config-dir", args.config_dir])
+    return cmd
+
+
+def call_module(args, method, *method_args):
+    cmd = logoscore_args(args) + ["call", "logos_agent", method, *method_args]
+    return run(cmd)
+
+
+def cmd_init(args):
+    config = load_json_arg(args.config)
+    print(call_module(args, "init", json.dumps(config, separators=(",", ":"))))
+
+
+def cmd_start(args):
+    print(call_module(args, "start"))
+
+
+def cmd_stop(args):
+    print(call_module(args, "stop"))
+
+
+def cmd_status(args):
+    print(call_module(args, "status"))
+
+
+def cmd_skills(args):
+    print(call_module(args, "skills"))
+
+
+def cmd_invoke(args):
+    params = load_json_arg(args.params)
+    print(call_module(args, "invoke", args.skill, json.dumps(params, separators=(",", ":"))))
+
+
+def cmd_approve(args):
+    decision = {"approved": args.approved}
+    if args.decision:
+        decision.update(load_json_arg(args.decision))
+    print(call_module(args, "approve", args.approval_id, json.dumps(decision, separators=(",", ":"))))
+
+
+def cmd_deploy(args):
+    modules_dir = pathlib.Path(args.modules_dir).resolve()
+    modules_dir.mkdir(parents=True, exist_ok=True)
+    if args.lgx:
+        run(["lgpm", "--modules-dir", str(modules_dir), "install", "--file", args.lgx])
+    if args.start_daemon:
+        cmd = logoscore_args(args) + ["-D", "-m", str(modules_dir)]
+        proc = subprocess.Popen(cmd)
+        time.sleep(args.daemon_wait)
+        print(json.dumps({"daemon_pid": proc.pid, "modules_dir": str(modules_dir)}))
+    if args.load:
+        print(run(logoscore_args(args) + ["load-module", "logos_agent"]))
+
+
+def build_agent_config(args, root):
+    return {
+        "identity": {
+            "agent_id": args.agent_id,
+            "messaging_address": args.messaging_address,
+            "lez_account": args.lez_account,
+            "lez_account_is_public": False,
+        },
+        "wallet": {
+            "config_path": str(root / "lez-wallet-config.json"),
+            "storage_path": str(root / "lez-wallet-storage.json"),
+            "create": args.create_wallet,
+            "create_agent_account": args.create_agent_account,
+        },
+        "policy": {
+            "per_transaction_limit": args.per_tx_limit,
+            "period_limit": args.period_limit,
+            "period_seconds": args.period_seconds,
+        },
+        "security": {
+            "allow_dev_file_cipher": args.allow_dev_file_cipher,
+            "allow_dev_a2a_secret": args.allow_dev_a2a_secret,
+        },
+        "chat": {
+            "name": args.chat_name or args.agent_name,
+            "port": args.chat_port,
+            "clusterId": args.chat_cluster_id,
+            "shardId": args.chat_shard_id,
+            "staticPeers": args.chat_static_peer,
+            "create_intro_bundle": args.create_intro_bundle,
+            "owner_conversation_id": args.owner_conversation_id,
+            "owner_intro_bundle": args.owner_intro_bundle,
+        },
+        "storage": {
+            "data-dir": str(root / "storage"),
+            "log-level": "INFO",
+            "log-file": str(root / "storage.log"),
+        },
+        "delivery": {
+            "logLevel": args.delivery_log_level,
+            "mode": args.delivery_mode,
+            "preset": args.delivery_preset,
+        },
+        "a2a": {
+            "discovery_topic": args.discovery_topic,
+            "publish_on_start": args.publish_on_start,
+        },
+        "agent_card": {
+            "name": args.agent_name,
+            "description": args.agent_description,
+            "version": "0.1.0",
+        },
+    }
+
+
+def write_agent_config(args):
+    root = pathlib.Path(args.output_dir).resolve()
+    root.mkdir(parents=True, exist_ok=True)
+    config = build_agent_config(args, root)
+    path = root / "agent-config.json"
+    path.write_text(json.dumps(config, indent=2))
+    return path
+
+
+def cmd_make_config(args):
+    path = write_agent_config(args)
+    print(path)
+
+
+def cmd_provision(args):
+    config_path = write_agent_config(args)
+    modules_dir = pathlib.Path(args.modules_dir).resolve()
+    modules_dir.mkdir(parents=True, exist_ok=True)
+
+    result = {
+        "config": str(config_path),
+        "modules_dir": str(modules_dir),
+        "daemon_pid": None,
+        "installed": False,
+        "loaded": False,
+        "initialized": False,
+        "started": False,
+    }
+
+    if args.lgx:
+        run(["lgpm", "--modules-dir", str(modules_dir), "install", "--file", args.lgx])
+        result["installed"] = True
+
+    if args.start_daemon:
+        cmd = logoscore_args(args) + ["-D", "-m", str(modules_dir)]
+        proc = subprocess.Popen(cmd)
+        time.sleep(args.daemon_wait)
+        result["daemon_pid"] = proc.pid
+
+    if not args.skip_load:
+        result["load_output"] = run(logoscore_args(args) + ["load-module", "logos_agent"])
+        result["loaded"] = True
+
+    config = json.loads(config_path.read_text())
+    result["init_output"] = call_module(args, "init", json.dumps(config, separators=(",", ":")))
+    result["initialized"] = True
+
+    if not args.skip_start_agent:
+        result["start_output"] = call_module(args, "start")
+        result["started"] = True
+
+    print(json.dumps(result, indent=2))
+
+
+def add_config_args(p, output_required=True):
+    p.add_argument("--output-dir", required=output_required)
+    p.add_argument("--agent-id", default="agent-local")
+    p.add_argument("--agent-name", default="Logos Agent")
+    p.add_argument("--agent-description", default="Logos-native autonomous agent")
+    p.add_argument("--messaging-address", default="")
+    p.add_argument("--lez-account", default="")
+    p.add_argument("--per-tx-limit", default="0")
+    p.add_argument("--period-limit", default="0")
+    p.add_argument("--period-seconds", type=int, default=86400)
+    p.add_argument("--delivery-preset", default="logos.dev")
+    p.add_argument("--delivery-mode", default="Core", choices=["Core", "Edge", "noMode"])
+    p.add_argument("--delivery-log-level", default="INFO", choices=["TRACE", "DEBUG", "INFO", "WARN"])
+    p.add_argument("--discovery-topic", default="/logos-agent/1/discovery/json")
+    p.add_argument("--publish-on-start", action="store_true")
+    p.add_argument("--create-wallet", action="store_true")
+    p.add_argument("--create-agent-account", action="store_true")
+    p.add_argument("--allow-dev-file-cipher", action="store_true")
+    p.add_argument("--allow-dev-a2a-secret", action="store_true")
+    p.add_argument("--chat-name")
+    p.add_argument("--chat-port", type=int, default=60002)
+    p.add_argument("--chat-cluster-id", type=int, default=2)
+    p.add_argument("--chat-shard-id", type=int, default=1)
+    p.add_argument("--chat-static-peer", action="append", default=[])
+    p.add_argument("--create-intro-bundle", action="store_true")
+    p.add_argument("--owner-conversation-id", default="")
+    p.add_argument("--owner-intro-bundle", default="")
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(prog="logos-agent-cli")
+    parser.add_argument("--logoscore", default=os.environ.get("LOGOSCORE", "logoscore"))
+    parser.add_argument("--config-dir", default=os.environ.get("LOGOSCORE_CONFIG_DIR"))
+    sub = parser.add_subparsers(required=True)
+
+    p = sub.add_parser("deploy")
+    p.add_argument("--modules-dir", default="./modules")
+    p.add_argument("--lgx")
+    p.add_argument("--start-daemon", action="store_true")
+    p.add_argument("--daemon-wait", type=float, default=2.0)
+    p.add_argument("--load", action="store_true")
+    p.set_defaults(func=cmd_deploy)
+
+    p = sub.add_parser("make-config")
+    add_config_args(p)
+    p.set_defaults(func=cmd_make_config)
+
+    p = sub.add_parser("provision")
+    add_config_args(p)
+    p.add_argument("--modules-dir", default="./modules")
+    p.add_argument("--lgx")
+    p.add_argument("--start-daemon", action="store_true")
+    p.add_argument("--daemon-wait", type=float, default=2.0)
+    p.add_argument("--skip-load", action="store_true")
+    p.add_argument("--skip-start-agent", action="store_true")
+    p.set_defaults(func=cmd_provision)
+
+    p = sub.add_parser("init")
+    p.add_argument("config")
+    p.set_defaults(func=cmd_init)
+
+    p = sub.add_parser("start")
+    p.set_defaults(func=cmd_start)
+
+    p = sub.add_parser("stop")
+    p.set_defaults(func=cmd_stop)
+
+    p = sub.add_parser("status")
+    p.set_defaults(func=cmd_status)
+
+    p = sub.add_parser("skills")
+    p.set_defaults(func=cmd_skills)
+
+    p = sub.add_parser("invoke")
+    p.add_argument("skill")
+    p.add_argument("params", nargs="?", default="{}")
+    p.set_defaults(func=cmd_invoke)
+
+    p = sub.add_parser("approve")
+    p.add_argument("approval_id")
+    p.add_argument("--approved", action=argparse.BooleanOptionalAction, default=True)
+    p.add_argument("--decision")
+    p.set_defaults(func=cmd_approve)
+
+    return parser
+
+
+def main():
+    args = build_parser().parse_args()
+    args.func(args)
+
+
+if __name__ == "__main__":
+    main()
