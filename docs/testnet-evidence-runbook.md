@@ -74,6 +74,25 @@ the same binary to the same testnet state can be dropped as
 `ProgramAlreadyExists`. For a fresh reproducible run, rebuild a unique demo
 program or deploy to a fresh local sequencer/testnet state.
 
+## Captured Hosted A2A Payment Evidence
+
+Hosted testnet LEZ payment evidence for a paid A2A task was captured on
+2026-06-19 UTC:
+
+```bash
+./scripts/lez-testnet-a2a-payment-evidence.sh
+```
+
+- Task id: `task-testnet-paid-a2a-20260619T235140Z`
+- Skill id: `messaging.echo`
+- Payment tx:
+  `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`
+- Payer balance: `3647 -> 3646`
+- Recipient balance: `4001 -> 4002`
+
+This proves the hosted-testnet payment leg. It must still be combined with a
+live two-agent Delivery transport run for final prize evidence.
+
 ## Package Evidence
 
 ```bash
@@ -82,6 +101,7 @@ program or deploy to a fresh local sequencer/testnet state.
 ./scripts/basecamp-owner-channel.sh --capture-only
 ./scripts/basecamp-profile-install-smoke.sh
 ./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.dev
+./scripts/lez-testnet-a2a-payment-evidence.sh
 ./scripts/collect-prize-evidence.py --network localnet
 ```
 

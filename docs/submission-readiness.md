@@ -171,6 +171,14 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `Public/3XJoAbLkgSjyAnS7XngaiBdcaU54UzN67FH9Q8NGbbgT` returned account data
   bytes for `Hola mundo!` and nonce `1`. See
   `docs/testnet-program-evidence-20260619.md`.
+- Verified hosted-testnet LEZ payment leg for a paid A2A task on
+  2026-06-19 UTC:
+  `scripts/lez-testnet-a2a-payment-evidence.sh` submitted the declared
+  `messaging.echo` task price with tx hash
+  `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`.
+  Balance evidence showed payer `3647 -> 3646` and recipient `4001 -> 4002`;
+  transaction lookup returned the tx. See
+  `docs/testnet-a2a-payment-evidence-20260619.md`.
 
 ## Hosted Testnet Wallet Version
 
@@ -185,6 +193,8 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 
 - CU measurements in `docs/cu-report.md` for:
   `wallet.send`, `program.deploy`, `program.call`, and `agent.task` payment.
+  Hosted-testnet tx hashes now exist for all four rows, but CU is still not
+  exposed by the wallet/RPC output.
 - Official clean-machine LGX package build. A current dev LGX exists at
   `result/logos-logos_agent-module-lib.lgx`, produced from the locally tested
   module payload. Before final submission, also rerun the official clean Nix
@@ -195,7 +205,9 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   GUI build/launch and chat interaction still need recorded proof.
 - Three LEZ testnet agent deployments:
   Storage agent, Messaging agent, Blockchain agent.
-- End-to-end testnet evidence for at least three illustrative use cases.
+- End-to-end testnet evidence for at least three illustrative use cases,
+  including a live two-agent Delivery/A2A run that combines discovery, task
+  lifecycle, and the real LEZ payment path in one recorded flow.
 - Basecamp owner-channel live run against the deployed agent.
 - Recorded narrated demo with terminal proof output showing `RISC0_DEV_MODE=0`.
 

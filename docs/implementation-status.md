@@ -158,6 +158,13 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
     `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`.
   - `getAccount` returned data bytes for `Hola mundo!`, proving the deployed
     program executed on hosted testnet.
+- Hosted LEZ testnet A2A payment evidence captured on 2026-06-19:
+  - Submitted the declared `messaging.echo` paid-task price with tx hash
+    `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`.
+  - Balance evidence showed payer `3647 -> 3646` and recipient
+    `4001 -> 4002`; transaction lookup returned the tx.
+  - This proves the hosted-testnet LEZ payment leg. The full live
+    Delivery/A2A transport run remains required for final prize submission.
 
 ## Needs Next
 
@@ -172,6 +179,8 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
   testnet deployments are ready; module capture and package-manager profile
   install are now proven.
 - Run and record three testnet agents: Storage, Messaging, Blockchain.
+- Record a live two-agent Delivery/A2A run that combines discovery, task
+  lifecycle, and the hosted-testnet payment path.
 - Fill `docs/cu-report.md` from devnet/testnet measurements with
   `RISC0_DEV_MODE=0`.
 - Rebuild and attach the official clean-machine LGX package artifact before

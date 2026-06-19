@@ -241,6 +241,7 @@ def summarize_testnet_compatibility(path):
         "testnet_url": "",
         "wallet_transfer": {},
         "program_evidence": {},
+        "a2a_payment": {},
     }
     if not path or not path.exists():
         return summary
@@ -290,6 +291,24 @@ def summarize_testnet_compatibility(path):
             "call_instruction_ascii": str(call.get("instruction_ascii", "")),
             "call_account_data_ascii": str(call.get("account_data_ascii", "")),
             "call_account_nonce": str((call.get("account_state") or {}).get("nonce", "")),
+        }
+    a2a_payment = load_json(path / "testnet-a2a-payment-summary.json")
+    if isinstance(a2a_payment, dict):
+        summary["a2a_payment"] = {
+            "ok": bool(a2a_payment.get("ok")),
+            "payment_tx_hash": str(a2a_payment.get("payment_tx_hash", "")),
+            "task_id": str(a2a_payment.get("task_id", "")),
+            "skill_id": str(a2a_payment.get("skill_id", "")),
+            "from": str(a2a_payment.get("from", "")),
+            "to": str(a2a_payment.get("to", "")),
+            "amount": str(a2a_payment.get("amount", "")),
+            "risc0_dev_mode": str(a2a_payment.get("risc0_dev_mode", "")),
+            "lez_ref": str(a2a_payment.get("lez_ref", "")),
+            "lez_commit": str(a2a_payment.get("lez_commit", "")),
+            "transaction_lookup_returned_some": bool(a2a_payment.get("transaction_lookup_returned_some")),
+            "balance_delta_ok": bool(a2a_payment.get("balance_delta_ok")),
+            "nonce_delta_ok": bool(a2a_payment.get("nonce_delta_ok")),
+            "binding_status": str(a2a_payment.get("binding_status", "")),
         }
     return summary
 
@@ -391,6 +410,19 @@ def markdown_report(report):
             lines.append(f"- Program call instruction: `{program.get('call_instruction_ascii', '')}`")
             lines.append(f"- Program call account data: `{program.get('call_account_data_ascii', '')}`")
             lines.append(f"- Program evidence RISC0_DEV_MODE: `{program.get('risc0_dev_mode', '')}`")
+        a2a_payment = compatibility.get("a2a_payment") or {}
+        if a2a_payment:
+            lines.append(f"- A2A payment evidence OK: `{a2a_payment.get('ok', False)}`")
+            lines.append(f"- A2A payment task: `{a2a_payment.get('task_id', '')}` / `{a2a_payment.get('skill_id', '')}`")
+            lines.append(f"- A2A payment tx: `{a2a_payment.get('payment_tx_hash', '')}`")
+            lines.append(f"- A2A payment amount: `{a2a_payment.get('amount', '')}`")
+            lines.append(
+                f"- A2A payment lookup returned transaction: `{a2a_payment.get('transaction_lookup_returned_some', False)}`"
+            )
+            lines.append(f"- A2A payment balance delta OK: `{a2a_payment.get('balance_delta_ok', False)}`")
+            lines.append(f"- A2A payment nonce delta OK: `{a2a_payment.get('nonce_delta_ok', False)}`")
+            lines.append(f"- A2A payment RISC0_DEV_MODE: `{a2a_payment.get('risc0_dev_mode', '')}`")
+            lines.append(f"- A2A payment scope: {a2a_payment.get('binding_status', '')}")
 
     basecamp_install = report.get("basecamp_profile_install", {})
     lines.extend(["", "## Basecamp Profile Install", ""])
@@ -505,6 +537,7 @@ def main():
     compatibility_summary = summarize_testnet_compatibility(testnet_compatibility_run)
     compatibility_wallet_transfer = compatibility_summary.get("wallet_transfer") or {}
     compatibility_program = compatibility_summary.get("program_evidence") or {}
+    compatibility_a2a_payment = compatibility_summary.get("a2a_payment") or {}
     wallet_tx = first_tx(runs_by_label["wallet"])
     if wallet_tx == "TBD" and compatibility_wallet_transfer.get("ok"):
         wallet_tx = compatibility_wallet_transfer.get("tx_hash") or "TBD"
@@ -515,6 +548,8 @@ def main():
     if compatibility_program.get("call_ok"):
         program_call_tx = compatibility_program.get("call_tx_hash") or "TBD"
     paid_a2a_payment_tx = first_tx(runs_by_label["paid_a2a"], "payment")
+    if paid_a2a_payment_tx == "TBD" and compatibility_a2a_payment.get("ok"):
+        paid_a2a_payment_tx = compatibility_a2a_payment.get("payment_tx_hash") or "TBD"
     paid_a2a_refund_tx = first_tx(runs_by_label["paid_a2a"], "refund")
 
     cu_rows = [
