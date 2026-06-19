@@ -67,6 +67,11 @@ RUN_ROOT="$(cd "$RUN_ROOT" && pwd)"
 WALLET_HOME="$RUN_ROOT/wallet-home"
 printf '%s\n' "$RUN_ROOT" > "$ROOT/.local/last-testnet-evidence-run-root"
 
+WALLET_HOME_ENV_VAR="LEE_WALLET_HOME_DIR"
+if "$WALLET" --help 2>&1 | grep -q "NSSA_WALLET_HOME_DIR"; then
+  WALLET_HOME_ENV_VAR="NSSA_WALLET_HOME_DIR"
+fi
+
 cat > "$WALLET_HOME/wallet_config.json" <<JSON
 {
   "sequencer_addr": "$TESTNET_URL",
@@ -89,8 +94,9 @@ rpc() {
 }
 
 wallet_cmd() {
-  LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" \
-    LEE_WALLET_HOME_DIR="$WALLET_HOME" \
+  env \
+    LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" \
+    "$WALLET_HOME_ENV_VAR=$WALLET_HOME" \
     RISC0_DEV_MODE=0 \
     "$WALLET" "$@"
 }
@@ -120,7 +126,8 @@ import sys
 
 repo = pathlib.Path(sys.argv[1])
 files = sorted(
-    glob.glob(str(repo / "target/release/build/lee-*/out/program_methods/mod.rs")),
+    glob.glob(str(repo / "target/release/build/lee-*/out/program_methods/mod.rs"))
+    + glob.glob(str(repo / "target/release/build/nssa-*/out/program_methods/mod.rs")),
     key=lambda p: pathlib.Path(p).stat().st_mtime,
     reverse=True,
 )
@@ -167,7 +174,7 @@ set -e
   git -C "$LEZ_REPO" status --short 2>/dev/null || true
 } > "$RUN_ROOT/lez-repo-status.out"
 
-python3 - "$RUN_ROOT" "$TESTNET_URL" "$WALLET" "$WALLET_HOME" "$CHECK_HEALTH_STATUS" "$CURRENT_BLOCK_STATUS" "$ACCOUNT_LIST_STATUS" <<'PY'
+python3 - "$RUN_ROOT" "$TESTNET_URL" "$WALLET" "$WALLET_HOME" "$WALLET_HOME_ENV_VAR" "$CHECK_HEALTH_STATUS" "$CURRENT_BLOCK_STATUS" "$ACCOUNT_LIST_STATUS" <<'PY'
 import json
 import pathlib
 import re
@@ -176,9 +183,10 @@ from datetime import datetime, timezone
 
 run_root = pathlib.Path(sys.argv[1])
 testnet_url, wallet, wallet_home = sys.argv[2], sys.argv[3], sys.argv[4]
-check_health_status = int(sys.argv[5])
-current_block_status = int(sys.argv[6])
-account_list_status = int(sys.argv[7])
+wallet_home_env_var = sys.argv[5]
+check_health_status = int(sys.argv[6])
+current_block_status = int(sys.argv[7])
+account_list_status = int(sys.argv[8])
 
 def load_json(name):
     try:
@@ -225,6 +233,7 @@ summary = {
     "testnet_url": testnet_url,
     "wallet": wallet,
     "wallet_home": wallet_home,
+    "wallet_home_env_var": wallet_home_env_var,
     "endpoint_health_ok": isinstance(endpoint_health, dict) and endpoint_health.get("result") is None,
     "check_health_exit_code": check_health_status,
     "current_block_exit_code": current_block_status,

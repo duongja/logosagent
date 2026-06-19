@@ -1,7 +1,8 @@
-# Hosted LEZ Testnet Compatibility Evidence - 2026-06-19 UTC
+# Hosted LEZ Testnet Compatibility Evidence - Initial Main-Wallet Probe - 2026-06-19 UTC
 
-This is the sanitized hosted-testnet evidence captured before attempting
-LP-0008 transaction/CU proofs.
+This is the sanitized hosted-testnet evidence from the initial probe with the
+current public LEZ `main` wallet. It is kept to explain why the matching
+`v0.1.2` wallet is required for hosted-testnet transactions.
 
 Command:
 
@@ -49,13 +50,11 @@ Local ID for authenticated transfer program is different from remote
 
 ## Conclusion
 
-Hosted-testnet transaction evidence is blocked by LEZ artifact mismatch, not by
-the LP-0008 agent module. Do not submit hosted-testnet `wallet.send`,
-`agent.task` payment, `program.deploy`, or `program.call` proofs from this
-wallet until `wallet check-health` passes.
+Hosted-testnet transaction evidence is blocked when using the current public
+LEZ `main` wallet, not by the LP-0008 agent module. A later artifact scan found
+that LEZ tag `v0.1.2` / commit `cf3639d8` matches the hosted testnet program
+IDs. The successful hosted-testnet transfer evidence is recorded in
+`docs/testnet-wallet-transfer-evidence-20260619.md`.
 
-Required external input:
-
-- exact LEZ wallet/artifact commit for `https://testnet.lez.logos.co/`; or
-- matching prebuilt wallet binary; or
-- a testnet redeploy aligned to the public wallet artifacts.
+Use the `v0.1.2` wallet unless Logos redeploys the hosted testnet or publishes
+a newer matching prebuilt wallet.

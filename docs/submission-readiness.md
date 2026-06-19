@@ -148,39 +148,27 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   This creates `.local/testnet-agents/latest/manifest.json` plus Storage,
   Messaging, and Blockchain agent directories with `agent-config.json` and
   `deploy.sh` wrappers.
-- Hosted LEZ testnet reachability checked on 2026-06-19 UTC:
-  `./scripts/lez-testnet-compatibility-evidence.sh`.
+- Hosted LEZ testnet reachability and wallet compatibility checked on
+  2026-06-19 UTC:
+  `./scripts/lez-testnet-compatibility-evidence.sh --lez-repo /home/agate/Projects/logos/logos-execution-zone-v0.1.2-testnet --wallet /home/agate/Projects/logos/logos-execution-zone-v0.1.2-testnet/target/release/wallet`.
   The endpoint `https://testnet.lez.logos.co/` returned healthy JSON-RPC
-  responses, `chain-info current-block-id` returned block `61095`, and the
-  wallet read/list commands succeeded with `RISC0_DEV_MODE=0`.
+  responses, `chain-info current-block-id` returned block `61127`, and
+  `wallet check-health` passed with `RISC0_DEV_MODE=0`.
+- Verified hosted-testnet wallet transfer on 2026-06-19 UTC:
+  `wallet auth-transfer send --from Public/6iArKUXxhUJqS7kCaPNhwMWt3ro71PDyBj7jwAyE2VQV --to Public/7wHg9sbJwc6h3NP1S9bekfAzB8CHifEcxKswCKUt3YQo --amount 1`.
+  The run used LEZ tag `v0.1.2` / commit `cf3639d8`, returned tx hash
+  `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0`,
+  and a follow-up `chain-info transaction` query returned the transaction.
+  Balance evidence showed sender `3648 -> 3647` and recipient `4000 -> 4001`.
 
-## Current Hosted Testnet Blocker
+## Hosted Testnet Wallet Version
 
-- Hosted-testnet transaction evidence is currently blocked by LEZ artifact
-  mismatch, not by the agent module. The current public LEZ wallet built from
-  `logos-execution-zone` commit `feb6cb7` fails `wallet check-health` against
-  `https://testnet.lez.logos.co/` with:
-  `Local ID for authenticated transfer program is different from remote`.
-- The same compatibility run records that all five builtin program IDs differ:
-  `authenticated_transfer`, `token`, `pinata`, `amm`, and
-  `privacy_preserving_circuit`. Because wallet `check-health` fails, submitting
-  hosted-testnet transfers from this binary would not be valid prize evidence.
-- Targeted branch-artifact scan found no match for the hosted testnet
-  `authenticated_transfer` ID among the fetched public branches checked:
-  `origin/main`, `origin/fix/program-ids`,
-  `origin/programs-elfs-deployments-circuits-fix`,
-  `origin/Pravdyvy/programs-elfs-deployments`,
-  `origin/Pravdyvy/hardcoded-initial-state`,
-  `origin/fix/add-amm-to-rpc-endpoint`,
-  `origin/fix/increase-wallet-polling-timeout`,
-  `origin/fix/update-wallet-output-examples`,
-  `origin/schouhy/finish-auth-transfer-ffi-functionality`,
-  `origin/schouhy/fix-wallet`, `origin/schouhy/protocol-fixes`, and
-  `origin/schouhy/standalone-sequencer-with-mock`.
-- Required external input before real hosted-testnet tx hashes can be produced:
-  the exact LEZ wallet/artifact commit for `https://testnet.lez.logos.co/`, a
-  prebuilt matching wallet binary, or a testnet redeploy aligned to the public
-  wallet artifacts.
+- The current public LEZ `main` wallet built from commit `feb6cb7` does not
+  match `https://testnet.lez.logos.co/`; its builtin program IDs differ from
+  the hosted testnet IDs.
+- A full public artifact scan found matching builtin program IDs on LEZ tag
+  `v0.1.2` / commit `cf3639d8` (also tag `v0.2.0-rc3`). Use that wallet for
+  hosted-testnet tx evidence unless Logos redeploys the testnet.
 
 ## Evidence Still Required
 

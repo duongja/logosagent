@@ -15,10 +15,25 @@ and CU/cycle evidence.
 
 ## Hosted LEZ Testnet Compatibility Gate
 
-Before attempting hosted-testnet transactions, run:
+Before attempting hosted-testnet transactions, build the LEZ wallet that matches
+the hosted testnet artifacts. As of 2026-06-19 UTC, the matching public tag is
+`v0.1.2` / commit `cf3639d8`:
 
 ```bash
-./scripts/lez-testnet-compatibility-evidence.sh
+git -C ../logos-execution-zone fetch --depth=1 origin tag v0.1.2
+git -C ../logos-execution-zone worktree add --detach ../logos-execution-zone-v0.1.2-testnet v0.1.2
+cd ../logos-execution-zone-v0.1.2-testnet
+LOGOS_BLOCKCHAIN_CIRCUITS=$HOME/.cache/logos/blockchain/logos-blockchain-circuits-v0.5.0-linux-x86_64 \
+  CARGO_BUILD_JOBS=1 cargo build -p wallet --release
+cd ../logos-agent
+```
+
+Then run:
+
+```bash
+./scripts/lez-testnet-compatibility-evidence.sh \
+  --lez-repo ../logos-execution-zone-v0.1.2-testnet \
+  --wallet ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
 ```
 
 This writes `.local/testnet-evidence/<timestamp>-lez-compat/summary.json` and
@@ -35,11 +50,8 @@ Only proceed to real `wallet.send`, A2A payment, `program.deploy`, or
 `"transaction_submission_allowed": true`.
 
 As of the 2026-06-19 UTC run against `https://testnet.lez.logos.co/`, the
-endpoint is healthy and read-only chain queries work, but the current public
-wallet artifacts fail `check-health` because the remote builtin program IDs do
-not match the local wallet. Hosted-testnet tx hashes are therefore blocked until
-Logos provides the exact matching LEZ wallet/artifact commit, a matching
-prebuilt wallet, or a redeployed testnet aligned to public artifacts.
+current public `main` wallet artifacts fail `check-health`, but LEZ tag
+`v0.1.2` passes and can produce hosted-testnet transaction evidence.
 
 ## Package Evidence
 

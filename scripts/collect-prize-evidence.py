@@ -239,6 +239,7 @@ def summarize_testnet_compatibility(path):
         "check_health_exit_code": "",
         "program_id_matches": {},
         "testnet_url": "",
+        "wallet_transfer": {},
     }
     if not path or not path.exists():
         return summary
@@ -254,6 +255,19 @@ def summarize_testnet_compatibility(path):
         "program_id_matches": dict(payload.get("program_id_matches") or {}),
         "testnet_url": str(payload.get("testnet_url", "")),
     })
+    transfer = load_json(path / "testnet-wallet-transfer-summary.json")
+    if isinstance(transfer, dict):
+        summary["wallet_transfer"] = {
+            "ok": bool(transfer.get("ok")),
+            "tx_hash": str(transfer.get("tx_hash", "")),
+            "from": str(transfer.get("from", "")),
+            "to": str(transfer.get("to", "")),
+            "amount": str(transfer.get("amount", "")),
+            "risc0_dev_mode": str(transfer.get("risc0_dev_mode", "")),
+            "lez_ref": str(transfer.get("lez_ref", "")),
+            "lez_commit": str(transfer.get("lez_commit", "")),
+            "transaction_lookup_returned_some": bool(transfer.get("transaction_lookup_returned_some")),
+        }
     return summary
 
 
@@ -329,6 +343,16 @@ def markdown_report(report):
         if matches:
             for program, matched in matches.items():
                 lines.append(f"- Program ID match `{program}`: `{matched}`")
+        transfer = compatibility.get("wallet_transfer") or {}
+        if transfer:
+            lines.append(f"- Wallet transfer OK: `{transfer.get('ok', False)}`")
+            lines.append(f"- Wallet transfer tx: `{transfer.get('tx_hash', '')}`")
+            lines.append(f"- Wallet transfer amount: `{transfer.get('amount', '')}`")
+            lines.append(f"- Wallet transfer RISC0_DEV_MODE: `{transfer.get('risc0_dev_mode', '')}`")
+            lines.append(f"- Wallet transfer LEZ ref: `{transfer.get('lez_ref', '')}` / `{transfer.get('lez_commit', '')}`")
+            lines.append(
+                f"- Wallet transfer lookup returned transaction: `{transfer.get('transaction_lookup_returned_some', False)}`"
+            )
 
     basecamp_install = report.get("basecamp_profile_install", {})
     lines.extend(["", "## Basecamp Profile Install", ""])
@@ -440,7 +464,11 @@ def main():
     runs = [summarize_run(label, path) for label, path in selected.items()]
 
     runs_by_label = {run["label"]: run for run in runs}
+    compatibility_summary = summarize_testnet_compatibility(testnet_compatibility_run)
+    compatibility_wallet_transfer = compatibility_summary.get("wallet_transfer") or {}
     wallet_tx = first_tx(runs_by_label["wallet"])
+    if wallet_tx == "TBD" and compatibility_wallet_transfer.get("ok"):
+        wallet_tx = compatibility_wallet_transfer.get("tx_hash") or "TBD"
     paid_a2a_payment_tx = first_tx(runs_by_label["paid_a2a"], "payment")
     paid_a2a_refund_tx = first_tx(runs_by_label["paid_a2a"], "refund")
 
@@ -457,7 +485,7 @@ def main():
         "network": args.network,
         "artifacts": artifacts,
         "three_agent_manifest": summarize_three_agent_manifest(pathlib.Path(args.three_agent_manifest) if args.three_agent_manifest else None),
-        "testnet_compatibility": summarize_testnet_compatibility(testnet_compatibility_run),
+        "testnet_compatibility": compatibility_summary,
         "basecamp_profile_install": summarize_basecamp_profile_install(selected["basecamp_profile_install"]),
         "runs": runs,
         "cu_rows": cu_rows,
