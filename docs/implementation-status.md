@@ -137,6 +137,14 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
 - Unpaid A2A lifecycle verified locally on 2026-06-17:
   - Task `task-a2a-smoke-20260617T000633Z` progressed from submit to working to
     completed over Delivery.
+- A2A discovery + paid lifecycle verified locally on 2026-06-20:
+  - `scripts/agent-a2a-paid-smoke.sh` now subscribes the client to discovery,
+    publishes the server's signed Agent Card on start, waits for the discovered
+    card, then submits the paid task.
+  - Latest proof used two isolated Logos Core daemons plus scaffold localnet.
+    Both agents reached `TASK_STATE_COMPLETED`.
+  - Payment tx hash:
+    `81b55313e470325b17d58328dc03da9f03538d7c970a24b8d98ea23c83e0ed74`.
 - Program operation smoke verified locally on 2026-06-16:
   - `scripts/agent-program-smoke.sh` starts scaffold localnet, loads the agent
     into Logos Core, and proves `program.query`, `program.call`, and
@@ -163,8 +171,19 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
     `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`.
   - Balance evidence showed payer `3647 -> 3646` and recipient
     `4001 -> 4002`; transaction lookup returned the tx.
-  - This proves the hosted-testnet LEZ payment leg. The full live
-    Delivery/A2A transport run remains required for final prize submission.
+  - This proves the hosted-testnet LEZ payment leg. The full two-agent
+    Delivery transport proof is captured locally in
+    `docs/localnet-a2a-discovery-payment-evidence-20260620.md` and should be
+    included in the final recording or rerun on the demo host.
+- Three headless category-agent deployments captured on 2026-06-20:
+  - Storage, Messaging, and Blockchain agents installed the verified LGX module
+    set, loaded `logos_agent`, initialized, started, generated signed Agent
+    Cards, returned `meta.skills`, returned `meta.status`, created private LEZ
+    accounts, and started Delivery.
+  - Evidence lives under `.local/testnet-agents/latest` and is summarized by
+    `scripts/summarize-three-agent-deployment.py`.
+  - The post-capture daemons did not remain running on this laptop, so the live
+    Basecamp owner-channel recording should be done on a larger or cached host.
 
 ## Needs Next
 
@@ -178,9 +197,8 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
 - Run the Basecamp owner-channel path live with the Chat UI after the agent
   testnet deployments are ready; module capture and package-manager profile
   install are now proven.
-- Run and record three testnet agents: Storage, Messaging, Blockchain.
-- Record a live two-agent Delivery/A2A run that combines discovery, task
-  lifecycle, and the hosted-testnet payment path.
+- Record the already-proven headless two-agent Delivery/A2A discovery +
+  payment proof, or rerun it on the final demo host.
 - Fill `docs/cu-report.md` from devnet/testnet measurements with
   `RISC0_DEV_MODE=0`.
 - Rebuild and attach the official clean-machine LGX package artifact before

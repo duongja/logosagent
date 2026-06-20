@@ -402,7 +402,7 @@ config = {
     },
     "a2a": {
         "discovery_topic": discovery_topic,
-        "publish_on_start": False,
+        "publish_on_start": role == "server",
     },
     "agent_card": {
         "name": label,
@@ -489,6 +489,22 @@ if a2a.get("ok") is not True:
 PY
 }
 
+assert_publish_card() {
+  local file="$1"
+  local label="$2"
+  python3 - "$file" "$label" <<'PY'
+import json
+import pathlib
+import sys
+
+payload = json.loads(pathlib.Path(sys.argv[1]).read_text())
+label = sys.argv[2]
+publish = payload.get("adapters", {}).get("a2a_publish", {})
+if publish.get("ok") is not True:
+    raise SystemExit(f"{label}: A2A Agent Card did not publish cleanly: {json.dumps(payload, indent=2)[:1600]}")
+PY
+}
+
 task_params() {
   python3 - "$SERVER_ADDRESS" "$TASK_ID" "$TASK_AMOUNT" "$PAYMENT_RECIPIENT" "$PAYMENT_MODE" "$CANCEL_AFTER_SUBMIT" <<'PY'
 import json
@@ -513,6 +529,15 @@ print(json.dumps(payload, separators=(",", ":")))
 PY
 }
 
+discover_params() {
+  python3 - "$DISCOVERY_TOPIC" <<'PY'
+import json
+import sys
+
+print(json.dumps({"topic": sys.argv[1]}, separators=(",", ":")))
+PY
+}
+
 cancel_params() {
   python3 - "$SERVER_ADDRESS" "$TASK_ID" <<'PY'
 import json
@@ -524,6 +549,46 @@ print(json.dumps({
     "reason": "paid A2A cancellation/refund smoke",
 }, separators=(",", ":")))
 PY
+}
+
+wait_for_discovered_agent() {
+  local cfg="$1"
+  local label="$2"
+  local expected_address="$3"
+  local latest="$4"
+  local deadline=$((SECONDS + TASK_TIMEOUT_SEC))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    call_agent "$cfg" invoke agent.discover "$(discover_params)" >"$latest"
+    if assert_json_ok "$latest" "$label agent.discover" >/dev/null 2>&1 && python3 - "$latest" "$expected_address" "$PAYMENT_RECIPIENT" <<'PY'
+import json
+import pathlib
+import sys
+
+payload = json.loads(pathlib.Path(sys.argv[1]).read_text())
+expected_address = sys.argv[2]
+expected_payment_recipient = sys.argv[3]
+for card in payload.get("agents", []):
+    if not isinstance(card, dict):
+        continue
+    logos = card.get("logos", {})
+    if not isinstance(logos, dict) or logos.get("agent_address") != expected_address:
+        continue
+    if not card.get("signature"):
+        raise SystemExit(1)
+    if expected_payment_recipient:
+        payment = logos.get("payment", {})
+        if not isinstance(payment, dict) or payment.get("recipient") != expected_payment_recipient:
+            raise SystemExit(1)
+    raise SystemExit(0)
+raise SystemExit(1)
+PY
+    then
+      return 0
+    fi
+    sleep 1
+  done
+  echo "timed out waiting for $label to discover Agent Card for $expected_address" >&2
+  return 1
 }
 
 subscribe_params() {
@@ -680,13 +745,17 @@ assert_json_ok "$RUN_ROOT/client-init.json" "client init"
 call_agent "$SERVER_CFG" init "$(cat "$SERVER_CONFIG_JSON")" >"$RUN_ROOT/server-init.json"
 assert_json_ok "$RUN_ROOT/server-init.json" "server init"
 
-call_agent "$SERVER_CFG" start >"$RUN_ROOT/server-start.json"
-assert_json_ok "$RUN_ROOT/server-start.json" "server start"
-assert_start_adapters "$RUN_ROOT/server-start.json" "server"
-
 call_agent "$CLIENT_CFG" start >"$RUN_ROOT/client-start.json"
 assert_json_ok "$RUN_ROOT/client-start.json" "client start"
 assert_start_adapters "$RUN_ROOT/client-start.json" "client"
+
+call_agent "$CLIENT_CFG" invoke agent.discover "$(discover_params)" >"$RUN_ROOT/client-discover-subscribe.json"
+assert_json_ok "$RUN_ROOT/client-discover-subscribe.json" "client agent.discover subscribe"
+
+call_agent "$SERVER_CFG" start >"$RUN_ROOT/server-start.json"
+assert_json_ok "$RUN_ROOT/server-start.json" "server start"
+assert_start_adapters "$RUN_ROOT/server-start.json" "server"
+assert_publish_card "$RUN_ROOT/server-start.json" "server"
 
 if [ "$CANCEL_AFTER_SUBMIT" -eq 1 ] && [ -z "$PAYMENT_RECIPIENT" ]; then
   PAYMENT_RECIPIENT="$(json_field "$RUN_ROOT/server-start.json" "adapters.wallet.account.account")"
@@ -695,6 +764,8 @@ if [ "$CANCEL_AFTER_SUBMIT" -eq 1 ] && [ -z "$PAYMENT_RECIPIENT" ]; then
     exit 1
   fi
 fi
+
+wait_for_discovered_agent "$CLIENT_CFG" "client" "$SERVER_ADDRESS" "$RUN_ROOT/client-discover-final.json"
 
 call_agent "$CLIENT_CFG" invoke agent.subscribe "$(subscribe_params)" >"$RUN_ROOT/client-subscribe.json"
 assert_json_ok "$RUN_ROOT/client-subscribe.json" "client agent.subscribe"
@@ -736,6 +807,8 @@ print(json.dumps({
         "server_init": f"{run_root}/server-init.json",
         "client_start": f"{run_root}/client-start.json",
         "server_start": f"{run_root}/server-start.json",
+        "client_discover_subscribe": f"{run_root}/client-discover-subscribe.json",
+        "client_discover_final": f"{run_root}/client-discover-final.json",
         "client_subscribe": f"{run_root}/client-subscribe.json",
         "client_task_submit": f"{run_root}/client-task-submit.json",
         "client_completed_status": f"{run_root}/client-meta-status-completed.json",

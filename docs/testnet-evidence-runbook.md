@@ -90,8 +90,10 @@ Hosted testnet LEZ payment evidence for a paid A2A task was captured on
 - Payer balance: `3647 -> 3646`
 - Recipient balance: `4001 -> 4002`
 
-This proves the hosted-testnet payment leg. It must still be combined with a
-live two-agent Delivery transport run for final prize evidence.
+This proves the hosted-testnet payment leg. The combined Delivery discovery,
+task lifecycle, and payment flow is proven locally in
+`docs/localnet-a2a-discovery-payment-evidence-20260620.md`; include that proof
+in the final recording or rerun it on the final demo host.
 
 ## Package Evidence
 
@@ -128,7 +130,12 @@ state. Use `--copy-runs` only for a deliberately redacted archive review path.
 Before recording live proofs, use
 `.local/testnet-agents/latest/manifest.json` from
 `scripts/prepare-three-agent-deployment.sh` as the deployment checklist for the
-three required prize agents.
+three required prize agents. Headless evidence for those agents has already
+been captured in `.local/testnet-agents/latest/three-agent-deployment-evidence.json`;
+the remaining proof is a stable live recording of the owner flow and final demo
+flows. A localnet headless two-agent A2A proof with discovery, task lifecycle,
+and LEZ payment is captured in
+`.local/agent-a2a-paid-smoke/20260620T101217Z-discovery-paid-prize`.
 
 1. `wallet.send`
    - Agent has its own LEZ account.
@@ -152,6 +159,8 @@ three required prize agents.
    - Server reaches a valid A2A terminal state.
    - Cancellation/refund path is shown if using an input-required task.
    - Evidence: task id, Agent Cards, payment tx hash, refund tx hash if any.
+   - Current localnet proof:
+     `docs/localnet-a2a-discovery-payment-evidence-20260620.md`.
 
 5. Program operations
    - `program.query`.

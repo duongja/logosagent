@@ -65,7 +65,7 @@ require_file docs/submission-readiness.md
 require_file docs/prize-submission-dossier.md
 require_file docs/manual-intervention-checklist.md
 
-python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scripts/create-submission-bundle.py
+python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/summarize-three-agent-deployment.py
 ./cli/logos-agent-cli --help >/dev/null
 
 bash -n \

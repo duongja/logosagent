@@ -106,6 +106,13 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `RUN_ROOT="$PWD/.local/agent-a2a-smoke/$(date -u +%Y%m%dT%H%M%SZ)-current"; ./scripts/agent-a2a-smoke.sh --run-root "$RUN_ROOT"`.
   Task `task-a2a-smoke-20260617T000633Z` progressed from submit to working to
   completed over Delivery.
+- Verified local A2A discovery + payment flow on 2026-06-20:
+  `RISC0_DEV_MODE=0 SCAFFOLD_BIN=/home/agate/Projects/logos/scaffold/target/release/logos-scaffold LOGOSCORE=/home/agate/Projects/logos/logos-agent/.local/logoscore-bin/bin/logoscore MODULES_DIR=/home/agate/Projects/logos/logos-agent/.local/live-modules ./scripts/agent-a2a-paid-smoke.sh --run-root .local/agent-a2a-paid-smoke/20260620T101217Z-discovery-paid-prize --localnet-timeout 180`.
+  The client subscribed to `/logos-agent/1/a2a-smoke-discovery/json`,
+  discovered the server's signed Agent Card with advertised price `1`, paid the
+  task price, and both agents reached `TASK_STATE_COMPLETED`. Payment tx hash:
+  `81b55313e470325b17d58328dc03da9f03538d7c970a24b8d98ea23c83e0ed74`.
+  See `docs/localnet-a2a-discovery-payment-evidence-20260620.md`.
 - Verified local program operation flow on 2026-06-16:
   `SCAFFOLD_BIN=/home/agate/Projects/logos/scaffold/target/release/logos-scaffold ./scripts/stable-test-runner.sh --allow-battery --jobs 1 --nix-cores 1 -- ./scripts/agent-program-smoke.sh --localnet-timeout 180 --daemon-timeout 45`.
   The run started localnet, loaded the module in Logos Core, proved
@@ -153,6 +160,11 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   This creates `.local/testnet-agents/latest/manifest.json` plus Storage,
   Messaging, and Blockchain agent directories with `agent-config.json` and
   `deploy.sh` wrappers.
+- Headless three-agent deployment evidence captured on 2026-06-20 UTC:
+  Storage, Messaging, and Blockchain agents installed the verified module LGXs,
+  loaded `logos_agent`, initialized, started, generated signed Agent Cards,
+  returned `meta.skills`, returned `meta.status`, created private LEZ accounts,
+  and started Delivery. See `docs/three-agent-headless-evidence-20260620.md`.
 - Hosted LEZ testnet reachability and wallet compatibility checked on
   2026-06-19 UTC:
   `./scripts/lez-testnet-compatibility-evidence.sh --lez-repo /home/agate/Projects/logos/logos-execution-zone-v0.1.2-testnet --wallet /home/agate/Projects/logos/logos-execution-zone-v0.1.2-testnet/target/release/wallet`.
@@ -208,11 +220,10 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 - Live Basecamp GUI setup/launch/owner-channel run against a separate Logos app
   profile. The module capture and package-manager install layers now work; the
   GUI build/launch and chat interaction still need recorded proof.
-- Three LEZ testnet agent deployments:
-  Storage agent, Messaging agent, Blockchain agent.
-- End-to-end testnet evidence for at least three illustrative use cases,
-  including a live two-agent Delivery/A2A run that combines discovery, task
-  lifecycle, and the real LEZ payment path in one recorded flow.
+- End-to-end recorded evidence for at least three illustrative use cases. The
+  two-agent Delivery/A2A discovery + payment flow is now proven headlessly on
+  localnet, but still needs to be included in the narrated final recording or
+  rerun on the final demo host.
 - Basecamp owner-channel live run against the deployed agent.
 - Recorded narrated demo with terminal proof output showing `RISC0_DEV_MODE=0`.
 

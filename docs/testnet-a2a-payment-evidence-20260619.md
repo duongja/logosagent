@@ -59,7 +59,8 @@ advanced by one.
 ## Scope Note
 
 This proves the hosted-testnet LEZ payment leg for a paid A2A task record. The
-full live two-agent Delivery transport run remains separate prize evidence:
-local A2A lifecycle and paid/refund flows are already proven, but the final
-submission still needs a live Delivery/Basecamp or multi-node agent run that
-combines discovery, task lifecycle, and this payment path in one recorded flow.
+two-agent Delivery transport flow is proven locally in
+`docs/localnet-a2a-discovery-payment-evidence-20260620.md`, where the client
+discovers a signed Agent Card, pays the advertised LEZ price, and both agents
+reach `TASK_STATE_COMPLETED`. The final submission should record that flow or
+rerun it on the final demo host.

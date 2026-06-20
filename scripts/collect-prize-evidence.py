@@ -13,6 +13,7 @@ TX_FIELD_NAMES = {"tx_hash", "transaction_hash", "payment_tx_hash", "refund_tx_h
 CONTENT_ADDRESS_FIELD_NAMES = {"address", "content_address"}
 PROGRAM_ID_FIELD_NAMES = {"program_id", "program"}
 SENSITIVE_PATH_PARTS = {
+    "agent-config.json",
     "key",
     "keys",
     "secret",
@@ -23,6 +24,8 @@ SENSITIVE_PATH_PARTS = {
     "tokens.json",
     "wallet",
     "wallet_config.json",
+    "client-agent-config.json",
+    "server-agent-config.json",
 }
 
 
@@ -161,6 +164,73 @@ def summarize_run(label, root):
         deduped_receipts.values(),
         key=lambda item: (receipt_priority(item), item["file"], item["field"]),
     )
+    if label == "paid_a2a":
+        summary["a2a"] = summarize_paid_a2a(root)
+    return summary
+
+
+def task_state(path, task_id):
+    payload = load_json(path)
+    if not isinstance(payload, dict):
+        return ""
+    for task in payload.get("active_tasks", []):
+        if isinstance(task, dict) and task.get("task_id") == task_id:
+            return str(task.get("state", ""))
+    return ""
+
+
+def summarize_paid_a2a(root):
+    summary = {
+        "summary_exists": False,
+        "task_id": "",
+        "paid": False,
+        "discovery_topic": "",
+        "discovered_agents": 0,
+        "discovered_signed_card": False,
+        "discovered_agent_address": "",
+        "discovered_payment_price": "",
+        "discovered_payment_recipient": "",
+        "payment_tx_hash": "",
+        "client_terminal_state": "",
+        "server_terminal_state": "",
+    }
+    a2a_summary = load_json(root / "a2a-summary.json")
+    if not isinstance(a2a_summary, dict):
+        return summary
+    summary["summary_exists"] = True
+    summary["task_id"] = str(a2a_summary.get("task_id", ""))
+    summary["paid"] = bool(a2a_summary.get("paid"))
+
+    discover = load_json(root / "a2a" / "client-discover-final.json")
+    if isinstance(discover, dict):
+        agents = [agent for agent in discover.get("agents", []) if isinstance(agent, dict)]
+        summary["discovery_topic"] = str(discover.get("topic", ""))
+        summary["discovered_agents"] = len(agents)
+        if agents:
+            card = agents[0]
+            logos = card.get("logos") or {}
+            payment = logos.get("payment") or {}
+            summary["discovered_signed_card"] = bool(card.get("signature"))
+            summary["discovered_agent_address"] = str(logos.get("agent_address", ""))
+            summary["discovered_payment_price"] = str(payment.get("price", ""))
+            summary["discovered_payment_recipient"] = str(payment.get("recipient", ""))
+
+    task_submit = load_json(root / "a2a" / "client-task-submit.json")
+    if isinstance(task_submit, dict):
+        tx = (
+            task_submit.get("task", {})
+            .get("payment", {})
+            .get("transfer", {})
+            .get("transaction", {})
+            .get("result", {})
+            .get("tx_hash", "")
+        )
+        summary["payment_tx_hash"] = str(tx)
+
+    task_id = summary["task_id"]
+    if task_id:
+        summary["client_terminal_state"] = task_state(root / "a2a" / "client-meta-status-completed.json", task_id)
+        summary["server_terminal_state"] = task_state(root / "a2a" / "server-meta-status-completed.json", task_id)
     return summary
 
 
@@ -208,6 +278,7 @@ def summarize_three_agent_manifest(path):
         "exists": bool(path and path.exists()),
         "network": "",
         "agents": [],
+        "deployment_evidence": {},
     }
     if not path or not path.exists():
         return summary
@@ -225,6 +296,32 @@ def summarize_three_agent_manifest(path):
             "config": str(agent.get("config", "")),
             "deploy_script": str(agent.get("deploy_script", "")),
         })
+    evidence = load_json(path.parent / "three-agent-deployment-evidence.json")
+    if isinstance(evidence, dict):
+        summary["deployment_evidence"] = {
+            "ok": bool(evidence.get("ok")),
+            "generated_at": str(evidence.get("generated_at", "")),
+            "delivery_preset": str(evidence.get("delivery_preset", "")),
+            "risc0_dev_mode": str(evidence.get("risc0_dev_mode", "")),
+            "scope_note": str(evidence.get("scope_note", "")),
+            "agents": [
+                {
+                    "category": str(agent.get("category", "")),
+                    "agent_id": str(agent.get("agent_id", "")),
+                    "agent_card_exists": bool(agent.get("agent_card_exists")),
+                    "agent_card_signed": bool(agent.get("agent_card_signed")),
+                    "meta_skills_exists": bool(agent.get("meta_skills_exists")),
+                    "meta_status_exists": bool(agent.get("meta_status_exists")),
+                    "lez_account": str(agent.get("lez_account", "")),
+                    "delivery_started": bool(agent.get("delivery_started")),
+                    "chat_started": bool(agent.get("chat_started")),
+                    "started": bool(agent.get("started")),
+                    "post_run_status": str((agent.get("post_run_status") or {}).get("stdout", "")),
+                }
+                for agent in evidence.get("agents", [])
+                if isinstance(agent, dict)
+            ],
+        }
     return summary
 
 
@@ -368,6 +465,20 @@ def markdown_report(report):
             )
     else:
         lines.append("- No three-agent deployment manifest found.")
+    deployment_evidence = manifest.get("deployment_evidence") or {}
+    if deployment_evidence:
+        lines.append(f"- Headless deployment evidence OK: `{deployment_evidence.get('ok', False)}`")
+        lines.append(f"- Headless deployment generated: `{deployment_evidence.get('generated_at', '')}`")
+        lines.append(f"- Headless deployment RISC0_DEV_MODE: `{deployment_evidence.get('risc0_dev_mode', '')}`")
+        for agent in deployment_evidence.get("agents", []):
+            lines.append(
+                f"- {agent['category']} evidence: card `{agent.get('agent_card_exists', False)}`, "
+                f"signed `{agent.get('agent_card_signed', False)}`, skills `{agent.get('meta_skills_exists', False)}`, "
+                f"status `{agent.get('meta_status_exists', False)}`, LEZ `{agent.get('lez_account', '')}`, "
+                f"delivery `{agent.get('delivery_started', False)}`"
+            )
+        if deployment_evidence.get("scope_note"):
+            lines.append(f"- Headless deployment scope: {deployment_evidence.get('scope_note')}")
 
     compatibility = report.get("testnet_compatibility", {})
     if compatibility.get("path") or report["network"].lower() in {"testnet", "devnet"}:
@@ -439,6 +550,18 @@ def markdown_report(report):
         lines.append("")
         lines.append(f"- Root: `{run['root']}`")
         lines.append(f"- Exists: `{run['exists']}`")
+        a2a = run.get("a2a") or {}
+        if a2a.get("summary_exists"):
+            lines.append(f"- A2A task id: `{a2a.get('task_id', '')}`")
+            lines.append(f"- A2A paid: `{a2a.get('paid', False)}`")
+            lines.append(f"- A2A discovery topic: `{a2a.get('discovery_topic', '')}`")
+            lines.append(f"- A2A discovered signed card: `{a2a.get('discovered_signed_card', False)}`")
+            lines.append(f"- A2A discovered agent: `{a2a.get('discovered_agent_address', '')}`")
+            lines.append(f"- A2A discovered price: `{a2a.get('discovered_payment_price', '')}`")
+            lines.append(f"- A2A payment recipient: `{a2a.get('discovered_payment_recipient', '')}`")
+            lines.append(f"- A2A payment tx: `{a2a.get('payment_tx_hash', '')}`")
+            lines.append(f"- A2A client terminal state: `{a2a.get('client_terminal_state', '')}`")
+            lines.append(f"- A2A server terminal state: `{a2a.get('server_terminal_state', '')}`")
         if run["tx_hashes"]:
             for receipt in run["tx_receipts"]:
                 lines.append(f"- Tx hash: `{receipt['tx_hash']}` ({receipt['kind']}, `{receipt['file']}` -> `{receipt['field']}`)")

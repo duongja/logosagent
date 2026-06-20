@@ -105,9 +105,11 @@ configured, the runtime submits a LEZ refund through `wallet.send`, records the
 refund receipt on the task, and exposes the refund transfer in `agent.subscribe`
 and `meta.status`.
 
-The local paid A2A smoke proof covers payment acceptance plus cancellation
-refund. The final prize evidence still needs the same flow repeated on the
-target LEZ testnet/devnet environment with transaction and CU/cycle evidence.
+The local A2A smoke proofs cover discovery, signed Agent Card receipt, payment
+acceptance, task completion, and cancellation refund. The hosted-testnet
+evidence currently proves the LEZ payment leg with transaction lookup and
+balance deltas; CU/cycle values still depend on the target network exposing
+that metadata or an evaluator-approved benchmark mapping.
 
 ## Signatures And Replay Protection
 

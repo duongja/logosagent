@@ -28,14 +28,15 @@ DEFAULT_DOCS = [
     "docs/testnet-wallet-transfer-evidence-20260619.md",
     "docs/testnet-program-evidence-20260619.md",
     "docs/testnet-a2a-payment-evidence-20260619.md",
+    "docs/localnet-a2a-discovery-payment-evidence-20260620.md",
+    "docs/three-agent-headless-evidence-20260620.md",
     "docs/manual-intervention-checklist.md",
     ".github/workflows/ci.yml",
 ]
 MANUAL_ITEMS = [
     "Run the Basecamp GUI owner-channel proof with separate owner/agent profiles and record the chat interaction plus agent/Core logs.",
-    "Deploy the three generated testnet agent profiles (Storage, Messaging, Blockchain) and record agent.card, meta.skills, and meta.status for each.",
-    "Run a live two-agent Delivery/A2A flow that combines discovery, task lifecycle, and LEZ payment in one recorded session.",
-    "Record at least three illustrative use cases end-to-end on the target devnet/testnet/local sequencer mix accepted by Logos.",
+    "Record the already-proven headless two-agent Delivery/A2A discovery + payment flow, or rerun it on the final demo host.",
+    "Record at least three illustrative use cases end-to-end using the accepted devnet/testnet/local sequencer mix.",
     "Capture a narrated demo video that shows terminal proof output, tx hashes, and RISC0_DEV_MODE=0 for proof-generating runs.",
     "Fill CU values from a Logos explorer, sequencer metadata endpoint, logs, or evaluator-approved benchmark mapping if Logos does not expose CU directly.",
     "Run the official clean Nix package build on a stable machine or GitHub workflow: nix build --impure .#lgx -L.",

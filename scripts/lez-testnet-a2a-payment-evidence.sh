@@ -301,9 +301,10 @@ summary = {
         {"state": "completed", "agent": server_agent, "output": {"ok": True}},
     ],
     "binding_status": (
-        "Hosted-testnet LEZ payment leg verified. Full live Delivery transport "
-        "A2A execution is tracked separately by the local A2A smoke evidence and "
-        "the remaining Basecamp/Delivery live proof."
+        "Hosted-testnet LEZ payment leg verified. Two-agent Delivery discovery, "
+        "task lifecycle, and LEZ payment are proven locally in "
+        "docs/localnet-a2a-discovery-payment-evidence-20260620.md; final "
+        "submission should record that proof or rerun it on the demo host."
     ),
     "payment_tx_hash": tx_hash,
     "from": from_account,

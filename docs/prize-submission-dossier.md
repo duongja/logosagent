@@ -48,16 +48,24 @@ testnet program IDs.
 - Storage upload/list/share/download completed and downloaded bytes matched the
   original input.
 - Messaging send/create-group/join completed over Delivery topics.
-- A2A task lifecycle completed locally over Delivery.
+- A2A task lifecycle completed locally over Delivery, including a latest
+  discovery + payment proof where the client discovered the server's signed
+  Agent Card and paid its advertised price.
 - Paid A2A task payment and cancel/refund completed locally with LEZ tx hashes.
 - Basecamp profile install smoke installed Delivery, Storage, Chat, LEZ, and
   Agent LGXs into `alice` and `bob` profiles with the real `lgpm` CLI.
+- Three headless category agents generated signed Agent Cards, `meta.skills`,
+  `meta.status`, private LEZ accounts, and Delivery startup evidence.
 
 ## Known Scope Boundaries
 
-- The hosted-testnet A2A evidence currently proves the LEZ payment leg for a
-  priced A2A task, while the full live two-agent Delivery transport proof is
-  still a manual recording item.
+- The hosted-testnet A2A evidence proves the LEZ payment leg for a priced A2A
+  task. The full two-agent Delivery transport proof is currently localnet
+  headless evidence; final submission should record that run or rerun it on the
+  final demo host.
+- The three-agent deployment evidence is headless CLI evidence. On this laptop
+  the post-capture `logoscore` daemons did not remain running, so Basecamp GUI
+  owner-channel recording should be done on a larger or already-cached machine.
 - `program.call` uses the current supported signed public call path. The
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
@@ -70,9 +78,7 @@ testnet program IDs.
 See `docs/manual-intervention-checklist.md`. In short:
 
 - Basecamp GUI owner-channel recording.
-- Three live agent deployment recordings.
-- Live two-agent Delivery/A2A recording with discovery, task lifecycle, and
-  payment in one flow.
+- Recording of the already-proven headless two-agent Delivery/A2A flow.
 - Three narrated illustrative use cases.
 - Final narrated submission video.
 - CU confirmation or accepted `TBD` policy from Logos.
