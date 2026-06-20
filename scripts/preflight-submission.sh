@@ -62,6 +62,7 @@ require_file docs/owner-channel-basecamp.md
 require_file docs/cu-report.md
 require_file docs/testnet-evidence-runbook.md
 require_file docs/submission-readiness.md
+require_file docs/prize-submission-dossier.md
 require_file docs/manual-intervention-checklist.md
 
 python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scripts/create-submission-bundle.py

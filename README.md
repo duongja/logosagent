@@ -172,6 +172,8 @@ For prize packaging status, see
 [docs/submission-readiness.md](docs/submission-readiness.md).
 For final tx/CU/testnet evidence capture, see
 [docs/testnet-evidence-runbook.md](docs/testnet-evidence-runbook.md).
+For a concise committed review map, see
+[docs/prize-submission-dossier.md](docs/prize-submission-dossier.md).
 
 Create a sanitized local review bundle with:
 

@@ -22,6 +22,7 @@ DEFAULT_DOCS = [
     "docs/cu-report.md",
     "docs/environment-setup.md",
     "docs/submission-readiness.md",
+    "docs/prize-submission-dossier.md",
     "docs/testnet-evidence-runbook.md",
     "docs/testnet-compatibility-evidence-20260619.md",
     "docs/testnet-wallet-transfer-evidence-20260619.md",
