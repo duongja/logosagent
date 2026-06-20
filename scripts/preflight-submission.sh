@@ -62,8 +62,9 @@ require_file docs/owner-channel-basecamp.md
 require_file docs/cu-report.md
 require_file docs/testnet-evidence-runbook.md
 require_file docs/submission-readiness.md
+require_file docs/manual-intervention-checklist.md
 
-python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py
+python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scripts/create-submission-bundle.py
 ./cli/logos-agent-cli --help >/dev/null
 
 bash -n \
@@ -81,6 +82,8 @@ bash -n \
   scripts/agent-storage-smoke.sh \
   scripts/agent-wallet-smoke.sh \
   scripts/delivery-smoke.sh \
+  scripts/lez-testnet-a2a-payment-evidence.sh \
+  scripts/lez-testnet-compatibility-evidence.sh \
   scripts/stable-test-runner.sh \
   scripts/localnet-integration.sh \
   scripts/package-live-modules-lgx.sh \
@@ -94,6 +97,7 @@ bash -n \
 ./scripts/demo-local.sh
 ./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.dev >/dev/null
 ./scripts/basecamp-profile-install-smoke.sh --run-root .local/preflight-basecamp-profile-install >/dev/null
+./scripts/create-submission-bundle.py --out-dir .local/preflight-submission-bundle >/dev/null
 
 if [ "$RUN_PACKAGE_DEV" -eq 1 ]; then
   ./scripts/package-dev-lgx.sh

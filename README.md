@@ -172,3 +172,13 @@ For prize packaging status, see
 [docs/submission-readiness.md](docs/submission-readiness.md).
 For final tx/CU/testnet evidence capture, see
 [docs/testnet-evidence-runbook.md](docs/testnet-evidence-runbook.md).
+
+Create a sanitized local review bundle with:
+
+```bash
+./scripts/create-submission-bundle.py
+```
+
+The bundle intentionally excludes wallet state and raw runtime secrets. The
+remaining manual/UI tasks are tracked in
+[docs/manual-intervention-checklist.md](docs/manual-intervention-checklist.md).

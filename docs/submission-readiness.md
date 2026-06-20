@@ -143,6 +143,11 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `./scripts/collect-prize-evidence.py --network localnet`.
   The output is intended to be rerun with explicit testnet run roots before
   final submission.
+- Sanitized submission bundle generation available:
+  `./scripts/create-submission-bundle.py`.
+  It writes public docs, local/testnet evidence summaries, artifact checksums,
+  and a manual-only checklist under `.local/submission-bundle/<timestamp>`
+  without copying wallet state.
 - Three-agent prize deployment profiles available:
   `./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.dev`.
   This creates `.local/testnet-agents/latest/manifest.json` plus Storage,
@@ -219,4 +224,5 @@ Run these from a clean checkout after `scripts/bootstrap-workspace.sh`:
 ./scripts/preflight-submission.sh
 ./scripts/preflight-submission.sh --full
 SCAFFOLD_BIN=../scaffold/target/release/logos-scaffold ./scripts/preflight-submission.sh --localnet
+./scripts/create-submission-bundle.py
 ```
