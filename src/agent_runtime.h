@@ -50,6 +50,7 @@ private:
     QJsonObject maybeGateSpend(const QString& skillName, const QString& amount, const QJsonObject& params, const QString& origin);
     QJsonObject executeSkill(const QString& skillName, const QJsonObject& params, const QString& origin);
     void emitEvent(const QString& name, const QJsonObject& payload);
+    void recordAsyncAdapterResult(const QString& adapter, const QJsonObject& result);
     void handleOwnerMessage(const QJsonObject& payload);
 
     LogosModules* m_logos = nullptr;
@@ -64,6 +65,9 @@ private:
     EventSink m_eventSink;
     bool m_initialized = false;
     bool m_started = false;
+    bool m_eventsWired = false;
+    bool m_starting = false;
+    QJsonObject m_lastStartAdapters;
 };
 
 #endif

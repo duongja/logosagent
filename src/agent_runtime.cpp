@@ -75,6 +75,7 @@ AgentRuntime::AgentRuntime()
 void AgentRuntime::setLogosModules(LogosModules* modules)
 {
     m_logos = modules;
+    m_eventsWired = false;
     m_wallet.setLogosModules(modules);
     m_storage.setLogosModules(modules);
     m_messaging.setLogosModules(modules);
@@ -92,8 +93,12 @@ void AgentRuntime::setEventSink(EventSink sink)
 
 void AgentRuntime::wireDependencyEvents()
 {
+    if (!m_logos || m_eventsWired) {
+        return;
+    }
     m_storage.wireEvents();
     m_messaging.wireEvents();
+    m_eventsWired = true;
 }
 
 QJsonObject AgentRuntime::init(const QString& configJson)
@@ -166,22 +171,37 @@ QJsonObject AgentRuntime::start()
         }
         m_initialized = true;
     }
+    wireDependencyEvents();
     const QJsonObject config = m_state.config();
+    const bool asyncStart = config.value(QStringLiteral("runtime")).toObject().value(QStringLiteral("async_start")).toBool(false);
     QJsonObject adapters;
+    m_starting = true;
     adapters.insert(QStringLiteral("wallet"), m_wallet.init(config));
-    adapters.insert(QStringLiteral("storage"), m_storage.init(config));
-    adapters.insert(QStringLiteral("messaging"), m_messaging.init(config));
-    if (config.contains(QStringLiteral("a2a")) && config.contains(QStringLiteral("delivery"))) {
+    adapters.insert(QStringLiteral("storage"), m_storage.init(config, asyncStart, [this](const QJsonObject& result) {
+        recordAsyncAdapterResult(QStringLiteral("storage"), result);
+    }));
+    adapters.insert(QStringLiteral("messaging"), m_messaging.init(config, asyncStart, [this](const QJsonObject& result) {
+        recordAsyncAdapterResult(QStringLiteral("messaging.delivery"), result);
+    }));
+    if (!asyncStart && config.contains(QStringLiteral("a2a")) && config.contains(QStringLiteral("delivery"))) {
         adapters.insert(QStringLiteral("a2a"), m_a2a.start());
+    } else if (asyncStart && config.contains(QStringLiteral("a2a")) && config.contains(QStringLiteral("delivery"))) {
+        adapters.insert(QStringLiteral("a2a"), JsonUtils::ok(QJsonObject{
+            {QStringLiteral("starting"), true},
+            {QStringLiteral("async"), true},
+            {QStringLiteral("note"), QStringLiteral("A2A task subscription is deferred until Delivery startup is complete")}
+        }));
     }
+    m_lastStartAdapters = adapters;
     m_started = true;
+    m_starting = asyncStart;
     emitEvent(QStringLiteral("agentStarted"), adapters);
 
-    if (config.value(QStringLiteral("a2a")).toObject().value(QStringLiteral("publish_on_start")).toBool(false)) {
+    if (!asyncStart && config.value(QStringLiteral("a2a")).toObject().value(QStringLiteral("publish_on_start")).toBool(false)) {
         adapters.insert(QStringLiteral("a2a_publish"), m_a2a.publishCard());
     }
 
-    return JsonUtils::ok(QJsonObject{{QStringLiteral("adapters"), adapters}});
+    return JsonUtils::ok(QJsonObject{{QStringLiteral("adapters"), adapters}, {QStringLiteral("async_start"), asyncStart}});
 }
 
 QJsonObject AgentRuntime::stop()
@@ -266,10 +286,13 @@ QJsonObject AgentRuntime::status()
     QJsonObject status{
         {QStringLiteral("initialized"), m_initialized},
         {QStringLiteral("started"), m_started},
+        {QStringLiteral("starting"), m_starting},
         {QStringLiteral("persistence_path"), m_state.persistencePath()},
         {QStringLiteral("identity"), redactSecretFields(m_state.identity())},
         {QStringLiteral("policy"), m_state.policy()},
         {QStringLiteral("messaging"), m_messaging.status()},
+        {QStringLiteral("storage"), m_storage.status()},
+        {QStringLiteral("startup_adapters"), m_lastStartAdapters},
         {QStringLiteral("pending_approvals"), m_state.approvals()},
         {QStringLiteral("active_tasks"), m_state.tasks()}
     };
@@ -278,6 +301,46 @@ QJsonObject AgentRuntime::status()
         status.insert(QStringLiteral("wallet"), balance);
     }
     return JsonUtils::ok(status);
+}
+
+void AgentRuntime::recordAsyncAdapterResult(const QString& adapter, const QJsonObject& result)
+{
+    m_lastStartAdapters.insert(adapter, result);
+    bool anyStarting = false;
+    const QJsonObject storageStatus = m_storage.status();
+    const QJsonObject messagingStatus = m_messaging.status();
+    anyStarting = storageStatus.value(QStringLiteral("starting")).toBool(false)
+        || messagingStatus.value(QStringLiteral("chat_starting")).toBool(false)
+        || messagingStatus.value(QStringLiteral("delivery_starting")).toBool(false);
+    m_starting = anyStarting;
+    emitEvent(QStringLiteral("agentAdapterStarted"), QJsonObject{
+        {QStringLiteral("adapter"), adapter},
+        {QStringLiteral("result"), result},
+        {QStringLiteral("starting"), m_starting}
+    });
+
+    const QJsonObject config = m_state.config();
+    if (adapter == QStringLiteral("messaging.delivery")
+        && result.value(QStringLiteral("ok")).toBool(false)
+        && config.contains(QStringLiteral("a2a"))
+        && config.contains(QStringLiteral("delivery"))) {
+        const QJsonObject a2aResult = m_a2a.start();
+        m_lastStartAdapters.insert(QStringLiteral("a2a"), a2aResult);
+        emitEvent(QStringLiteral("agentAdapterStarted"), QJsonObject{
+            {QStringLiteral("adapter"), QStringLiteral("a2a")},
+            {QStringLiteral("result"), a2aResult},
+            {QStringLiteral("starting"), m_starting}
+        });
+        if (config.value(QStringLiteral("a2a")).toObject().value(QStringLiteral("publish_on_start")).toBool(false)) {
+            const QJsonObject publishResult = m_a2a.publishCard();
+            m_lastStartAdapters.insert(QStringLiteral("a2a_publish"), publishResult);
+            emitEvent(QStringLiteral("agentAdapterStarted"), QJsonObject{
+                {QStringLiteral("adapter"), QStringLiteral("a2a_publish")},
+                {QStringLiteral("result"), publishResult},
+                {QStringLiteral("starting"), m_starting}
+            });
+        }
+    }
 }
 
 AgentState& AgentRuntime::state() { return m_state; }

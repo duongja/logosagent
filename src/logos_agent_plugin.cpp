@@ -32,7 +32,6 @@ void LogosAgentPlugin::initLogos(LogosAPI* logosAPIInstance)
         m_runtime.setEventSink([this](const QString& eventName, const QJsonObject& payload) {
             emitAgentEvent(eventName, payload);
         });
-        wireEvents();
     }
 }
 

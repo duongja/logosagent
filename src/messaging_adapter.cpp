@@ -7,6 +7,7 @@
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QTimer>
 #include <QVariant>
 #include <QVariantList>
 #include <utility>
@@ -78,9 +79,21 @@ void MessagingAdapter::wireEvents()
             m_inboundHandler(topic, payload);
         }
     });
+
+    m_logos->delivery_module.on("connectionStateChanged", [this](const QVariantList& data) {
+        if (data.isEmpty()) {
+            return;
+        }
+        recordDeliveryConnectionState(data.at(0).toString());
+    });
 }
 
 QJsonObject MessagingAdapter::init(const QJsonObject& config)
+{
+    return init(config, false);
+}
+
+QJsonObject MessagingAdapter::init(const QJsonObject& config, bool asyncStart, StartCallback callback)
 {
     if (!m_logos) {
         return JsonUtils::error(QStringLiteral("messaging.unavailable"), QStringLiteral("LogosModules is not initialized"));
@@ -91,7 +104,7 @@ QJsonObject MessagingAdapter::init(const QJsonObject& config)
         result.insert(QStringLiteral("chat"), initChat(config.value(QStringLiteral("chat")).toObject()));
     }
     if (config.contains(QStringLiteral("delivery"))) {
-        result.insert(QStringLiteral("delivery"), initDelivery(config.value(QStringLiteral("delivery")).toObject()));
+        result.insert(QStringLiteral("delivery"), initDelivery(config.value(QStringLiteral("delivery")).toObject(), asyncStart, callback));
     }
     return JsonUtils::ok(result);
 }
@@ -171,10 +184,20 @@ QJsonObject MessagingAdapter::createGroup(const QJsonObject& params)
 
 QJsonObject MessagingAdapter::status() const
 {
-    return QJsonObject{
+    QJsonObject out{
+        {QStringLiteral("chat_starting"), m_chatStarting},
         {QStringLiteral("chat_started"), m_chatStarted},
-        {QStringLiteral("delivery_started"), m_deliveryStarted}
+        {QStringLiteral("delivery_starting"), m_deliveryStarting},
+        {QStringLiteral("delivery_started"), m_deliveryStarted},
+        {QStringLiteral("delivery_connection_status"), m_deliveryConnectionStatus}
     };
+    if (!m_chatLastError.isEmpty()) {
+        out.insert(QStringLiteral("chat_last_error"), m_chatLastError);
+    }
+    if (!m_deliveryLastError.isEmpty()) {
+        out.insert(QStringLiteral("delivery_last_error"), m_deliveryLastError);
+    }
+    return out;
 }
 
 QJsonObject MessagingAdapter::deliverySend(const QString& topic, const QJsonObject& payload)
@@ -213,20 +236,26 @@ QJsonObject MessagingAdapter::initChat(const QJsonObject& chatCfg)
 {
     const QString cfgJson = JsonUtils::toString(chatCfg);
     if (!m_logos->chat_module.initChat(cfgJson)) {
+        m_chatLastError = QStringLiteral("chat_module.initChat returned false");
         return JsonUtils::error(QStringLiteral("chat.init_failed"), QStringLiteral("chat_module.initChat returned false"));
     }
     m_logos->chat_module.setEventCallback();
+    m_chatStarting = true;
     if (!m_logos->chat_module.startChat()) {
+        m_chatStarting = false;
+        m_chatLastError = QStringLiteral("chat_module.startChat returned false");
         return JsonUtils::error(QStringLiteral("chat.start_failed"), QStringLiteral("chat_module.startChat returned false"));
     }
+    m_chatStarting = false;
     m_chatStarted = true;
+    m_chatLastError.clear();
     if (chatCfg.value(QStringLiteral("create_intro_bundle")).toBool(false)) {
         m_logos->chat_module.createIntroBundle();
     }
     return JsonUtils::ok(QJsonObject{{QStringLiteral("started"), true}});
 }
 
-QJsonObject MessagingAdapter::initDelivery(const QJsonObject& deliveryCfg)
+QJsonObject MessagingAdapter::initDelivery(const QJsonObject& deliveryCfg, bool asyncStart, StartCallback callback)
 {
     QJsonObject cfg = deliveryCfg;
     if (cfg.isEmpty()) {
@@ -238,14 +267,58 @@ QJsonObject MessagingAdapter::initDelivery(const QJsonObject& deliveryCfg)
     }
     LogosResult created = m_logos->delivery_module.createNode(JsonUtils::toString(cfg));
     if (!created.success) {
+        m_deliveryLastError = created.getError();
         return JsonUtils::error(QStringLiteral("delivery.create_failed"), created.getError());
     }
+    m_deliveryStarting = true;
+    m_deliveryStarted = false;
+    m_deliveryConnectionStatus.clear();
+    m_deliveryLastError.clear();
+    if (asyncStart) {
+        QTimer::singleShot(0, [this, cfg, callback]() {
+            LogosResult started = m_logos->delivery_module.start();
+            const bool eventConfirmedStart = m_deliveryStarted && m_deliveryLastError.isEmpty();
+            const bool returnUnverifiedStart = !started.success && started.getError().isEmpty();
+            m_deliveryStarting = false;
+            m_deliveryStarted = started.success || eventConfirmedStart || returnUnverifiedStart;
+            m_deliveryLastError = m_deliveryStarted ? QString() : started.getError();
+            const QJsonObject result = m_deliveryStarted
+                ? JsonUtils::ok(QJsonObject{
+                    {QStringLiteral("started"), true},
+                    {QStringLiteral("async"), true},
+                    {QStringLiteral("return_unverified"), returnUnverifiedStart},
+                    {QStringLiteral("connection_status"), m_deliveryConnectionStatus},
+                    {QStringLiteral("config"), cfg}
+                })
+                : JsonUtils::error(QStringLiteral("delivery.start_failed"), m_deliveryLastError, QJsonObject{{QStringLiteral("async"), true}, {QStringLiteral("config"), cfg}});
+            if (callback) {
+                callback(result);
+            }
+        });
+        return JsonUtils::ok(QJsonObject{
+            {QStringLiteral("created"), true},
+            {QStringLiteral("starting"), true},
+            {QStringLiteral("async"), true},
+            {QStringLiteral("config"), cfg}
+        });
+    }
     LogosResult started = m_logos->delivery_module.start();
-    if (!started.success) {
+    const bool eventConfirmedStart = m_deliveryStarted && m_deliveryLastError.isEmpty();
+    const bool returnUnverifiedStart = !started.success && started.getError().isEmpty();
+    if (!started.success && !eventConfirmedStart && !returnUnverifiedStart) {
+        m_deliveryStarting = false;
+        m_deliveryLastError = started.getError();
         return JsonUtils::error(QStringLiteral("delivery.start_failed"), started.getError());
     }
+    m_deliveryStarting = false;
     m_deliveryStarted = true;
-    return JsonUtils::ok(QJsonObject{{QStringLiteral("started"), true}, {QStringLiteral("config"), cfg}});
+    m_deliveryLastError.clear();
+    return JsonUtils::ok(QJsonObject{
+        {QStringLiteral("started"), true},
+        {QStringLiteral("return_unverified"), returnUnverifiedStart},
+        {QStringLiteral("connection_status"), m_deliveryConnectionStatus},
+        {QStringLiteral("config"), cfg}
+    });
 }
 
 void MessagingAdapter::recordMessage(const QJsonObject& message)
@@ -253,5 +326,15 @@ void MessagingAdapter::recordMessage(const QJsonObject& message)
     if (m_state) {
         m_state->addMessage(message);
         m_state->save();
+    }
+}
+
+void MessagingAdapter::recordDeliveryConnectionState(const QString& status)
+{
+    m_deliveryConnectionStatus = status;
+    if (status == QStringLiteral("Connected") || status == QStringLiteral("PartiallyConnected")) {
+        m_deliveryStarting = false;
+        m_deliveryStarted = true;
+        m_deliveryLastError.clear();
     }
 }

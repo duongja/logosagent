@@ -119,6 +119,11 @@ void StorageAdapter::wireEvents()
 
 QJsonObject StorageAdapter::init(const QJsonObject& config)
 {
+    return init(config, false);
+}
+
+QJsonObject StorageAdapter::init(const QJsonObject& config, bool asyncStart, StartCallback callback)
+{
     if (!m_logos) {
         return JsonUtils::error(QStringLiteral("storage.unavailable"), QStringLiteral("LogosModules is not initialized"));
     }
@@ -126,15 +131,56 @@ QJsonObject StorageAdapter::init(const QJsonObject& config)
     if (!storageCfg.isEmpty()) {
         const QString cfgJson = JsonUtils::toString(storageCfg);
         if (!m_logos->storage_module.init(cfgJson)) {
+            m_lastError = QStringLiteral("storage_module.init returned false");
+            m_configured = false;
             return JsonUtils::error(QStringLiteral("storage.init_failed"), QStringLiteral("storage_module.init returned false"));
         }
+        m_configured = true;
+        m_lastError.clear();
         if (config.value(QStringLiteral("autostart_storage")).toBool(true)) {
+            m_starting = true;
+            m_started = false;
+            if (asyncStart) {
+                m_logos->storage_module.startAsync([this, callback](bool ok) {
+                    m_starting = false;
+                    m_started = ok;
+                    m_lastError = ok ? QString() : QStringLiteral("storage_module.start returned false");
+                    const QJsonObject result = ok
+                        ? JsonUtils::ok(QJsonObject{{QStringLiteral("started"), true}, {QStringLiteral("async"), true}})
+                        : JsonUtils::error(QStringLiteral("storage.start_failed"), m_lastError, QJsonObject{{QStringLiteral("async"), true}});
+                    if (callback) {
+                        callback(result);
+                    }
+                }, Timeout(60000));
+                return JsonUtils::ok(QJsonObject{
+                    {QStringLiteral("configured"), true},
+                    {QStringLiteral("starting"), true},
+                    {QStringLiteral("async"), true}
+                });
+            }
             if (!m_logos->storage_module.start()) {
+                m_starting = false;
+                m_lastError = QStringLiteral("storage_module.start returned false");
                 return JsonUtils::error(QStringLiteral("storage.start_failed"), QStringLiteral("storage_module.start returned false"));
             }
+            m_starting = false;
+            m_started = true;
         }
     }
     return JsonUtils::ok(QJsonObject{{QStringLiteral("configured"), !storageCfg.isEmpty()}});
+}
+
+QJsonObject StorageAdapter::status() const
+{
+    QJsonObject out{
+        {QStringLiteral("configured"), m_configured},
+        {QStringLiteral("starting"), m_starting},
+        {QStringLiteral("started"), m_started}
+    };
+    if (!m_lastError.isEmpty()) {
+        out.insert(QStringLiteral("last_error"), m_lastError);
+    }
+    return out;
 }
 
 QJsonObject StorageAdapter::upload(const QJsonObject& params)

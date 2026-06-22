@@ -69,6 +69,20 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
   - `summary.json` confirmed all modules were present, dependency references
     were satisfied, and the expected `linux-amd64-dev` manifest variant was
     exposed for each module.
+- Basecamp `0.1.2` launch and agent inspector flow verified locally on
+  2026-06-22:
+  - Scaffold launched Basecamp profile `alice` from `/tmp/lb` using
+    `logos-basecamp` commit
+    `63b35e8a0e826789ba15a46766df9fedc6794bc8`.
+  - The five runtime modules loaded: `storage_module`, `chat_module`,
+    `delivery_module`, `logos_execution_zone`, and `logos_agent`.
+  - `logos_agent` exposed `init`, `start`, `stop`, `invoke`, `approve`,
+    `skills`, and `status`.
+  - `skills()`, `init()`, async `start()`, delayed `status()`, and
+    `agent.card` succeeded through the Basecamp QML inspector.
+  - Delivery started and connected to `logos.dev`.
+  - Evidence: `docs/basecamp-v012-agent-evidence-20260622.md` and
+    `support/basecamp-v012-agent-proof-20260622/`.
 - Workspace bootstrap script and CI workflow for reproducible dependency setup.
 - Opt-in localnet integration harness using `logos-scaffold` standalone
   sequencer with `RISC0_DEV_MODE=0`.

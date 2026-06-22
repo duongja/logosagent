@@ -112,6 +112,10 @@ def build_agent_config(args, root):
             "allow_dev_file_cipher": args.allow_dev_file_cipher,
             "allow_dev_a2a_secret": args.allow_dev_a2a_secret,
         },
+        "runtime": {
+            "async_start": args.async_start,
+        },
+        "autostart_storage": args.autostart_storage,
         "chat": {
             "name": args.chat_name or args.agent_name,
             "port": args.chat_port,
@@ -217,6 +221,9 @@ def add_config_args(p, output_required=True):
     p.add_argument("--create-agent-account", action="store_true")
     p.add_argument("--allow-dev-file-cipher", action="store_true")
     p.add_argument("--allow-dev-a2a-secret", action="store_true")
+    p.add_argument("--async-start", action="store_true", help="Return from start() before slow network adapters finish; intended for Basecamp/UI flows.")
+    p.add_argument("--no-autostart-storage", dest="autostart_storage", action="store_false", help="Initialize storage_module but do not start its node during agent start().")
+    p.set_defaults(autostart_storage=True)
     p.add_argument("--chat-name")
     p.add_argument("--chat-port", type=int, default=60002)
     p.add_argument("--chat-cluster-id", type=int, default=2)

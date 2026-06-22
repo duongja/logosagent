@@ -25,6 +25,23 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/module_config.h"
 )
 include_directories("${CMAKE_CURRENT_BINARY_DIR}")
 
+set(EXTRA_SDK_SOURCES)
+if(DEFINED LOGOS_CPP_SDK_ROOT)
+    foreach(extra_sdk_source
+        logos_registry_factory.cpp
+        logos_transport_factory.cpp
+        logos_types.cpp
+        implementations/mock/mock_transport.cpp
+        implementations/qt_local/local_transport.cpp
+        implementations/qt_remote/qt_remote_registry.cpp
+        implementations/qt_remote/remote_transport.cpp
+    )
+        if(EXISTS "${LOGOS_CPP_SDK_ROOT}/cpp/${extra_sdk_source}")
+            list(APPEND EXTRA_SDK_SOURCES "${LOGOS_CPP_SDK_ROOT}/cpp/${extra_sdk_source}")
+        endif()
+    endforeach()
+endif()
+
 logos_module(
     NAME ${MODULE_NAME}
     SOURCES
@@ -57,6 +74,7 @@ logos_module(
         src/a2a_adapter.cpp
         src/program_adapter.h
         src/program_adapter.cpp
+        ${EXTRA_SDK_SOURCES}
 )
 
 target_link_libraries(${MODULE_NAME}_module_plugin PRIVATE OpenSSL::Crypto)

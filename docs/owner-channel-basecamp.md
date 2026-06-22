@@ -106,6 +106,22 @@ This installs the five LGX packages into scaffold-compatible `alice` and `bob`
 Basecamp profile trees with the real `lgpm` CLI, then writes
 `.local/basecamp-profile-install-smoke/latest/summary.json`.
 
+For a low-risk Basecamp launch proof, generate a config that lets UI startup
+return before slow network adapters finish and does not start the Storage node
+inside Basecamp:
+
+```bash
+./cli/logos-agent-cli make-config \
+  --output-dir .local/basecamp-safe-config \
+  --agent-name "Basecamp Safe Agent" \
+  --async-start \
+  --no-autostart-storage
+```
+
+Then launch Basecamp and load modules one at a time through the QML inspector,
+waiting a few seconds between module loads. This avoids racing module
+registration during GUI startup.
+
 For the official Basecamp AppImage, use portable LGXs:
 
 ```bash
@@ -146,3 +162,24 @@ logos-scaffold basecamp launch alice
 Use the Chat UI in Basecamp to create or open the private conversation with the
 agent. The final recorded prize demo should show this path end-to-end after the
 testnet agents and LEZ funding are ready.
+
+## Verified Basecamp Launch
+
+On 2026-06-22, the module set was verified against Basecamp `0.1.2` at
+`logos-basecamp` commit `63b35e8a0e826789ba15a46766df9fedc6794bc8`.
+
+The run proved:
+
+- all five modules loaded in the `alice` Basecamp profile;
+- `logos_agent` exposed `init`, `start`, `stop`, `invoke`, `approve`,
+  `skills`, and `status`;
+- `skills()` returned the LP-0008 skill surface;
+- `init()`, `start()`, delayed `status()`, and `agent.card` succeeded through
+  Basecamp's QML inspector;
+- Delivery started and connected to `logos.dev`.
+
+See [basecamp-v012-agent-evidence-20260622.md](basecamp-v012-agent-evidence-20260622.md).
+
+Storage is still intentionally not autostarted in the Basecamp-safe config.
+Starting the Storage node inside Basecamp is tracked as a module-runtime issue;
+the storage skill flow remains proven in headless Logos Core tests.

@@ -146,6 +146,18 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   and `bob` Basecamp profile trees using the real `lgpm` CLI. The generated
   `summary.json` confirmed all five modules were present and exposed the
   expected `linux-amd64-dev` manifest variant.
+- Verified Basecamp `0.1.2` launch and agent inspector flow on 2026-06-22:
+  Basecamp was launched from Scaffold workspace `/tmp/lb` against
+  `logos-basecamp` commit
+  `63b35e8a0e826789ba15a46766df9fedc6794bc8`. The five runtime modules loaded
+  in the `alice` profile, `logos_agent` exposed its invokable API, `skills()`
+  returned the LP-0008 skill surface, `init()` and async `start()` succeeded,
+  delayed `status()` returned `started = true` / `starting = false`, and
+  `agent.card` returned a signed Ed25519 A2A-compatible card. Delivery logs
+  showed `DeliveryModuleImpl: Delivery start completed with success` and a
+  connection transition to `Connected`. See
+  `docs/basecamp-v012-agent-evidence-20260622.md` and
+  `support/basecamp-v012-agent-proof-20260622/`.
 - Local evidence bundle generation available:
   `./scripts/collect-prize-evidence.py --network localnet`.
   The output is intended to be rerun with explicit testnet run roots before
@@ -217,9 +229,10 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   module payload. Before final submission, also rerun the official clean Nix
   package path (`nix build --impure .#lgx -L`) on a machine with enough memory or
   after cache warmup.
-- Live Basecamp GUI setup/launch/owner-channel run against a separate Logos app
-  profile. The module capture and package-manager install layers now work; the
-  GUI build/launch and chat interaction still need recorded proof.
+- Live Basecamp Chat UI owner-channel run against a separate Logos app profile.
+  Basecamp `0.1.2` launch and inspector-driven agent start now work with the
+  safe config; the remaining Basecamp evidence is the user-facing chat
+  interaction recording.
 - End-to-end recorded evidence for at least three illustrative use cases. The
   two-agent Delivery/A2A discovery + payment flow is now proven headlessly on
   localnet, but still needs to be included in the narrated final recording or

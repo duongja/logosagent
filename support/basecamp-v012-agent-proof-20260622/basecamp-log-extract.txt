@@ -1,0 +1,48 @@
+    18	LogosBasecamp version 0.1.2 (dev build)
+    19	Build commits:
+    20	  - logos-basecamp 63b35e8a0e826789ba15a46766df9fedc6794bc8
+    21	  - logos-nix e637a1f5e871244d1c2df1e3c52a067f2eb406f2
+    22	  - logos-cpp-sdk ecd369d48bffda2ad3c5233687603ef07d8b76a6
+    23	  - logos-module 194778491ef4dd36967ac40cc2fec6b8a8b1d660
+    24	  - logos-liblogos 87b5c2e3379bd413ad5e3934ed91b0234c5fead0
+    25	  - logos-package-manager 9101875bc103214855bc6217834e22e66802ed86
+    26	  - logos-package-manager-module aead48cefdb1f9980c660677f9ffdb1e389271be
+    27	  - logos-package-downloader-module f8c9b660ae8cb00dc3cf9d74d7bddb29bcd7742f
+    28	  - logos-capability-module 0655be68e0078bede0682bb6a5b53330dac37a72
+    29	  - logos-package ff93a0df15ceab255f27687d22d962ea2737efbe
+    30	  - logos-package-manager-ui fe5ac75882434a66230b70d005b48ec3e5258c0e
+    31	  - logos-webview-app b5d1bb40da6ba550076069a10cf9beaac45aa515
+    32	  - logos-design-system 6176f0d7a5dfeb64a7f0f98e7ca2bf71a4804772
+
+--- module loads ---
+449	[2026-06-22 16:07:13.455] [info] Module loaded: storage_module
+450	Successfully loaded core module: "storage_module"
+470	[2026-06-22 16:07:23.453] [info] Module loaded: chat_module
+471	Successfully loaded core module: "chat_module"
+493	[2026-06-22 16:07:33.529] [info] Module loaded: delivery_module
+494	Successfully loaded core module: "delivery_module"
+516	[2026-06-22 16:07:45.456] [info] Module loaded: logos_execution_zone
+517	Successfully loaded core module: "logos_execution_zone"
+537	[2026-06-22 16:07:53.459] [info] Module loaded: logos_agent
+538	Successfully loaded core module: "logos_agent"
+
+--- agent event subscriptions ---
+623	[2026-06-22 16:08:06.416] [info] [logos_agent] [LogosObject] LogosAPIConsumer: event callback registered for: "storageUploadDone"
+632	[2026-06-22 16:08:06.417] [info] [logos_agent] [LogosObject] LogosAPIConsumer: event callback registered for: "chatNewMessage"
+641	[2026-06-22 16:08:06.418] [info] [logos_agent] [LogosObject] LogosAPIConsumer: event callback registered for: "messageReceived"
+643	[2026-06-22 16:08:06.418] [info] [logos_agent] [LogosObject] RemoteLogosObject::onEvent subscribing to event: "connectionStateChanged"
+644	[2026-06-22 16:08:06.418] [info] [logos_agent] [LogosObject] LogosAPIConsumer: event callback registered for: "connectionStateChanged"
+
+--- delivery start/connect ---
+807	[2026-06-22 16:08:06.486] [out] [chat_module] INF 2026-06-22 16:08:06.486+03:00 Node started successfully                  topics="waku node" tid=46866
+941	[2026-06-22 16:08:20.402] [info] [delivery_module] DeliveryModuleImpl::start called
+957	[2026-06-22 16:08:20.407] [out] [delivery_module] INF 2026-06-22 16:08:20.407+03:00 Node started successfully                  topics="waku node" tid=46868
+1063	[2026-06-22 16:08:21.774] [out] [delivery_module] DBG 2026-06-22 16:08:21.772+03:00 connectionStatus change                    tid=46868 oldstatus=Disconnected newstatus=PartiallyConnected
+1065	[2026-06-22 16:08:21.774] [info] [delivery_module] DeliveryModuleImpl::event_callback message: {"eventType":"connection_status_change","connectionStatus":"PartiallyConnected"}
+1066	[2026-06-22 16:08:21.774] [info] [delivery_module] [LogosProviderObject] emitEvent: "connectionStateChanged"
+1067	[2026-06-22 16:08:21.774] [info] [delivery_module] [LogosProviderObject] ModuleProxy: forwarding event "connectionStateChanged" as Qt signal
+1073	[2026-06-22 16:08:21.776] [info] [delivery_module] DeliveryModuleImpl: Delivery start completed with success
+1075	[2026-06-22 16:08:21.880] [out] [delivery_module] DBG 2026-06-22 16:08:21.879+03:00 connectionStatus change                    tid=46868 oldstatus=PartiallyConnected newstatus=Connected
+1077	[2026-06-22 16:08:21.880] [info] [delivery_module] DeliveryModuleImpl::event_callback message: {"eventType":"connection_status_change","connectionStatus":"Connected"}
+1078	[2026-06-22 16:08:21.880] [info] [delivery_module] [LogosProviderObject] emitEvent: "connectionStateChanged"
+1079	[2026-06-22 16:08:21.880] [info] [delivery_module] [LogosProviderObject] ModuleProxy: forwarding event "connectionStateChanged" as Qt signal

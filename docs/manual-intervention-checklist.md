@@ -8,8 +8,11 @@ evidence, and packaging helpers.
 ## Must Be Recorded For Final Prize Submission
 
 1. Basecamp owner-channel proof
-   - Launch Basecamp with separate owner and agent profiles.
-   - Show the module set loaded.
+   - The Basecamp `0.1.2` launch and inspector proof is now captured in
+     `docs/basecamp-v012-agent-evidence-20260622.md`.
+   - For the final recording, launch Basecamp with separate owner and agent
+     profiles.
+   - Show the module set loaded, or reference the captured inspector proof.
    - Send at least one owner chat JSON skill call to the agent.
    - Show the agent response and matching agent/Core logs.
 
