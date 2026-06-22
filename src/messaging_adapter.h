@@ -25,6 +25,7 @@ public:
     QJsonObject join(const QJsonObject& params);
     QJsonObject createGroup(const QJsonObject& params);
     QJsonObject status() const;
+    QJsonObject replyToOwner(const QJsonObject& inboundPayload, const QJsonObject& body);
 
     QJsonObject deliverySend(const QString& topic, const QJsonObject& payload);
     QJsonObject deliverySubscribe(const QString& topic);
@@ -32,6 +33,9 @@ public:
 private:
     QJsonObject initChat(const QJsonObject& chatCfg);
     QJsonObject initDelivery(const QJsonObject& deliveryCfg, bool asyncStart, StartCallback callback = {});
+    QString ownerConversationIdFromPayload(const QJsonObject& payload) const;
+    void recordChatIntroBundleEvent(const QJsonObject& event);
+    void recordChatConversationEvent(const QJsonObject& event);
     void recordMessage(const QJsonObject& message);
     void recordDeliveryConnectionState(const QString& status);
 
@@ -43,6 +47,9 @@ private:
     bool m_deliveryStarting = false;
     bool m_deliveryStarted = false;
     QString m_deliveryConnectionStatus;
+    QString m_ownerConversationId;
+    QString m_chatIntroBundle;
+    QString m_chatIntroBundleLastError;
     QString m_chatLastError;
     QString m_deliveryLastError;
 };

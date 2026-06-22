@@ -3,14 +3,52 @@
 #include "agent_state.h"
 #include "json_utils.h"
 #include "logos_sdk.h"
+#include "owner_message_utils.h"
 
 #include <QDateTime>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QJsonValue>
 #include <QTimer>
 #include <QVariant>
 #include <QVariantList>
 #include <utility>
+
+namespace {
+
+QJsonObject parseEventObject(const QVariantList& data)
+{
+    if (data.isEmpty()) {
+        return {};
+    }
+    QString err;
+    return JsonUtils::parseObject(data.at(0).toString(), &err);
+}
+
+QJsonObject objectFromJsonString(const QString& raw)
+{
+    QString err;
+    return JsonUtils::parseObject(raw, &err);
+}
+
+QJsonObject nestedPayloadObject(const QJsonObject& payload)
+{
+    const QJsonValue wrapped = payload.value(QStringLiteral("payload"));
+    if (wrapped.isObject()) {
+        return wrapped.toObject();
+    }
+    if (wrapped.isString()) {
+        return objectFromJsonString(wrapped.toString());
+    }
+    return {};
+}
+
+QString conversationIdFromObject(const QJsonObject& obj)
+{
+    return OwnerMessageUtils::ownerConversationId(obj);
+}
+
+} // namespace
 
 void MessagingAdapter::setLogosModules(LogosModules* modules)
 {
@@ -34,22 +72,37 @@ void MessagingAdapter::wireEvents()
     }
 
     m_logos->chat_module.on("chatNewMessage", [this](const QVariantList& data) {
-        if (data.isEmpty()) {
-            return;
-        }
-        QString err;
-        const QJsonObject message = JsonUtils::parseObject(data.at(0).toString(), &err);
+        const QJsonObject message = parseEventObject(data);
         if (message.isEmpty()) {
             return;
+        }
+        const QString conversationId = ownerConversationIdFromPayload(message);
+        if (!conversationId.isEmpty()) {
+            m_ownerConversationId = conversationId;
         }
         recordMessage(QJsonObject{
             {QStringLiteral("transport"), QStringLiteral("chat")},
             {QStringLiteral("direction"), QStringLiteral("in")},
             {QStringLiteral("payload"), message},
+            {QStringLiteral("conversation_id"), conversationId},
             {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
         });
         if (m_inboundHandler) {
             m_inboundHandler(QStringLiteral("owner"), message);
+        }
+    });
+
+    m_logos->chat_module.on("chatCreateIntroBundleResult", [this](const QVariantList& data) {
+        const QJsonObject event = parseEventObject(data);
+        if (!event.isEmpty()) {
+            recordChatIntroBundleEvent(event);
+        }
+    });
+
+    m_logos->chat_module.on("chatNewConversation", [this](const QVariantList& data) {
+        const QJsonObject event = parseEventObject(data);
+        if (!event.isEmpty()) {
+            recordChatConversationEvent(event);
         }
     });
 
@@ -194,10 +247,34 @@ QJsonObject MessagingAdapter::status() const
     if (!m_chatLastError.isEmpty()) {
         out.insert(QStringLiteral("chat_last_error"), m_chatLastError);
     }
+    if (!m_ownerConversationId.isEmpty()) {
+        out.insert(QStringLiteral("owner_conversation_id"), m_ownerConversationId);
+    }
+    if (!m_chatIntroBundle.isEmpty()) {
+        out.insert(QStringLiteral("chat_intro_bundle"), m_chatIntroBundle);
+    }
+    if (!m_chatIntroBundleLastError.isEmpty()) {
+        out.insert(QStringLiteral("chat_intro_bundle_last_error"), m_chatIntroBundleLastError);
+    }
     if (!m_deliveryLastError.isEmpty()) {
         out.insert(QStringLiteral("delivery_last_error"), m_deliveryLastError);
     }
     return out;
+}
+
+QJsonObject MessagingAdapter::replyToOwner(const QJsonObject& inboundPayload, const QJsonObject& body)
+{
+    const QString conversationId = ownerConversationIdFromPayload(inboundPayload);
+    if (conversationId.isEmpty()) {
+        return JsonUtils::error(
+            QStringLiteral("messaging.owner_conversation_missing"),
+            QStringLiteral("owner chat event did not include a conversation id"));
+    }
+    m_ownerConversationId = conversationId;
+    return send(QJsonObject{
+        {QStringLiteral("recipient"), conversationId},
+        {QStringLiteral("message"), body}
+    });
 }
 
 QJsonObject MessagingAdapter::deliverySend(const QString& topic, const QJsonObject& payload)
@@ -234,6 +311,7 @@ QJsonObject MessagingAdapter::deliverySubscribe(const QString& topic)
 
 QJsonObject MessagingAdapter::initChat(const QJsonObject& chatCfg)
 {
+    m_ownerConversationId = chatCfg.value(QStringLiteral("owner_conversation_id")).toString();
     const QString cfgJson = JsonUtils::toString(chatCfg);
     if (!m_logos->chat_module.initChat(cfgJson)) {
         m_chatLastError = QStringLiteral("chat_module.initChat returned false");
@@ -253,6 +331,67 @@ QJsonObject MessagingAdapter::initChat(const QJsonObject& chatCfg)
         m_logos->chat_module.createIntroBundle();
     }
     return JsonUtils::ok(QJsonObject{{QStringLiteral("started"), true}});
+}
+
+QString MessagingAdapter::ownerConversationIdFromPayload(const QJsonObject& payload) const
+{
+    const QString direct = OwnerMessageUtils::ownerConversationId(payload);
+    if (!direct.isEmpty()) {
+        return direct;
+    }
+    return m_ownerConversationId;
+}
+
+void MessagingAdapter::recordChatIntroBundleEvent(const QJsonObject& event)
+{
+    QJsonObject body = event;
+    const QJsonObject nested = nestedPayloadObject(event);
+    if (!nested.isEmpty()) {
+        body = nested;
+    }
+
+    const QString introBundle = body.value(QStringLiteral("introBundle")).toString(
+        body.value(QStringLiteral("intro_bundle")).toString());
+    if (!introBundle.isEmpty()) {
+        m_chatIntroBundle = introBundle;
+        m_chatIntroBundleLastError.clear();
+    }
+
+    if (!body.value(QStringLiteral("success")).toBool(true)) {
+        m_chatIntroBundleLastError = body.value(QStringLiteral("error")).toString(
+            body.value(QStringLiteral("message")).toString(QStringLiteral("chat intro bundle creation failed")));
+    }
+
+    recordMessage(QJsonObject{
+        {QStringLiteral("transport"), QStringLiteral("chat")},
+        {QStringLiteral("direction"), QStringLiteral("event")},
+        {QStringLiteral("event"), QStringLiteral("chatCreateIntroBundleResult")},
+        {QStringLiteral("payload"), body},
+        {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+    });
+}
+
+void MessagingAdapter::recordChatConversationEvent(const QJsonObject& event)
+{
+    QJsonObject body = event;
+    const QJsonObject nested = nestedPayloadObject(event);
+    if (!nested.isEmpty()) {
+        body = nested;
+    }
+
+    const QString conversationId = conversationIdFromObject(body);
+    if (!conversationId.isEmpty()) {
+        m_ownerConversationId = conversationId;
+    }
+
+    recordMessage(QJsonObject{
+        {QStringLiteral("transport"), QStringLiteral("chat")},
+        {QStringLiteral("direction"), QStringLiteral("event")},
+        {QStringLiteral("event"), QStringLiteral("chatNewConversation")},
+        {QStringLiteral("conversation_id"), conversationId},
+        {QStringLiteral("payload"), body},
+        {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+    });
 }
 
 QJsonObject MessagingAdapter::initDelivery(const QJsonObject& deliveryCfg, bool asyncStart, StartCallback callback)

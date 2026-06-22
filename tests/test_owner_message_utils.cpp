@@ -40,6 +40,26 @@ LOGOS_TEST(owner_message_decodes_chat_module_hex_content)
     LOGOS_ASSERT_EQ(msg.value(QStringLiteral("skill")).toString().toStdString(), std::string("wallet.balance"));
 }
 
+LOGOS_TEST(owner_message_extracts_wrapped_chat_conversation_id)
+{
+    const QString command = JsonUtils::toString(QJsonObject{
+        {QStringLiteral("skill"), QStringLiteral("meta.status")},
+        {QStringLiteral("params"), QJsonObject{}}
+    });
+    const QString chatPayload = JsonUtils::toString(QJsonObject{
+        {QStringLiteral("eventType"), QStringLiteral("new_message")},
+        {QStringLiteral("conversationId"), QStringLiteral("conv-owner-agent")},
+        {QStringLiteral("content"), QString::fromLatin1(command.toUtf8().toHex())}
+    });
+
+    const QString conversationId = OwnerMessageUtils::ownerConversationId(QJsonObject{
+        {QStringLiteral("payload"), chatPayload},
+        {QStringLiteral("timestamp"), QStringLiteral("2026-06-22T00:00:00Z")}
+    });
+
+    LOGOS_ASSERT_EQ(conversationId.toStdString(), std::string("conv-owner-agent"));
+}
+
 LOGOS_TEST(owner_message_accepts_approval_decision)
 {
     const QString decision = JsonUtils::toString(QJsonObject{

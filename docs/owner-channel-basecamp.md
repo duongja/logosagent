@@ -57,6 +57,19 @@ Approval:
 
 Above-threshold transactions stay pending until an approval message is received.
 
+When a skill call arrives through the owner Chat conversation, the agent sends
+a Chat reply into the same conversation:
+
+```json
+{"type":"skill_result","skill":"meta.status","result":{"ok":true}}
+```
+
+When an approval decision arrives, the agent replies with:
+
+```json
+{"type":"approval_result","approval_id":"appr_xxx","result":{"ok":true}}
+```
+
 ## Basecamp Module Packaging
 
 Package the locally tested module payload first. This creates
@@ -162,6 +175,37 @@ logos-scaffold basecamp launch alice
 Use the Chat UI in Basecamp to create or open the private conversation with the
 agent. The final recorded prize demo should show this path end-to-end after the
 testnet agents and LEZ funding are ready.
+
+## Owner-to-Agent Chat Test
+
+The lowest-memory way to prove the owner channel is to run the agent headless
+and use Basecamp only as the owner app:
+
+1. Start the agent with Chat enabled, `create_intro_bundle: true`, and Storage
+   autostart disabled.
+2. Call `status()` on `logos_agent` until `messaging.chat_intro_bundle` appears.
+3. Open Basecamp as the owner.
+4. In Chat, create a private conversation by pasting the agent
+   `chat_intro_bundle`.
+5. Send this message:
+
+```json
+{"skill":"meta.status","params":{}}
+```
+
+Expected result: the same Chat conversation receives a JSON reply with
+`"type":"skill_result"`, `"skill":"meta.status"`, and the agent status in
+`"result"`.
+
+If a transaction needs approval, send the approval JSON in the same
+conversation:
+
+```json
+{"approval_id":"appr_xxx","approved":true}
+```
+
+Expected result: the Chat conversation receives a JSON reply with
+`"type":"approval_result"`.
 
 ## Verified Basecamp Launch
 

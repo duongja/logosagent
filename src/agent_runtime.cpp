@@ -466,14 +466,32 @@ void AgentRuntime::handleOwnerMessage(const QJsonObject& payload)
         const QString skill = message.value(QStringLiteral("skill")).toString();
         const QJsonObject params = message.value(QStringLiteral("params")).toObject();
         QJsonObject result = invokeObject(skill, params, QStringLiteral("owner-chat"));
+        const QJsonObject reply = m_messaging.replyToOwner(payload, QJsonObject{
+            {QStringLiteral("type"), QStringLiteral("skill_result")},
+            {QStringLiteral("skill"), skill},
+            {QStringLiteral("result"), result}
+        });
         emitEvent(QStringLiteral("ownerSkillResult"), QJsonObject{
             {QStringLiteral("request"), message},
             {QStringLiteral("raw_payload"), payload},
-            {QStringLiteral("result"), result}
+            {QStringLiteral("result"), result},
+            {QStringLiteral("reply"), reply}
         });
+        return;
     }
     if (message.contains(QStringLiteral("approval_id"))) {
         QJsonObject decision = message;
-        approve(message.value(QStringLiteral("approval_id")).toString(), JsonUtils::toString(decision));
+        const QJsonObject result = approve(message.value(QStringLiteral("approval_id")).toString(), JsonUtils::toString(decision));
+        const QJsonObject reply = m_messaging.replyToOwner(payload, QJsonObject{
+            {QStringLiteral("type"), QStringLiteral("approval_result")},
+            {QStringLiteral("approval_id"), message.value(QStringLiteral("approval_id")).toString()},
+            {QStringLiteral("result"), result}
+        });
+        emitEvent(QStringLiteral("ownerApprovalResult"), QJsonObject{
+            {QStringLiteral("request"), message},
+            {QStringLiteral("raw_payload"), payload},
+            {QStringLiteral("result"), result},
+            {QStringLiteral("reply"), reply}
+        });
     }
 }

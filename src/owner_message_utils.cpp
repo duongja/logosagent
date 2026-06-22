@@ -53,6 +53,27 @@ QJsonObject parseHexObjectString(const QString& hex, QString* errorMessage)
     return parseObjectString(QString::fromUtf8(bytes), errorMessage);
 }
 
+QString conversationIdFromObject(const QJsonObject& obj)
+{
+    const QString camel = obj.value(QStringLiteral("conversationId")).toString();
+    if (!camel.isEmpty()) {
+        return camel;
+    }
+    return obj.value(QStringLiteral("conversation_id")).toString();
+}
+
+QJsonObject nestedPayloadObject(const QJsonObject& payload)
+{
+    const QJsonValue wrappedPayload = payload.value(QStringLiteral("payload"));
+    if (wrappedPayload.isObject()) {
+        return wrappedPayload.toObject();
+    }
+    if (wrappedPayload.isString()) {
+        return parseObjectString(wrappedPayload.toString(), nullptr);
+    }
+    return {};
+}
+
 QJsonObject normalizeNestedChatPayload(const QJsonObject& wrapped, QString* errorMessage)
 {
     const QString rawPayload = wrapped.value(QStringLiteral("payload")).toString();
@@ -117,6 +138,21 @@ QJsonObject normalizeOwnerMessage(const QJsonObject& payload, QString* errorMess
     if (errorMessage) {
         *errorMessage = QStringLiteral("owner message did not contain a skill call or approval decision");
     }
+    return {};
+}
+
+QString ownerConversationId(const QJsonObject& payload)
+{
+    const QString direct = conversationIdFromObject(payload);
+    if (!direct.isEmpty()) {
+        return direct;
+    }
+
+    const QJsonObject nested = nestedPayloadObject(payload);
+    if (!nested.isEmpty()) {
+        return ownerConversationId(nested);
+    }
+
     return {};
 }
 
