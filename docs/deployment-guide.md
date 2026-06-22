@@ -129,6 +129,10 @@ Basecamp is the reference owner app shell. After building the LGX:
 ./scripts/basecamp-owner-channel.sh --setup
 ```
 
+The helper pins Basecamp to `tutorial-v3` / `release/0.1.2`
+(`63b35e8a0e826789ba15a46766df9fedc6794bc8`) by default. Override with
+`BASECAMP_PIN=<commit-or-tag>` only if Logos provides a newer required build.
+
 For a light validation that only captures the module table:
 
 ```bash

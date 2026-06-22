@@ -6,6 +6,8 @@ WORKSPACE="$(cd "$ROOT/.." && pwd)"
 BASECAMP_ROOT="$ROOT/.local/basecamp-owner-channel"
 SCAFFOLD_REPO="${SCAFFOLD_REPO:-$WORKSPACE/scaffold}"
 SCAFFOLD_BIN="${SCAFFOLD_BIN:-}"
+BASECAMP_SOURCE="${BASECAMP_SOURCE:-https://github.com/logos-co/logos-basecamp.git}"
+BASECAMP_PIN="${BASECAMP_PIN:-63b35e8a0e826789ba15a46766df9fedc6794bc8}"
 DEFAULT_LGX="$ROOT/result/logos-logos_agent-module-lib.lgx"
 LGX="${LGX:-$DEFAULT_LGX}"
 BASECAMP_LGX_ROOT="${BASECAMP_LGX_ROOT:-$ROOT/.local/artifacts/basecamp-lgx}"
@@ -34,6 +36,10 @@ Options:
 Environment:
   SCAFFOLD_BIN   Path to logos-scaffold binary.
   SCAFFOLD_REPO  Path to logos-co/scaffold checkout.
+  BASECAMP_SOURCE
+                 Basecamp repository. Default: https://github.com/logos-co/logos-basecamp.git.
+  BASECAMP_PIN   Basecamp commit/tag for scaffold.toml. Default: tutorial-v3
+                 commit 63b35e8a0e826789ba15a46766df9fedc6794bc8.
   LGX            Path to logos_agent .lgx artifact.
   BASECAMP_LGX_ROOT
                  Directory created by scripts/package-live-modules-lgx.sh.
@@ -126,6 +132,67 @@ cd "$BASECAMP_ROOT"
 if [ ! -f scaffold.toml ]; then
   "$SCAFFOLD_BIN" init
 fi
+
+python3 - "$BASECAMP_SOURCE" "$BASECAMP_PIN" <<'PY'
+import pathlib
+import sys
+
+path = pathlib.Path("scaffold.toml")
+source = sys.argv[1]
+pin = sys.argv[2]
+lines = path.read_text(encoding="utf-8").splitlines()
+
+out = []
+in_basecamp = False
+seen_basecamp = False
+seen_source = False
+seen_pin = False
+
+for line in lines:
+    stripped = line.strip()
+    if stripped.startswith("[") and stripped.endswith("]"):
+        if in_basecamp:
+            if not seen_source:
+                out.append(f'source = "{source}"')
+            if not seen_pin:
+                out.append(f'pin = "{pin}"')
+        in_basecamp = stripped == "[repos.basecamp]"
+        seen_basecamp = seen_basecamp or in_basecamp
+        seen_source = False
+        seen_pin = False
+        out.append(line)
+        continue
+
+    if in_basecamp and stripped.startswith("source"):
+        out.append(f'source = "{source}"')
+        seen_source = True
+    elif in_basecamp and stripped.startswith("pin"):
+        out.append(f'pin = "{pin}"')
+        seen_pin = True
+    else:
+        out.append(line)
+
+if in_basecamp:
+    if not seen_source:
+        out.append(f'source = "{source}"')
+    if not seen_pin:
+        out.append(f'pin = "{pin}"')
+
+if not seen_basecamp:
+    if out and out[-1].strip():
+        out.append("")
+    out.extend([
+        "[repos.basecamp]",
+        f'source = "{source}"',
+        f'pin = "{pin}"',
+        'build = "nix-flake"',
+        'attr = "app"',
+    ])
+
+path.write_text("\n".join(out) + "\n", encoding="utf-8")
+PY
+
+echo "Using Basecamp pin: $BASECAMP_PIN"
 
 if [ "$RUN_SETUP" -eq 1 ]; then
   "$SCAFFOLD_BIN" basecamp setup

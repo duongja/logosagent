@@ -192,11 +192,14 @@ The owner-channel helper uses `logos-co/scaffold` Basecamp commands:
 ./scripts/basecamp-owner-channel.sh --setup
 ```
 
-It creates `.local/basecamp-owner-channel`, captures the local runtime module
+It creates `.local/basecamp-owner-channel`, pins Basecamp to the recommended
+`tutorial-v3` / `release/0.1.2` commit
+`63b35e8a0e826789ba15a46766df9fedc6794bc8`, captures the local runtime module
 LGXs, and installs them into scaffold's `alice`/`bob` Basecamp profiles. Use
 `--capture-only` to validate the module table without building Basecamp, and
 `--launch` only when you want to open the app; the recorded demo remains a later
-step.
+step. If Logos publishes a newer Basecamp build, set
+`BASECAMP_PIN=<commit-or-tag>` when running the helper.
 
 When the Basecamp GUI build is too large for the local machine, validate the
 install layer separately:

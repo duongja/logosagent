@@ -83,6 +83,11 @@ The Basecamp package set includes:
 
 ## Basecamp Setup
 
+The helper pins Scaffold's Basecamp checkout to the recommended
+`tutorial-v3` / `release/0.1.2` commit
+`63b35e8a0e826789ba15a46766df9fedc6794bc8` by default. Override with
+`BASECAMP_PIN=<commit-or-tag>` only if Logos publishes a newer required build.
+
 Validate module capture without running the heavier Basecamp install/setup
 path:
 

@@ -159,6 +159,8 @@ See [docs/skill-interface.md](docs/skill-interface.md).
 For the owner app path, see
 [docs/owner-channel-basecamp.md](docs/owner-channel-basecamp.md). It documents
 how Basecamp loads the module and how owner chat messages are formatted.
+The Basecamp helper pins Scaffold's Basecamp checkout to `tutorial-v3` /
+`release/0.1.2` (`63b35e8a0e826789ba15a46766df9fedc6794bc8`) by default.
 On low-memory machines, use `./scripts/basecamp-profile-install-smoke.sh` to
 prove the real `lgpm` profile install layer without building the Basecamp GUI.
 
