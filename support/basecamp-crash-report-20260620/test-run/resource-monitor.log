@@ -1,0 +1,408 @@
+timestamp: 2026-06-19T19:30:49,517787706+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       1.3Gi       5.0Gi       234Mi       1.9Gi       6.3Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723518
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910030
+io pressure:
+some avg10=0.14 avg60=0.38 avg300=0.38 total=326407939
+full avg10=0.11 avg60=0.32 avg300=0.33 total=277202127
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  65984   65977 codex            1.7  2.5 135176 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106496 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.4 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18124 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13356 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+  44165   43704 gsd-media-keys   0.1  0.0  9364 /usr/libexec/gsd-media-keys
+
+timestamp: 2026-06-19T19:31:04,542528803+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       1.4Gi       4.9Gi       251Mi       1.9Gi       6.2Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723522
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910033
+io pressure:
+some avg10=0.45 avg60=0.45 avg300=0.40 total=326578317
+full avg10=0.44 avg60=0.40 avg300=0.35 total=277371026
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  65984   65977 codex            1.6  2.5 133536 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106484 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  88183   88172 nix              0.5  4.5 44164 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13356 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:31:19,598143609+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       1.3Gi       4.9Gi       237Mi       1.9Gi       6.3Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723522
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910033
+io pressure:
+some avg10=0.09 avg60=0.34 avg300=0.37 total=326655632
+full avg10=0.08 avg60=0.30 avg300=0.33 total=277447033
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  65984   65977 codex            1.6  2.5 133352 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106512 /usr/bin/gnome-shell
+  88183   88172 nix              0.7  5.8 56732 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13356 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:31:34,626133488+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       2.1Gi       4.0Gi       255Mi       2.1Gi       5.4Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723523
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910035
+io pressure:
+some avg10=2.04 avg60=0.99 avg300=0.53 total=327224828
+full avg10=2.04 avg60=0.97 avg300=0.48 total=278009788
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             11.7 35.3 934436 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.7  2.5 140468 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106548 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13360 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:31:49,645422722+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       2.6Gi       2.9Gi       235Mi       2.7Gi       5.0Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  192G   30G  87% /
+/dev/nvme0n1p2  233G  192G   30G  87% /
+/dev/nvme0n1p2  233G  192G   30G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723523
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910035
+io pressure:
+some avg10=2.29 avg60=1.14 avg300=0.57 total=327512002
+full avg10=2.29 avg60=1.12 avg300=0.54 total=278293534
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             17.1 52.9 1364240 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.7  2.5 135460 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106548 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13360 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:32:04,728814234+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       3.4Gi       1.5Gi       261Mi       3.3Gi       4.2Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723523
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910035
+io pressure:
+some avg10=3.15 avg60=1.43 avg300=0.66 total=327992095
+full avg10=2.90 avg60=1.36 avg300=0.62 total=278754285
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             26.8 66.3 2131056 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.6  2.5 133448 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106456 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+   1211       1 snapd            0.1  0.0 13364 /snap/snapd/current/usr/lib/snapd/snapd
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:32:19,751307943+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       4.0Gi       883Mi       239Mi       3.3Gi       3.5Gi
+Swap:           11Gi       898Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107723523
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95910035
+io pressure:
+some avg10=16.59 avg60=5.84 avg300=1.71 total=331864532
+full avg10=15.67 avg60=5.56 avg300=1.62 total=282449892
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             35.6 72.1 2831656 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.6  2.5 133448 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106564 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.5 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18132 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+   1211       1 snapd            0.1  0.0 13364 /snap/snapd/current/usr/lib/snapd/snapd
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+
+timestamp: 2026-06-19T19:32:34,792564363+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       5.4Gi       265Mi       172Mi       2.4Gi       2.1Gi
+Swap:           11Gi       899Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107747469
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95933745
+io pressure:
+some avg10=10.97 avg60=7.49 avg300=2.34 total=333491086
+full avg10=10.45 avg60=7.14 avg300=2.22 total=284029073
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             56.8 81.5 4515408 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.6  2.5 127580 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.2 12.3 102452 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.6 42640 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 19956 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 18976 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18020 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 16744 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+   1211       1 snapd            0.1  0.0 13228 /snap/snapd/current/usr/lib/snapd/snapd
+  44127   43704 gjs              0.1  0.0 12336 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1470       1 containerd       0.1  0.0 11832 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 10964 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 10836 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7  9920 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9552 /usr/sbin/NetworkManager --no-daemon
+  44549   43704 xdg-desktop-por  0.1  0.0  8992 /usr/libexec/xdg-desktop-portal-gnome
+  44918   43978 mutter-x11-fram  0.1  0.0  8804 /usr/libexec/mutter-x11-frames
+
+timestamp: 2026-06-19T19:32:49,825232229+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       6.0Gi       195Mi       233Mi       2.0Gi       1.6Gi
+Swap:           11Gi       899Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+/dev/nvme0n1p2  233G  192G   29G  87% /
+memory pressure:
+some avg10=0.00 avg60=0.00 avg300=0.00 total=107763020
+full avg10=0.00 avg60=0.00 avg300=0.00 total=95949264
+io pressure:
+some avg10=5.55 avg60=6.71 avg300=2.40 total=334066485
+full avg10=5.36 avg60=6.40 avg300=2.28 total=284585729
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             61.4 85.0 4880116 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.5  2.5 126592 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 104596 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.6 42308 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 19932 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 18048 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18020 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 16504 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+   1211       1 snapd            0.1  0.0 13228 /snap/snapd/current/usr/lib/snapd/snapd
+  44127   43704 gjs              0.1  0.0 12236 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1470       1 containerd       0.1  0.0 11876 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 10864 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 10824 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7  9884 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9548 /usr/sbin/NetworkManager --no-daemon
+  44549   43704 xdg-desktop-por  0.1  0.0  8908 /usr/libexec/xdg-desktop-portal-gnome
+  44918   43978 mutter-x11-fram  0.1  0.0  8644 /usr/libexec/mutter-x11-frames
+
+timestamp: 2026-06-19T19:33:04,907517829+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       6.8Gi       136Mi       205Mi       1.1Gi       796Mi
+Swap:           11Gi       904Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  193G   29G  88% /
+/dev/nvme0n1p2  233G  193G   29G  88% /
+/dev/nvme0n1p2  233G  193G   29G  88% /
+memory pressure:
+some avg10=3.72 avg60=0.68 avg300=0.14 total=108333190
+full avg10=2.45 avg60=0.45 avg300=0.09 total=96313440
+io pressure:
+some avg10=25.45 avg60=10.41 avg300=3.41 total=337697620
+full avg10=5.53 avg60=5.90 avg300=2.37 total=285373577
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             63.5 86.3 5042052 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  88915   88898 cc1plus          2.5 48.1 202240 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx_core.dir/src/core/manifest.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/manifest.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/manifest.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/core/manifest.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase manifest.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/ccKOFgQW.s
+  88913   88899 cc1plus          2.2 70.8 178704 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx_core.dir/src/core/package.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/package.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/package.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/core/package.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase package.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/ccs7yK2e.s
+  88908   88894 cc1plus          1.9 61.2 157184 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/core/tar_writer.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase tar_writer.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/cctJvrfw.s
+  88989   88988 cc1plus          1.8 72.7 146992 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx.dir/src/commands/extract_command.cpp.d -MF CMakeFiles/lgx.dir/src/commands/extract_command.cpp.o.d -MT CMakeFiles/lgx.dir/src/commands/extract_command.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/commands/extract_command.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/commands/ -dumpbase extract_command.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/cco22hK3.s
+  88986   88984 cc1plus          1.7 58.6 137856 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx.dir/src/commands/remove_command.cpp.d -MF CMakeFiles/lgx.dir/src/commands/remove_command.cpp.o.d -MT CMakeFiles/lgx.dir/src/commands/remove_command.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/commands/remove_command.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/commands/ -dumpbase remove_command.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/ccHiu8kq.s
+  89001   89000 cc1plus          1.7 64.7 136428 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx.dir/src/commands/verify_command.cpp.d -MF CMakeFiles/lgx.dir/src/commands/verify_command.cpp.o.d -MT CMakeFiles/lgx.dir/src/commands/verify_command.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/commands/verify_command.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/commands/ -dumpbase verify_command.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/ccKhYqKy.s
+  65984   65977 codex            1.5  2.5 126412 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  89047   89046 cc1plus          1.3 68.6 108160 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/include -I /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src -MD CMakeFiles/lgx.dir/src/commands/merge_command.cpp.d -MF CMakeFiles/lgx.dir/src/commands/merge_command.cpp.o.d -MT CMakeFiles/lgx.dir/src/commands/merge_command.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252407/0dgi584k8d3af4lgp7w3m0sx378vcg47-source/src/commands/merge_command.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/commands/ -dumpbase merge_command.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=sr699wh23y --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252407/ccLrPxMK.s
+  43978   43704 gnome-shell      1.2 12.3 98844 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.6 41756 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 19840 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 18096 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 16996 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 16244 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  88885   88760 cmake            0.1  0.0 14116 cmake --build build
+   1211       1 snapd            0.1  0.0 13228 /snap/snapd/current/usr/lib/snapd/snapd
+
+timestamp: 2026-06-19T19:33:19,956258230+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       6.1Gi       486Mi       231Mi       1.5Gi       1.5Gi
+Swap:           11Gi       905Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  193G   29G  88% /
+/dev/nvme0n1p2  233G  193G   29G  88% /
+/dev/nvme0n1p2  233G  193G   29G  88% /
+memory pressure:
+some avg10=1.30 avg60=0.72 avg300=0.18 total=108440269
+full avg10=0.71 avg60=0.41 avg300=0.10 total=96387217
+io pressure:
+some avg10=54.68 avg60=20.51 avg300=5.99 total=346910184
+full avg10=43.33 avg60=14.97 avg300=4.55 total=293171044
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             63.8 85.1 5072816 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  65984   65977 codex            1.5  2.5 126372 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.2 12.3 97612 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.6 41756 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 19840 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 18096 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 16996 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 16176 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+   1211       1 snapd            0.1  0.0 13228 /snap/snapd/current/usr/lib/snapd/snapd
+  44127   43704 gjs              0.1  0.0 12224 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1470       1 containerd       0.1  0.0 11876 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 10852 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 10660 /usr/bin/pipewire
+   1232       1 NetworkManager   0.1  0.0  9484 /usr/sbin/NetworkManager --no-daemon
+  43725   43704 wireplumber      0.1  0.7  8940 /usr/bin/wireplumber
+  44549   43704 xdg-desktop-por  0.1  0.0  8824 /usr/libexec/xdg-desktop-portal-gnome
+   5335       1 fwupd            0.1  0.0  8496 /usr/libexec/fwupd/fwupd
+
+timestamp: 2026-06-19T19:33:38,159845334+03:00
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       7.1Gi       122Mi       202Mi       1.0Gi       496Mi
+Swap:           11Gi       917Mi        11Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  193G   28G  88% /
+/dev/nvme0n1p2  233G  193G   28G  88% /
+/dev/nvme0n1p2  233G  193G   28G  88% /
+memory pressure:
+some avg10=20.97 avg60=4.55 avg300=1.02 total=111480578
+full avg10=17.45 avg60=3.61 avg300=0.79 total=98962171
+io pressure:
+some avg10=86.48 avg60=49.07 avg300=14.96 total=376604986
+full avg10=75.40 avg60=40.60 avg300=12.27 total=318410432
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  88183   88172 nix             63.2 74.4 5022120 nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+  89419   89402 cc1plus          3.3 24.0 263552 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_core.dir/src/core/manifest.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/manifest.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/manifest.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/manifest.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase manifest.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccOQPvrY.s
+  89416   89404 cc1plus          2.1 20.5 172408 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_core.dir/src/core/package.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/package.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/package.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/package.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase package.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccFGqk2U.s
+  89538   89537 cc1plus          2.1 80.1 169468 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_shared.dir/src/core/package.cpp.d -MF CMakeFiles/lgx_shared.dir/src/core/package.cpp.o.d -MT CMakeFiles/lgx_shared.dir/src/core/package.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D LGX_BUILD_SHARED -D lgx_shared_EXPORTS -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/package.cpp -quiet -dumpdir CMakeFiles/lgx_shared.dir/src/core/ -dumpbase package.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccqfzp5F.s
+  89413   89400 cc1plus          1.9 19.4 153748 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/tar_writer.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/tar_writer.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase tar_writer.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccA6PrT0.s
+  89410   89394 cc1plus          1.6 14.2 131376 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_core.dir/src/core/path_normalizer.cpp.d -MF CMakeFiles/lgx_core.dir/src/core/path_normalizer.cpp.o.d -MT CMakeFiles/lgx_core.dir/src/core/path_normalizer.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/path_normalizer.cpp -quiet -dumpdir CMakeFiles/lgx_core.dir/src/core/ -dumpbase path_normalizer.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccxv4cnh.s
+  89506   89505 cc1plus          1.5 14.3 126972 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_shared.dir/src/core/tar_reader.cpp.d -MF CMakeFiles/lgx_shared.dir/src/core/tar_reader.cpp.o.d -MT CMakeFiles/lgx_shared.dir/src/core/tar_reader.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D LGX_BUILD_SHARED -D lgx_shared_EXPORTS -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/tar_reader.cpp -quiet -dumpdir CMakeFiles/lgx_shared.dir/src/core/ -dumpbase tar_reader.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccBD974o.s
+  89542   89541 cc1plus          1.4 62.1 118256 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx.dir/src/main.cpp.d -MF CMakeFiles/lgx.dir/src/main.cpp.o.d -MT CMakeFiles/lgx.dir/src/main.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/main.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/ -dumpbase main.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/cc2vyeDM.s
+  65984   65977 codex            1.4  2.5 115880 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  89421   89406 cc1plus          1.4 10.3 115672 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_shared.dir/src/lib.cpp.d -MF CMakeFiles/lgx_shared.dir/src/lib.cpp.o.d -MT CMakeFiles/lgx_shared.dir/src/lib.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D LGX_BUILD_SHARED -D lgx_shared_EXPORTS -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/lib.cpp -quiet -dumpdir CMakeFiles/lgx_shared.dir/src/ -dumpbase lib.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/ccq3FOXd.s
+  89530   89529 cc1plus          1.3  9.2 107112 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx_shared.dir/src/core/manifest.cpp.d -MF CMakeFiles/lgx_shared.dir/src/core/manifest.cpp.o.d -MT CMakeFiles/lgx_shared.dir/src/core/manifest.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D LGX_BUILD_SHARED -D lgx_shared_EXPORTS -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/core/manifest.cpp -quiet -dumpdir CMakeFiles/lgx_shared.dir/src/core/ -dumpbase manifest.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -fPIC -fvisibility=hidden -fvisibility-inlines-hidden -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/cckbwWHv.s
+  43978   43704 gnome-shell      1.0 12.3 82736 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.4  7.6 34500 /usr/libexec/gnome-terminal-server
+  89546   89545 cc1plus          0.2 37.5 23392 /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/libexec/gcc/x86_64-unknown-linux-gnu/14.3.0/cc1plus -quiet -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/include -I /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src -MD CMakeFiles/lgx.dir/src/commands/command.cpp.d -MF CMakeFiles/lgx.dir/src/commands/command.cpp.o.d -MT CMakeFiles/lgx.dir/src/commands/command.cpp.o -D_GNU_SOURCE -U _FORTIFY_SOURCE -D NDEBUG -U _FORTIFY_SOURCE -D _FORTIFY_SOURCE=3 -idirafter /nix/store/gf3wh0x0rzb1dkx0wx1jvmipydwfzzd5-glibc-2.40-66-dev/include -idirafter /nix/store/82kmz7r96navanrc2fgckh2bamiqrgsw-gcc-14.3.0/lib/gcc/x86_64-unknown-linux-gnu/14.3.0/include-fixed -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include -isystem /nix/store/29mcvdnd9s6sp46cjmqm0pfg4xs56rik-zlib-1.3.1-dev/include -isystem /nix/store/083x1zrd8rnrkq1plphxvc2vdzgk8dvj-icu4c-76.1-dev/include -isystem /nix/store/r82wggrhgs0v2kkp0f2g9jplc4mfh2gq-nlohmann_json-3.11.3/include -isystem /nix/store/i4jy5k3i83gdcz76d7i7ymp500rz63pw-gtest-1.17.0-dev/include /nix/var/nix/builds/nix-88183-922252408/1sinj0mdj42srfgy4nagd080hyn3l969-source/src/commands/command.cpp -quiet -dumpdir CMakeFiles/lgx.dir/src/commands/ -dumpbase command.cpp.cpp -dumpbase-ext .cpp -mno-omit-leaf-frame-pointer -mtune=generic -march=x86-64 -O2 -O3 -Wformat=1 -Wformat-security -Werror=format-security -std=gnu++17 -fPIC -fstack-clash-protection -fzero-call-used-regs=used-gpr -fstack-protector-strong -fno-strict-overflow -fno-omit-frame-pointer -frandom-seed=w34rp4v3c3 --param=ssp-buffer-size=4 -o /nix/var/nix/builds/nix-88183-922252408/cc8OK5iu.s
+  43728   43704 pipewire-pulse   0.2  1.0 19684 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 18096 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 16400 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+

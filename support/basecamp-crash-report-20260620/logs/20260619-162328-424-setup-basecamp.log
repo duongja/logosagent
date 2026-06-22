@@ -1,0 +1,17 @@
+# step: building basecamp (.#app)
+# started: 2026-06-19T16:23:28Z
+# command: nix build .#app --out-link /home/agate/.cache/logos-scaffold/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69/app-result
+---
+unpacking 'github:logos-co/logos-capability-module/7b35383e0aa4e28a4633ed18a87efb57636939b1?narHash=sha256-jehjsB%2BBpDJlVu3I7x%2BvFVOdXmy9MDmFTJtRqzFUONo%3D' into the Git cache...
+warning: unable to download 'https://github.com/logos-co/logos-capability-module/archive/7b35383e0aa4e28a4633ed18a87efb57636939b1.tar.gz': Timeout was reached (28) Resolving timed out after 15000 milliseconds; retrying in 255 ms (attempt 1/5)
+warning: unable to download 'https://github.com/logos-co/logos-capability-module/archive/7b35383e0aa4e28a4633ed18a87efb57636939b1.tar.gz': Timeout was reached (28) Resolving timed out after 15001 milliseconds; retrying in 675 ms (attempt 2/5)
+warning: unable to download 'https://github.com/logos-co/logos-capability-module/archive/7b35383e0aa4e28a4633ed18a87efb57636939b1.tar.gz': Timeout was reached (28) Resolving timed out after 15000 milliseconds; retrying in 1099 ms (attempt 3/5)
+warning: unable to download 'https://github.com/logos-co/logos-capability-module/archive/7b35383e0aa4e28a4633ed18a87efb57636939b1.tar.gz': Timeout was reached (28) Resolving timed out after 15000 milliseconds; retrying in 2394 ms (attempt 4/5)
+error:
+       … while updating the lock file of flake 'git+file:///home/agate/.cache/logos-scaffold/repos/basecamp/a746cdbc521f72ee22c5a4856fd17a9802bb9d69?rev=a746cdbc521f72ee22c5a4856fd17a9802bb9d69'
+
+       … while updating the flake input 'logos-capability-module'
+
+       … while fetching the input 'github:logos-co/logos-capability-module/7b35383e0aa4e28a4633ed18a87efb57636939b1?narHash=sha256-jehjsB%2BBpDJlVu3I7x%2BvFVOdXmy9MDmFTJtRqzFUONo%3D'
+
+       error: Failed to open archive (Source threw exception: error: unable to download 'https://github.com/logos-co/logos-capability-module/archive/7b35383e0aa4e28a4633ed18a87efb57636939b1.tar.gz': Timeout was reached (28) Resolving timed out after 15000 milliseconds)

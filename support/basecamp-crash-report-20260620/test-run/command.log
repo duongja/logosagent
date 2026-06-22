@@ -1,0 +1,9 @@
+cloning basecamp at a746cdbc521f72ee22c5a4856fd17a9802bb9d69
+$ git fetch --all --tags
+$ git rev-parse --verify a746cdbc521f72ee22c5a4856fd17a9802bb9d69^{commit}
+$ git checkout a746cdbc521f72ee22c5a4856fd17a9802bb9d69
+HEAD is now at a746cdb discriminate between dev and portable package variants (#94)
+$ git rev-parse HEAD
+building basecamp (.#app)
+  tip: tail -f /home/agate/Projects/logos/logos-agent/.local/basecamp-owner-channel/.scaffold/logs/20260619-163100-138-setup-basecamp.log
+  ⋯ building basecamp (.#app)

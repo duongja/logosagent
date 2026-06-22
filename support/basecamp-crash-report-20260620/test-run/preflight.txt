@@ -1,0 +1,130 @@
+label: preflight
+timestamp: 2026-06-19T19:30:49,442503077+03:00
+
+uname:
+Linux KYL 6.8.0-117-generic #117-Ubuntu SMP PREEMPT_DYNAMIC Tue May  5 19:26:24 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+
+uptime:
+ 19:30:49 up 14:41,  1 user,  load average: 0.97, 1.08, 1.88
+
+memory:
+               total        used        free      shared  buff/cache   available
+Mem:           7.6Gi       1.3Gi       5.0Gi       232Mi       1.9Gi       6.3Gi
+Swap:           11Gi       898Mi        11Gi
+
+swap:
+NAME                     TYPE SIZE   USED PRIO
+/swap.img                file   4G 864.7M   -2
+/swapfile-logos-agent-8g file   8G    34M   -3
+
+disk:
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+/dev/nvme0n1p2  233G  191G   30G  87% /
+
+power:
+Device: /org/freedesktop/UPower/devices/battery_BAT0
+  native-path:          BAT0
+  vendor:               Hewlett-Packard
+  model:                Primary
+  serial:               03946 2020/04/18
+  power supply:         yes
+  updated:              Fri Jun 19 19:30:42 2026 (7 seconds ago)
+  has history:          yes
+  has statistics:       yes
+  battery
+    present:             yes
+    rechargeable:        yes
+    state:               fully-charged
+    warning-level:       none
+    energy:              33.6567 Wh
+    energy-empty:        0 Wh
+    energy-full:         33.6567 Wh
+    energy-full-design:  33.6567 Wh
+    energy-rate:         0 W
+    voltage:             13.015 V
+    charge-cycles:       N/A
+    percentage:          100%
+    capacity:            100%
+    technology:          lithium-ion
+    icon-name:          'battery-full-charged-symbolic'
+
+Device: /org/freedesktop/UPower/devices/line_power_AC
+  native-path:          AC
+  power supply:         yes
+  updated:              Fri Jun 19 17:30:35 2026 (7214 seconds ago)
+  has history:          no
+  has statistics:       no
+  line-power
+    warning-level:       none
+    online:              yes
+    icon-name:          'ac-adapter-symbolic'
+
+Device: /org/freedesktop/UPower/devices/DisplayDevice
+  power supply:         yes
+  updated:              Fri Jun 19 19:19:11 2026 (698 seconds ago)
+  has history:          no
+  has statistics:       no
+  battery
+    present:             yes
+    state:               fully-charged
+    warning-level:       none
+    energy:              33.6567 Wh
+    energy-full:         33.6567 Wh
+    energy-rate:         0 W
+    charge-cycles:       N/A
+    percentage:          100%
+    icon-name:          'battery-full-charged-symbolic'
+
+Daemon:
+  daemon-version:  1.90.3
+  on-battery:      no
+  lid-is-closed:   no
+  lid-is-present:  yes
+  critical-action: HybridSleep
+
+nix config:
+cores = 1
+max-jobs = 1
+sandbox = true
+sandbox-build-dir = /build
+sandbox-dev-shm-size = 50%
+sandbox-fallback = true
+sandbox-paths = /bin/sh=/nix/store/l34zf9300cgydgsimmnxvjl9ivjn2yjc-busybox-1.36.1/bin/busybox
+substituters = https://cache.nixos.org/
+trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=
+
+top memory processes:
+    PID    PPID COMMAND         %MEM %CPU   RSS COMMAND
+  65984   65977 codex            1.7  2.5 135176 /home/agate/.nvm/versions/node/v22.20.0/lib/node_modules/@openai/codex/node_modules/@openai/codex-linux-x64/vendor/x86_64-unknown-linux-musl/codex/codex .
+  43978   43704 gnome-shell      1.3 12.3 106496 /usr/bin/gnome-shell
+  65687   43704 gnome-terminal-  0.5  7.4 44760 /usr/libexec/gnome-terminal-server
+  43728   43704 pipewire-pulse   0.2  1.0 20332 /usr/bin/pipewire-pulse
+    327       1 systemd-journal  0.2  0.0 19424 /usr/lib/systemd/systemd-journald
+   2187       1 dockerd          0.2  0.0 18168 /usr/bin/dockerd -H fd:// --containerd=/run/containerd/containerd.sock
+  44590   43978 gjs              0.2  0.0 18124 gjs /usr/share/gnome-shell/extensions/ding@rastersoft.com/app/ding.js -E -P /usr/share/gnome-shell/extensions/ding@rastersoft.com/app
+  44127   43704 gjs              0.1  0.0 13364 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.Shell.Notifications
+   1211       1 snapd            0.1  0.0 13356 /snap/snapd/current/usr/lib/snapd/snapd
+   1470       1 containerd       0.1  0.0 11936 /usr/bin/containerd
+  44518   43704 gjs              0.1  0.0 11920 /usr/bin/gjs -m /usr/share/gnome-shell/org.gnome.ScreenSaver
+  43721   43704 pipewire         0.1  0.3 11248 /usr/bin/pipewire
+  43725   43704 wireplumber      0.1  0.7 10224 /usr/bin/wireplumber
+   1232       1 NetworkManager   0.1  0.0  9728 /usr/sbin/NetworkManager --no-daemon
+  44918   43978 mutter-x11-fram  0.1  0.0  9660 /usr/libexec/mutter-x11-frames
+  44171   43704 gsd-power        0.1  0.0  9388 /usr/libexec/gsd-power
+  44165   43704 gsd-media-keys   0.1  0.0  9364 /usr/libexec/gsd-media-keys
+  44549   43704 xdg-desktop-por  0.1  0.0  9280 /usr/libexec/xdg-desktop-portal-gnome
+   5335       1 fwupd            0.1  0.0  9272 /usr/libexec/fwupd/fwupd
+
+active inhibitors:
+WHO                          UID  USER  PID   COMM            WHAT                                                     WHY                                                       MODE
+ModemManager                 0    root  1355  ModemManager    sleep                                                    ModemManager needs to reset devices                       delay
+NetworkManager               0    root  1232  NetworkManager  sleep                                                    NetworkManager needs to turn off networks                 delay
+UPower                       0    root  1381  upowerd         sleep                                                    Pause device polling                                      delay
+Unattended Upgrades Shutdown 0    root  1465  unattended-upgr shutdown                                                 Stop ongoing upgrades or perform upgrades before shutdown delay
+agate                        1000 agate 44165 gsd-media-keys  handle-power-key:handle-suspend-key:handle-hibernate-key GNOME handling keypresses                                 block
+agate                        1000 agate 44165 gsd-media-keys  sleep                                                    GNOME handling keypresses                                 delay
+agate                        1000 agate 44171 gsd-power       sleep                                                    GNOME needs to lock the screen                            delay
+
+7 inhibitors listed.

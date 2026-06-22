@@ -1,0 +1,7 @@
+Generated LGX module sizes from .local/artifacts/basecamp-lgx:
+
+829557   logos_agent/logos_agent.lgx
+6588660  storage_module/storage_module.lgx
+6659312  logos_execution_zone/logos_execution_zone.lgx
+14623109 delivery_module/delivery_module.lgx
+14848416 chat_module/chat_module.lgx
