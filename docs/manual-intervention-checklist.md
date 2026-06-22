@@ -7,14 +7,14 @@ evidence, and packaging helpers.
 
 ## Must Be Recorded For Final Prize Submission
 
-1. Basecamp owner-channel proof
+1. Final Basecamp owner-channel recording
    - The Basecamp `0.1.2` launch and inspector proof is now captured in
      `docs/basecamp-v012-agent-evidence-20260622.md`.
-   - For the final recording, launch Basecamp with separate owner and agent
-     profiles.
-   - Show the module set loaded, or reference the captured inspector proof.
-   - Send at least one owner chat JSON skill call to the agent.
-   - Show the agent response and matching agent/Core logs.
+   - The owner-to-agent Chat UI proof is now captured in
+     `docs/basecamp-owner-chat-evidence-20260622.md`.
+   - For the final video, replay the same Chat flow or show the captured proof:
+     owner sends JSON skill calls, agent replies in the same conversation, and
+     `wallet.send` creates a pending approval.
 
 2. Recorded two-agent Delivery/A2A proof
    - The headless CLI proof already shows Agent Card discovery, paid task
@@ -31,6 +31,7 @@ evidence, and packaging helpers.
    - Show terminal output for proof-generating runs.
    - Show `RISC0_DEV_MODE=0`.
    - Show hosted-testnet tx hashes from the evidence docs.
+   - Show or include the Basecamp owner Chat proof now that it is working.
 
 5. CU values
    - Fill `docs/cu-report.md` if Logos exposes CU through explorer, sequencer metadata, or logs.

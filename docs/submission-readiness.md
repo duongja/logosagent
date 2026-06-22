@@ -158,6 +158,25 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   connection transition to `Connected`. See
   `docs/basecamp-v012-agent-evidence-20260622.md` and
   `support/basecamp-v012-agent-proof-20260622/`.
+- Verified Basecamp owner-to-agent Chat UI flow on 2026-06-22:
+  the owner pasted the agent intro bundle into Basecamp Chat and sent JSON
+  skill calls in a private conversation. The headless agent received
+  `meta.status`, `agent.card`, `wallet.balance`, `storage.list`,
+  `messaging.send`, and `wallet.send` through the real `chat_module` push-event
+  wrapper, replied to the same conversation, and created pending approval
+  `appr_29deccb3d30d7ab1842b43b8f42f1285` for the above-threshold
+  `wallet.send`. See `docs/basecamp-owner-chat-evidence-20260622.md`.
+- Verified full localnet prize evidence refresh on 2026-06-22:
+  Storage upload/list/share/download passed with byte-for-byte recovery and
+  content address `zDvZRwzmDgqgmHKmGhXFpXsWitckj81Tuzk3vKfABaPV4VHvrXxU`;
+  wallet threshold/transfer passed with tx
+  `22b2daffa8a526f17b4b370afe408edacbdfe48c2078af07c128673d5e402547`;
+  Messaging create/join/send passed over Delivery; unpaid and paid A2A reached
+  `TASK_STATE_COMPLETED`; paid A2A attached payment tx
+  `cbe01582b0bd0fab691b73760b1919b94e9d2da3ae023e32d158b02404d29bd7`;
+  program query/call/deploy passed with program ID
+  `e0dac2d532553d5c059523c920c36bfe47fbe39c45434ce0c66e08dcf856d75f`.
+  See `docs/localnet-prize-evidence-refresh-20260622.md`.
 - Local evidence bundle generation available:
   `./scripts/collect-prize-evidence.py --network localnet`.
   The output is intended to be rerun with explicit testnet run roots before
@@ -229,16 +248,11 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   module payload. Before final submission, also rerun the official clean Nix
   package path (`nix build --impure .#lgx -L`) on a machine with enough memory or
   after cache warmup.
-- Live Basecamp Chat UI owner-channel run against a separate Logos app profile.
-  Basecamp `0.1.2` launch and inspector-driven agent start now work with the
-  safe config; the remaining Basecamp evidence is the user-facing chat
-  interaction recording.
 - End-to-end recorded evidence for at least three illustrative use cases. The
-  two-agent Delivery/A2A discovery + payment flow is now proven headlessly on
-  localnet, but still needs to be included in the narrated final recording or
-  rerun on the final demo host.
-- Basecamp owner-channel live run against the deployed agent.
-- Recorded narrated demo with terminal proof output showing `RISC0_DEV_MODE=0`.
+  implementation flows are now proven, including Basecamp owner Chat, but the
+  final prize submission still needs narrated video footage that shows the
+  evidence commands, visible Basecamp Chat interaction, tx hashes, and
+  `RISC0_DEV_MODE=0`.
 
 ## Pre-Submission Command Set
 

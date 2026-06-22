@@ -19,6 +19,9 @@ DEFAULT_DOCS = [
     "docs/security-model.md",
     "docs/deployment-guide.md",
     "docs/owner-channel-basecamp.md",
+    "docs/basecamp-owner-chat-evidence-20260622.md",
+    "docs/basecamp-v012-agent-evidence-20260622.md",
+    "docs/localnet-prize-evidence-refresh-20260622.md",
     "docs/cu-report.md",
     "docs/environment-setup.md",
     "docs/submission-readiness.md",
@@ -34,10 +37,10 @@ DEFAULT_DOCS = [
     ".github/workflows/ci.yml",
 ]
 MANUAL_ITEMS = [
-    "Run the Basecamp GUI owner-channel proof with separate owner/agent profiles and record the chat interaction plus agent/Core logs.",
-    "Record the already-proven headless two-agent Delivery/A2A discovery + payment flow, or rerun it on the final demo host.",
+    "Record the working Basecamp owner Chat proof in the final narrated demo, or replay the same owner-to-agent JSON skill flow.",
+    "Record the proven headless two-agent Delivery/A2A discovery + payment flow, or rerun it on the final demo host.",
     "Record at least three illustrative use cases end-to-end using the accepted devnet/testnet/local sequencer mix.",
-    "Capture a narrated demo video that shows terminal proof output, tx hashes, and RISC0_DEV_MODE=0 for proof-generating runs.",
+    "Capture a narrated demo video that shows terminal proof output, tx hashes, Basecamp Chat, and RISC0_DEV_MODE=0 for proof-generating runs.",
     "Fill CU values from a Logos explorer, sequencer metadata endpoint, logs, or evaluator-approved benchmark mapping if Logos does not expose CU directly.",
     "Run the official clean Nix package build on a stable machine or GitHub workflow: nix build --impure .#lgx -L.",
 ]

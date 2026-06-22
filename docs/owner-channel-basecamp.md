@@ -227,3 +227,14 @@ See [basecamp-v012-agent-evidence-20260622.md](basecamp-v012-agent-evidence-2026
 Storage is still intentionally not autostarted in the Basecamp-safe config.
 Starting the Storage node inside Basecamp is tracked as a module-runtime issue;
 the storage skill flow remains proven in headless Logos Core tests.
+
+## Verified Owner Chat
+
+On 2026-06-22, the owner-to-agent Chat UI path was verified with Basecamp
+`0.1.2` as the owner app and a headless `logos_agent` instance as the agent.
+The owner sent JSON skill calls for `meta.status`, `agent.card`,
+`wallet.balance`, `storage.list`, `messaging.send`, and `wallet.send`. The
+agent replied in the same Chat conversation and created pending approval
+`appr_29deccb3d30d7ab1842b43b8f42f1285` for the above-threshold transfer.
+
+See [basecamp-owner-chat-evidence-20260622.md](basecamp-owner-chat-evidence-20260622.md).

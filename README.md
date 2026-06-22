@@ -172,6 +172,10 @@ For the required three-agent prize deployment profiles, run:
 
 For prize packaging status, see
 [docs/submission-readiness.md](docs/submission-readiness.md).
+For the latest all-category localnet proof, see
+[docs/localnet-prize-evidence-refresh-20260622.md](docs/localnet-prize-evidence-refresh-20260622.md).
+For the working Basecamp owner Chat proof, see
+[docs/basecamp-owner-chat-evidence-20260622.md](docs/basecamp-owner-chat-evidence-20260622.md).
 For final tx/CU/testnet evidence capture, see
 [docs/testnet-evidence-runbook.md](docs/testnet-evidence-runbook.md).
 For a concise committed review map, see

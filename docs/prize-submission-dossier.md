@@ -24,7 +24,9 @@ It avoids raw `.local` runtime state, wallet storage, and other local secrets.
 - Meta: skills, status, configure.
 
 Local smoke evidence exists for wallet, storage, messaging, A2A, program, and
-Basecamp package-manager install. Generate the current sanitized evidence view:
+Basecamp package-manager install. A 2026-06-22 refresh also proves the
+Basecamp owner Chat path and all default localnet skill categories. Generate
+the current sanitized evidence view:
 
 ```bash
 ./scripts/create-submission-bundle.py
@@ -51,6 +53,9 @@ testnet program IDs.
 - A2A task lifecycle completed locally over Delivery, including a latest
   discovery + payment proof where the client discovered the server's signed
   Agent Card and paid its advertised price.
+- Basecamp owner Chat accepted JSON skill calls and returned agent replies in
+  the same private conversation; above-threshold `wallet.send` created pending
+  owner approval `appr_29deccb3d30d7ab1842b43b8f42f1285`.
 - Paid A2A task payment and cancel/refund completed locally with LEZ tx hashes.
 - Basecamp profile install smoke installed Delivery, Storage, Chat, LEZ, and
   Agent LGXs into `alice` and `bob` profiles with the real `lgpm` CLI.
@@ -60,12 +65,11 @@ testnet program IDs.
 ## Known Scope Boundaries
 
 - The hosted-testnet A2A evidence proves the LEZ payment leg for a priced A2A
-  task. The full two-agent Delivery transport proof is currently localnet
-  headless evidence; final submission should record that run or rerun it on the
-  final demo host.
-- The three-agent deployment evidence is headless CLI evidence. On this laptop
-  the post-capture `logoscore` daemons did not remain running, so Basecamp GUI
-  owner-channel recording should be done on a larger or already-cached machine.
+  task. The full two-agent Delivery transport proof is localnet headless
+  evidence and should be shown in the final narrated recording.
+- The three-agent deployment evidence is headless CLI evidence. Basecamp
+  owner-chat evidence is now captured separately with a headless agent and the
+  Basecamp owner app.
 - `program.call` uses the current supported signed public call path. The
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
@@ -77,9 +81,7 @@ testnet program IDs.
 
 See `docs/manual-intervention-checklist.md`. In short:
 
-- Basecamp GUI owner-channel recording.
-- Recording of the already-proven headless two-agent Delivery/A2A flow.
-- Three narrated illustrative use cases.
-- Final narrated submission video.
+- Final narrated video that includes Basecamp owner Chat, storage vault,
+  paid A2A marketplace, wallet/program evidence, tx hashes, and terminal output.
 - CU confirmation or accepted `TBD` policy from Logos.
 - Official clean package build on stable hardware or CI.
