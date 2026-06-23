@@ -32,7 +32,409 @@ these are locally built development LGX packages. The important check is that
 they install into the expected Basecamp/Core module directories and contain the
 expected Linux variant.
 
-## Short Opening Script
+## Three Separate Videos
+
+Record this as three videos instead of one long video. Each video should stand
+alone, but together they cover the full LP-0008 submission.
+
+Recommended split:
+
+- Video 1: repository, package readiness, testnet transaction evidence, and
+  three-agent deployment evidence.
+- Video 2: Basecamp owner-to-agent Chat proof.
+- Video 3: live skill proofs: Storage, Wallet, Messaging, paid A2A, and Program
+  operations.
+
+If you make a small terminal mistake during recording, do not restart the whole
+video. Explain the mistake, rerun the correct command, and continue.
+
+## Video 1: Repository, Package, And Testnet Evidence
+
+Purpose:
+
+> This video proves that the repository is public-ready, the package artifacts
+> exist, the submission bundle can be generated, and the important LEZ testnet
+> transaction hashes are documented.
+
+Start with:
+
+```bash
+cd ~/Projects/logos/logos-agent
+git pull origin main
+git status --short --branch
+git log --oneline -5
+export RISC0_DEV_MODE=0
+echo "RISC0_DEV_MODE=$RISC0_DEV_MODE"
+```
+
+Say:
+
+> I am starting from the submitted repository. The clean `git status` means
+> this video matches the pushed code. `RISC0_DEV_MODE=0` means proof-generating
+> LEZ commands are not using the RISC0 developer shortcut.
+
+Run:
+
+```bash
+./scripts/preflight-submission.sh
+```
+
+Say:
+
+> This preflight checks the submission shape. It creates the three required
+> agent configs, confirms fail-closed spending policy, confirms encrypted
+> storage settings, checks A2A signing, checks CLI syntax, and verifies that
+> the module package artifact exists.
+
+Explain key lines:
+
+- `Generating three LP-0008 agent configs`: the repo can create Storage,
+  Messaging, and Blockchain category agents.
+- `fail-closed spend policy`: the agent is safe by default and will not freely
+  spend tokens.
+- `AES-GCM storage`: files are encrypted before storage.
+- `Ed25519 A2A signing`: Agent Cards and A2A messages can be signed.
+- `Package artifact`: the LGX package exists.
+- `Package is unsigned`: expected for local development packages.
+
+Run:
+
+```bash
+./scripts/package-live-modules-lgx.sh
+./scripts/basecamp-profile-install-smoke.sh
+```
+
+Say:
+
+> These commands package the live module set and install it into the same kind
+> of Basecamp profile module directories that Basecamp uses. This is not the
+> GUI proof yet; it is the package-manager/profile-install proof.
+
+Explain key output:
+
+- `Created package`: a module LGX was created.
+- `Added variant 'linux-amd64-dev'`: the package contains a Linux build.
+- `installed_modules`: Basecamp profile contains the expected modules.
+- `missing: []`: no required module is missing.
+- `dependency_errors: []`: package dependencies resolved.
+
+Run:
+
+```bash
+./scripts/create-submission-bundle.py --out-dir .local/submission-bundle/final-recording
+sed -n '1,220p' .local/submission-bundle/final-recording/SUBMISSION-INDEX.md
+cat .local/submission-bundle/final-recording/artifact-checksums.json
+```
+
+Say:
+
+> This creates a sanitized submission bundle. It copies public docs and
+> evidence summaries, but it does not copy wallet secrets or raw local runtime
+> state.
+
+Explain key output:
+
+- `ok: true`: bundle creation succeeded.
+- `Hosted-Testnet Tx Evidence`: real testnet transaction hashes are included.
+- `Local Evidence Summary`: local proof runs are indexed.
+- `artifact-checksums.json`: package file sizes and SHA-256 hashes are listed
+  for reproducibility.
+
+Show the hosted testnet evidence:
+
+```bash
+sed -n '1,160p' docs/testnet-wallet-transfer-evidence-20260619.md
+sed -n '1,180p' docs/testnet-program-evidence-20260619.md
+sed -n '1,160p' docs/testnet-a2a-payment-evidence-20260619.md
+```
+
+Say:
+
+> These documents show the hosted LEZ testnet evidence. The wallet transfer,
+> program deploy, program call, and paid A2A payment all have transaction
+> hashes. Storage and Delivery are proven separately with local Logos Core and
+> Basecamp because those are module-level systems rather than the same hosted
+> LEZ transaction endpoint.
+
+Important transaction hashes to call out:
+
+- `wallet.send` testnet tx:
+  `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0`
+- `program.deploy` testnet tx:
+  `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb`
+- `program.call` testnet tx:
+  `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`
+- paid A2A payment-leg testnet tx:
+  `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`
+
+Show the three-agent evidence:
+
+```bash
+sed -n '1,180p' docs/three-agent-headless-evidence-20260620.md
+```
+
+Say:
+
+> The prize asks for three separate agents, one per default skill category.
+> This evidence shows a Storage agent, Messaging agent, and Blockchain agent,
+> each with its own config, identity, LEZ account, signed Agent Card, Delivery
+> startup, and Chat startup.
+
+Show CU status:
+
+```bash
+sed -n '1,120p' docs/cu-report.md
+```
+
+Say:
+
+> CU values are documented honestly. The LEZ wallet and RPC output we used
+> expose transaction hashes and account state, but did not expose CU directly.
+> The report keeps CU as `TBD` until Logos exposes it through explorer,
+> sequencer metadata, logs, or an evaluator-approved benchmark mapping.
+
+Show GitHub Actions clean LGX status:
+
+```text
+Open https://github.com/duongja/logosagent/actions and click the latest clean-lgx run.
+```
+
+Say if it is running:
+
+> The official clean LGX build is running on GitHub Actions. The full Nix build
+> is heavy, so the workflow now has swap, heartbeat logs, and a longer timeout.
+> Local package artifacts and Basecamp install evidence are already captured.
+
+Video 1 closing:
+
+> This video proves repository readiness, package evidence, hosted LEZ testnet
+> transaction evidence, and the three-agent deployment evidence.
+
+## Video 2: Basecamp Owner-To-Agent Chat
+
+Purpose:
+
+> This video proves the user-facing requirement: the owner can talk to the
+> agent from Basecamp Chat without a custom HTTP server.
+
+Preparation commands to show in terminal:
+
+```bash
+cd ~/Projects/logos/logos-agent
+git status --short --branch
+./scripts/package-live-modules-lgx.sh
+./scripts/basecamp-owner-channel.sh --capture-only
+./scripts/basecamp-profile-install-smoke.sh
+sed -n '1,180p' docs/basecamp-owner-chat-evidence-20260622.md
+```
+
+Say:
+
+> These commands prepare and show the owner-channel evidence. The module set is
+> packaged, captured for Basecamp, and installed into Basecamp-style profiles.
+> The evidence document records the working owner Chat flow.
+
+Then switch to Basecamp and send these JSON messages one at a time:
+
+```json
+{"skill":"meta.status","params":{}}
+```
+
+Say:
+
+> This asks the agent for its current status. A response proves the owner can
+> send a skill call through Basecamp Chat and receive an answer from the agent.
+
+```json
+{"skill":"agent.card","params":{}}
+```
+
+Say:
+
+> This asks for the A2A Agent Card. The Agent Card is the agent's public
+> service profile: identity, skills, schemas, transport information, and price
+> information for peer agents.
+
+```json
+{"skill":"wallet.balance","params":{}}
+```
+
+Say:
+
+> This routes a wallet skill through the owner Chat path. If this isolated GUI
+> run is not funded, a controlled wallet error is acceptable. The important
+> proof is that the request reached the wallet skill and the module returned a
+> controlled result instead of crashing.
+
+```json
+{"skill":"storage.list","params":{}}
+```
+
+Say:
+
+> This asks the agent to list stored files. If this isolated owner-chat agent
+> has no files, an empty list is still valid. It proves Storage skills are
+> invokable through owner Chat.
+
+```json
+{"skill":"messaging.send","params":{"recipient":"6ceca915db6fcc4c3869e08f480469cc14c0","message":"agent echo proof"}}
+```
+
+Say:
+
+> This asks the agent to send an echo message back to the owner conversation.
+> It proves the Messaging skill can send through the Logos Chat path.
+
+```json
+{"skill":"wallet.send","params":{"recipient":"deadbeef","amount":"1"}}
+```
+
+Say:
+
+> This is the spending safety test. With the default strict policy, the agent
+> should not spend immediately. It should create a pending approval and wait for
+> the owner.
+
+If you see an approval object, explain:
+
+- `approval_id`: the durable approval request id.
+- `skill: wallet.send`: the blocked skill.
+- `amount: 1`: the proposed spend amount.
+- `status: pending`: the agent did not spend automatically.
+- `origin: owner-chat`: the request came from Basecamp Chat.
+
+Video 2 closing:
+
+> This video proves the owner-facing Basecamp path: the owner sends commands in
+> Chat, the agent receives them through the Logos Chat module, replies in the
+> same conversation, and spending above policy is held for approval.
+
+## Video 3: Live Skill Proofs And Use Cases
+
+Purpose:
+
+> This video proves the default skills in live local runs: Storage, Wallet,
+> Messaging, paid A2A, and Program operations. These are local Logos
+> Core/localnet proofs because they exercise module behavior that is not all
+> available as hosted LEZ testnet transactions.
+
+Start with:
+
+```bash
+cd ~/Projects/logos/logos-agent
+git status --short --branch
+export RISC0_DEV_MODE=0
+echo "RISC0_DEV_MODE=$RISC0_DEV_MODE"
+```
+
+Say:
+
+> I am still on the submitted code, and proof-generating LEZ commands use
+> `RISC0_DEV_MODE=0`.
+
+### Video 3A: Personal File Vault / Storage
+
+Run:
+
+```bash
+export RUN=.local/video/storage-$(date -u +%Y%m%dT%H%M%SZ)
+./scripts/agent-storage-smoke.sh --run-root "$RUN"
+cat "$RUN/storage-list-uploaded.json"
+cat "$RUN/share.json"
+cmp "$RUN/input.txt" "$RUN/downloaded.txt" && echo "downloaded file matches original"
+```
+
+Say:
+
+> This is the personal file vault use case. The agent encrypts and uploads a
+> file, lists it, creates a share payload, downloads it, and proves the
+> downloaded file matches the original byte-for-byte.
+
+### Video 3B: Wallet And Spending Controls
+
+Run:
+
+```bash
+export RUN=.local/video/wallet-$(date -u +%Y%m%dT%H%M%SZ)
+./scripts/agent-wallet-smoke.sh --run-root "$RUN" --localnet-timeout 240
+cat "$RUN/wallet-send-approval-required.json"
+cat "$RUN/wallet-send.json"
+cat "$RUN/wallet-history.json"
+```
+
+Say:
+
+> This proves the wallet and spending-policy path. First the agent creates a
+> pending approval for a blocked spend. Then it submits an allowed transfer and
+> records it in wallet history.
+
+### Video 3C: Messaging / Delivery
+
+Run:
+
+```bash
+export RUN=.local/video/messaging-$(date -u +%Y%m%dT%H%M%SZ)
+./scripts/agent-messaging-smoke.sh --run-root "$RUN" --message-timeout 90 --daemon-timeout 45
+cat "$RUN/messaging-create-group.json"
+cat "$RUN/messaging-join.json"
+cat "$RUN/messaging-send.json"
+tail -n 5 "$RUN/receiver-events.ndjson"
+```
+
+Say:
+
+> This proves the agent can send through Logos Delivery. A separate raw
+> receiver records `messageReceived`, so the proof is not only an internal
+> function call.
+
+### Video 3D: Paid Agent-To-Agent Task
+
+Run:
+
+```bash
+export RUN=.local/video/a2a-paid-$(date -u +%Y%m%dT%H%M%SZ)
+./scripts/agent-a2a-paid-smoke.sh --run-root "$RUN" --localnet-timeout 240
+cat "$RUN/a2a-summary.json"
+cat "$RUN/a2a/client-discover-final.json"
+cat "$RUN/a2a/client-task-submit.json"
+```
+
+Say:
+
+> This is the paid skill marketplace use case. A client agent discovers a
+> server Agent Card, reads the advertised 1 LEZ price, pays the server, submits
+> an A2A task, and the task reaches completion.
+
+### Video 3E: Program Operations
+
+Run:
+
+```bash
+export RUN=.local/video/program-$(date -u +%Y%m%dT%H%M%SZ)
+./scripts/agent-program-smoke.sh --run-root "$RUN" --localnet-timeout 240 --daemon-timeout 45
+cat "$RUN/program-query-health.json"
+cat "$RUN/program-call-wallet-health.json"
+cat "$RUN/program-deploy.json"
+```
+
+Say:
+
+> This proves the program skill category. The agent can query LEZ health/state,
+> call through the supported wallet/helper bridge, and deploy a program binary.
+
+Video 3 closing:
+
+> This video proves the working skill layer: encrypted storage, wallet policy,
+> Messaging over Delivery, paid A2A task coordination, and LEZ program
+> operations.
+
+## Detailed Explanation Bank
+
+Use this lower section as a reference while recording. The three video sections
+above are the actual recording order. The sections below repeat the same topics
+with more field-by-field explanation for the outputs.
+
+## Opening Script Reference
 
 Say:
 
@@ -722,4 +1124,3 @@ Before ending the recording, confirm you showed:
 - Submission bundle index and checksums.
 - CU-report status.
 - Clean LGX build status or current CI limitation.
-
