@@ -26,28 +26,77 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Free runner disk
+        run: |
+          set -euxo pipefail
+          df -h /
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL || true
+          docker system prune -af || true
+          df -h /
+
       - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
             experimental-features = nix-command flakes
             max-jobs = 1
-            cores = 2
+            cores = 1
+            sandbox = false
+            keep-outputs = true
+            keep-derivations = true
 
       - name: Show machine headroom
         run: |
           free -h
           df -h /
+          df -h /nix || true
+          systemctl status nix-daemon --no-pager || true
 
       - name: Bootstrap Logos workspace
         run: ./scripts/bootstrap-workspace.sh
 
       - name: Build official LGX package
-        run: nix build --impure .#lgx -L --max-jobs 1 --cores 2
+        run: |
+          set -uo pipefail
+          mkdir -p .local/ci-logs
+          status=1
+          for attempt in 1 2 3; do
+            echo "== LGX build attempt ${attempt} =="
+            free -h | tee ".local/ci-logs/headroom-before-attempt-${attempt}.log"
+            df -h / /nix 2>/dev/null | tee -a ".local/ci-logs/headroom-before-attempt-${attempt}.log" || true
+            nix build --impure .#lgx -L --max-jobs 1 --cores 1 --option sandbox false 2>&1 | tee ".local/ci-logs/nix-build-attempt-${attempt}.log"
+            status=${PIPESTATUS[0]}
+            if [ "$status" -eq 0 ]; then
+              exit 0
+            fi
+            echo "LGX build attempt ${attempt} failed with status ${status}" | tee -a ".local/ci-logs/nix-build-attempt-${attempt}.log"
+            systemctl status nix-daemon --no-pager > ".local/ci-logs/nix-daemon-status-attempt-${attempt}.log" 2>&1 || true
+            journalctl -u nix-daemon -n 300 --no-pager > ".local/ci-logs/nix-daemon-journal-attempt-${attempt}.log" 2>&1 || true
+            sudo systemctl restart nix-daemon.socket nix-daemon.service >/dev/null 2>&1 || true
+            sleep 10
+          done
+          exit "$status"
 
       - name: Inspect LGX result
         run: |
           ls -lh result
           sha256sum result/*.lgx
+
+      - name: Collect failure diagnostics
+        if: failure()
+        run: |
+          mkdir -p .local/ci-logs
+          free -h > .local/ci-logs/final-free.txt || true
+          df -h / /nix > .local/ci-logs/final-df.txt 2>&1 || true
+          systemctl status nix-daemon --no-pager > .local/ci-logs/final-nix-daemon-status.txt 2>&1 || true
+          journalctl -u nix-daemon -n 500 --no-pager > .local/ci-logs/final-nix-daemon-journal.txt 2>&1 || true
+
+      - name: Upload CI logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-lgx-ci-logs
+          path: .local/ci-logs
+          if-no-files-found: warn
 
       - name: Upload LGX artifact
         uses: actions/upload-artifact@v4
@@ -55,4 +104,3 @@ jobs:
           name: logos-agent-lgx
           path: result/*.lgx
           if-no-files-found: error
-
