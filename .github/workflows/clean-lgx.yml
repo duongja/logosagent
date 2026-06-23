@@ -22,7 +22,7 @@ jobs:
   build-lgx:
     name: Build clean LGX package
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    timeout-minutes: 360
     steps:
       - uses: actions/checkout@v4
 
@@ -65,9 +65,21 @@ jobs:
         run: ./scripts/bootstrap-workspace.sh
 
       - name: Build official LGX package
+        timeout-minutes: 330
         run: |
           set -uo pipefail
           mkdir -p .local/ci-logs
+          (
+            while true; do
+              echo "== heartbeat $(date -u +%Y-%m-%dT%H:%M:%SZ) =="
+              free -h || true
+              df -h / /nix 2>/dev/null || true
+              systemctl status nix-daemon --no-pager | sed -n '1,18p' || true
+              sleep 300
+            done
+          ) > .local/ci-logs/build-heartbeat.log 2>&1 &
+          heartbeat_pid=$!
+          trap 'kill "$heartbeat_pid" 2>/dev/null || true' EXIT
           status=1
           for attempt in 1 2 3; do
             echo "== LGX build attempt ${attempt} =="
