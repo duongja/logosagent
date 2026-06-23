@@ -27,6 +27,8 @@ evidence, and packaging helpers.
    - Program operation: deploy/call/query a LEZ program or show a monitoring/notary workflow.
 
 4. Narrated demo video
+   - Use `docs/final-demo-recording-guide.md` as the recording script. It
+     explains each command, output field, and narration point in simple terms.
    - Explain what was built and why.
    - Show terminal output for proof-generating runs.
    - Show `RISC0_DEV_MODE=0`.
