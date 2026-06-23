@@ -34,6 +34,16 @@ jobs:
           docker system prune -af || true
           df -h /
 
+      - name: Add swap
+        run: |
+          set -euxo pipefail
+          sudo swapoff -a || true
+          sudo fallocate -l 20G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - uses: cachix/install-nix-action@v31
         with:
           extra_nix_config: |
@@ -41,8 +51,8 @@ jobs:
             max-jobs = 1
             cores = 1
             sandbox = false
-            keep-outputs = true
-            keep-derivations = true
+            max-substitution-jobs = 1
+            http-connections = 1
 
       - name: Show machine headroom
         run: |
@@ -63,7 +73,7 @@ jobs:
             echo "== LGX build attempt ${attempt} =="
             free -h | tee ".local/ci-logs/headroom-before-attempt-${attempt}.log"
             df -h / /nix 2>/dev/null | tee -a ".local/ci-logs/headroom-before-attempt-${attempt}.log" || true
-            nix build --impure .#lgx -L --max-jobs 1 --cores 1 --option sandbox false 2>&1 | tee ".local/ci-logs/nix-build-attempt-${attempt}.log"
+            nix build --impure .#lgx -L --max-jobs 1 --cores 1 --option sandbox false --option max-substitution-jobs 1 --option http-connections 1 2>&1 | tee ".local/ci-logs/nix-build-attempt-${attempt}.log"
             status=${PIPESTATUS[0]}
             if [ "$status" -eq 0 ]; then
               exit 0
