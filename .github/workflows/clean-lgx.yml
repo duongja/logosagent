@@ -1,0 +1,58 @@
+name: clean-lgx
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/clean-lgx.yml"
+      - "flake.nix"
+      - "flake.lock"
+      - "metadata.json"
+      - "CMakeLists.txt"
+      - "src/**"
+      - "include/**"
+      - "cmake/**"
+      - "nix/**"
+      - "patches/**"
+      - "scripts/bootstrap-workspace.sh"
+  workflow_dispatch:
+
+jobs:
+  build-lgx:
+    name: Build clean LGX package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            max-jobs = 1
+            cores = 2
+
+      - name: Show machine headroom
+        run: |
+          free -h
+          df -h /
+
+      - name: Bootstrap Logos workspace
+        run: ./scripts/bootstrap-workspace.sh
+
+      - name: Build official LGX package
+        run: nix build --impure .#lgx -L --max-jobs 1 --cores 2
+
+      - name: Inspect LGX result
+        run: |
+          ls -lh result
+          sha256sum result/*.lgx
+
+      - name: Upload LGX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: logos-agent-lgx
+          path: result/*.lgx
+          if-no-files-found: error
+
