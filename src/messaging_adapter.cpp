@@ -197,19 +197,21 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
     }
 
     const QString contentHex = QString::fromLatin1(message.toUtf8().toHex());
-    const bool ok = m_logos->chat_module.sendMessage(recipient, contentHex);
-    if (!ok) {
-        return JsonUtils::error(QStringLiteral("messaging.send_failed"), QStringLiteral("chat_module.sendMessage returned false"));
-    }
+    const bool accepted = m_logos->chat_module.sendMessage(recipient, contentHex);
     recordMessage(QJsonObject{
         {QStringLiteral("transport"), QStringLiteral("chat")},
         {QStringLiteral("direction"), QStringLiteral("out")},
         {QStringLiteral("recipient"), recipient},
         {QStringLiteral("requested_recipient"), requestedRecipient},
         {QStringLiteral("message"), message},
+        {QStringLiteral("accepted_immediately"), accepted},
         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
     });
     return JsonUtils::ok(QJsonObject{
+        {QStringLiteral("accepted_immediately"), accepted},
+        {QStringLiteral("note"), accepted
+            ? QStringLiteral("chat_module accepted send synchronously")
+            : QStringLiteral("chat_module queued send asynchronously; confirm delivery in the owner conversation")},
         {QStringLiteral("recipient"), recipient},
         {QStringLiteral("requested_recipient"), requestedRecipient}
     });

@@ -458,6 +458,9 @@ Explain likely output:
 - `recipient` should resolve to the current Basecamp conversation id for this
   run.
 - `ok: true` means the send was accepted.
+- `accepted_immediately: false` can still be acceptable with the current Chat
+  module if the echo visibly arrives in Basecamp; it means the send completed
+  asynchronously.
 - If you see the echo in the same conversation, that proves the owner app
   received the agent's reply.
 

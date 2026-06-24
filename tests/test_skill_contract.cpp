@@ -97,6 +97,8 @@ LOGOS_TEST(owner_chat_messaging_send_uses_stable_owner_alias)
     LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("QStringLiteral(\"owner\")")));
     LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("m_ownerConversationId")));
     LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("requested_recipient")));
+    LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("accepted_immediately")));
+    LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("queued send asynchronously")));
 
     QFile guide(QDir(QStringLiteral(LOGOS_AGENT_SOURCE_DIR)).filePath(QStringLiteral("docs/final-demo-recording-guide.md")));
     LOGOS_ASSERT_TRUE(guide.open(QIODevice::ReadOnly | QIODevice::Text));
