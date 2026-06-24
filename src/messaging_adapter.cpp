@@ -168,10 +168,11 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
         return JsonUtils::error(QStringLiteral("messaging.unavailable"), QStringLiteral("LogosModules is not initialized"));
     }
     QString err;
-    const QString recipient = JsonUtils::requireString(params, QStringLiteral("recipient"), &err);
+    QString recipient = JsonUtils::requireString(params, QStringLiteral("recipient"), &err);
     if (!err.isEmpty()) {
         return JsonUtils::error(QStringLiteral("messaging.invalid_params"), err);
     }
+    const QString requestedRecipient = recipient;
     const QString message = params.value(QStringLiteral("message")).isObject()
         ? JsonUtils::toString(params.value(QStringLiteral("message")).toObject())
         : params.value(QStringLiteral("message")).toString();
@@ -186,6 +187,15 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
         return deliverySend(recipient, payload);
     }
 
+    if (recipient == QStringLiteral("owner") || recipient == QStringLiteral("owner-chat")) {
+        if (m_ownerConversationId.isEmpty()) {
+            return JsonUtils::error(
+                QStringLiteral("messaging.owner_conversation_missing"),
+                QStringLiteral("recipient alias 'owner' requires an active owner Chat conversation"));
+        }
+        recipient = m_ownerConversationId;
+    }
+
     const QString contentHex = QString::fromLatin1(message.toUtf8().toHex());
     const bool ok = m_logos->chat_module.sendMessage(recipient, contentHex);
     if (!ok) {
@@ -195,10 +205,14 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
         {QStringLiteral("transport"), QStringLiteral("chat")},
         {QStringLiteral("direction"), QStringLiteral("out")},
         {QStringLiteral("recipient"), recipient},
+        {QStringLiteral("requested_recipient"), requestedRecipient},
         {QStringLiteral("message"), message},
         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
     });
-    return JsonUtils::ok(QJsonObject{{QStringLiteral("recipient"), recipient}});
+    return JsonUtils::ok(QJsonObject{
+        {QStringLiteral("recipient"), recipient},
+        {QStringLiteral("requested_recipient"), requestedRecipient}
+    });
 }
 
 QJsonObject MessagingAdapter::join(const QJsonObject& params)

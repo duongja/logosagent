@@ -419,7 +419,7 @@ Explain likely output:
 Send:
 
 ```json
-{"skill":"messaging.send","params":{"recipient":"6ceca915db6fcc4c3869e08f480469cc14c0","message":"agent echo proof"}}
+{"skill":"messaging.send","params":{"recipient":"owner","message":"agent echo proof"}}
 ```
 
 Say:
@@ -430,6 +430,9 @@ Say:
 
 Explain likely output:
 
+- `requested_recipient: owner` means the command used the stable owner alias.
+- `recipient` should resolve to the current Basecamp conversation id for this
+  run.
 - `ok: true` means the send was accepted.
 - If you see the echo in the same conversation, that proves the owner app
   received the agent's reply.

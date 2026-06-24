@@ -87,3 +87,21 @@ LOGOS_TEST(delivery_topics_follow_lip23_short_format)
     LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("/logos-agent/1/group-%1/json")));
     LOGOS_ASSERT_FALSE(messagingText.contains(QStringLiteral("/logos-agent/1/group/%1/json")));
 }
+
+LOGOS_TEST(owner_chat_messaging_send_uses_stable_owner_alias)
+{
+    QFile messaging(QDir(QStringLiteral(LOGOS_AGENT_SOURCE_DIR)).filePath(QStringLiteral("src/messaging_adapter.cpp")));
+    LOGOS_ASSERT_TRUE(messaging.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString messagingText = QString::fromUtf8(messaging.readAll());
+
+    LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("QStringLiteral(\"owner\")")));
+    LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("m_ownerConversationId")));
+    LOGOS_ASSERT_TRUE(messagingText.contains(QStringLiteral("requested_recipient")));
+
+    QFile guide(QDir(QStringLiteral(LOGOS_AGENT_SOURCE_DIR)).filePath(QStringLiteral("docs/final-demo-recording-guide.md")));
+    LOGOS_ASSERT_TRUE(guide.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString guideText = QString::fromUtf8(guide.readAll());
+
+    LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("\"recipient\":\"owner\"")));
+    LOGOS_ASSERT_FALSE(guideText.contains(QStringLiteral("\"recipient\":\"6ceca915db6fcc4c3869e08f480469cc14c0\"")));
+}
