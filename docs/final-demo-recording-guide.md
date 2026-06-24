@@ -359,6 +359,22 @@ Explain likely output:
 - The exact values can differ between runs; the important proof is that the
   agent replied through Chat.
 
+After this first owner message, the agent has learned the current Basecamp
+conversation id. If the loaded module already includes the stable owner alias,
+you can keep using `recipient: "owner"` later. If you need the raw id, run:
+
+```bash
+RUN="$(cat .local/owner-chat-agent/latest-run-root.txt)"
+.local/logoscore-bin/bin/logoscore --config-dir "$RUN/core" call logos_agent status \
+  | jq -r '.result | fromjson | .messaging.owner_conversation_id'
+```
+
+Say:
+
+> This prints the current owner Chat conversation id for this run. It changes
+> when I create a fresh Basecamp private conversation, so I do not reuse ids
+> from older evidence runs.
+
 #### Agent Card
 
 Send:
@@ -420,6 +436,14 @@ Send:
 
 ```json
 {"skill":"messaging.send","params":{"recipient":"owner","message":"agent echo proof"}}
+```
+
+If the loaded module is older and `recipient: "owner"` has not been rebuilt
+into the LGX yet, replace `owner` with the current conversation id printed by
+the status command above:
+
+```json
+{"skill":"messaging.send","params":{"recipient":"<owner_conversation_id>","message":"agent echo proof"}}
 ```
 
 Say:
