@@ -379,6 +379,209 @@ print(tx_hash)
 PY
 }
 
+capture_chain_balances() {
+  local label="$1"
+  local out_file="$2"
+  python3 - \
+    "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" \
+    "$FROM_ADDRESS" \
+    "$TO_ADDRESS" \
+    "$label" \
+    "$out_file" <<'PY'
+import json
+import pathlib
+import sys
+import urllib.error
+import urllib.request
+
+wallet_config = pathlib.Path(sys.argv[1])
+from_address, to_address, label, out_file = sys.argv[2:6]
+
+BASE58_ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+def strip_account_prefix(value):
+    value = str(value).strip()
+    for prefix in ("Public/", "Private/"):
+        if value.startswith(prefix):
+            return value[len(prefix):], prefix[:-1]
+    return value, "Public"
+
+def b58encode(raw):
+    number = int.from_bytes(raw, "big")
+    encoded = ""
+    while number:
+        number, remainder = divmod(number, 58)
+        encoded = BASE58_ALPHABET[remainder] + encoded
+    leading_zeroes = 0
+    for byte in raw:
+        if byte == 0:
+            leading_zeroes += 1
+        else:
+            break
+    return ("1" * leading_zeroes) + (encoded or "1")
+
+def rpc_account_id(value):
+    raw, privacy = strip_account_prefix(value)
+    candidate = raw[2:] if raw.lower().startswith("0x") else raw
+    if len(candidate) == 64:
+        try:
+            return b58encode(bytes.fromhex(candidate)), privacy
+        except ValueError:
+            pass
+    return raw, privacy
+
+def rpc(url, method, params):
+    body = json.dumps({
+        "jsonrpc": "2.0",
+        "method": method,
+        "params": params,
+        "id": 1,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=20) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+def normalize_account(payload):
+    result = payload.get("result") if isinstance(payload, dict) else None
+    if not isinstance(result, dict):
+        return {
+            "exists": False,
+            "balance": 0,
+            "nonce": 0,
+            "raw_result": result,
+        }
+    return {
+        "exists": True,
+        "balance": int(result.get("balance") or 0),
+        "nonce": int(result.get("nonce") or 0),
+        "program_owner": result.get("program_owner"),
+        "data": result.get("data"),
+        "raw_result": result,
+    }
+
+config = json.loads(wallet_config.read_text(encoding="utf-8"))
+sequencer_url = config["sequencer_addr"]
+accounts = {}
+ok = True
+for role, address in (("sender", from_address), ("recipient", to_address)):
+    account_id, privacy = rpc_account_id(address)
+    entry = {
+        "input": address,
+        "privacy": privacy,
+        "rpc_account": account_id,
+        "account_id": f"{privacy}/{account_id}",
+    }
+    try:
+        payload = rpc(sequencer_url, "getAccount", [account_id])
+        entry["rpc_ok"] = True
+        entry["rpc_payload"] = payload
+        entry.update(normalize_account(payload))
+    except (OSError, urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+        ok = False
+        entry["rpc_ok"] = False
+        entry["error"] = str(exc)
+    accounts[role] = entry
+
+summary = {
+    "ok": ok,
+    "label": label,
+    "sequencer_url": sequencer_url,
+    "accounts": accounts,
+}
+path = pathlib.Path(out_file)
+path.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+print(json.dumps(summary, separators=(",", ":")))
+raise SystemExit(0 if ok else 1)
+PY
+}
+
+assert_transfer_balance_delta() {
+  local before_file="$1"
+  local after_file="$2"
+  local out_file="$3"
+  python3 - "$before_file" "$after_file" "$out_file" "$TRANSFER_AMOUNT" <<'PY'
+import json
+import pathlib
+import sys
+
+before_path, after_path, out_path, amount_raw = sys.argv[1:5]
+amount = int(str(amount_raw))
+before = json.loads(pathlib.Path(before_path).read_text(encoding="utf-8"))
+after = json.loads(pathlib.Path(after_path).read_text(encoding="utf-8"))
+
+def account(payload, role):
+    value = payload.get("accounts", {}).get(role, {})
+    return {
+        "account_id": value.get("account_id", ""),
+        "balance": int(value.get("balance") or 0),
+        "nonce": int(value.get("nonce") or 0),
+        "exists": bool(value.get("exists")),
+    }
+
+sender_before = account(before, "sender")
+sender_after = account(after, "sender")
+recipient_before = account(before, "recipient")
+recipient_after = account(after, "recipient")
+
+sender_delta = sender_after["balance"] - sender_before["balance"]
+recipient_delta = recipient_after["balance"] - recipient_before["balance"]
+summary = {
+    "ok": sender_delta == -amount and recipient_delta == amount,
+    "amount": amount,
+    "sender": {
+        "account_id": sender_before["account_id"] or sender_after["account_id"],
+        "before_balance": sender_before["balance"],
+        "after_balance": sender_after["balance"],
+        "delta": sender_delta,
+        "before_nonce": sender_before["nonce"],
+        "after_nonce": sender_after["nonce"],
+    },
+    "recipient": {
+        "account_id": recipient_before["account_id"] or recipient_after["account_id"],
+        "before_balance": recipient_before["balance"],
+        "after_balance": recipient_after["balance"],
+        "delta": recipient_delta,
+        "before_nonce": recipient_before["nonce"],
+        "after_nonce": recipient_after["nonce"],
+    },
+    "expected": {
+        "sender_delta": -amount,
+        "recipient_delta": amount,
+    },
+}
+pathlib.Path(out_path).write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+print(json.dumps(summary, separators=(",", ":")))
+if not summary["ok"]:
+    raise SystemExit(
+        "wallet transfer balance delta did not match amount: "
+        + json.dumps(summary, indent=2)
+    )
+PY
+}
+
+wait_for_transfer_balance_delta() {
+  local before_file="$1"
+  local after_file="$2"
+  local out_file="$3"
+  local attempt
+  for attempt in $(seq 1 30); do
+    capture_chain_balances "after_transfer_attempt_$attempt" "$after_file" >"$RUN_ROOT/chain-balances-after-transfer-$attempt.out" || true
+    if assert_transfer_balance_delta "$before_file" "$after_file" "$out_file" \
+      >"$RUN_ROOT/wallet-transfer-balance-delta.out" \
+      2>"$RUN_ROOT/wallet-transfer-balance-delta.err"; then
+      return 0
+    fi
+    sleep 2
+  done
+  assert_transfer_balance_delta "$before_file" "$after_file" "$out_file" \
+    >"$RUN_ROOT/wallet-transfer-balance-delta.out"
+}
+
 normalize_public_address() {
   local address="$1"
   case "$address" in
@@ -426,9 +629,11 @@ if [ "$START_LOCALNET" -eq 1 ]; then
   LOCALNET_STARTED=1
 fi
 wait_for_localnet
+capture_chain_balances "before_topup" "$RUN_ROOT/chain-balances-before-topup.json"
 if [ "$AUTO_TOPUP" -eq 1 ]; then
   topup_sender
 fi
+capture_chain_balances "before_transfer_after_topup" "$RUN_ROOT/chain-balances-before-transfer.json"
 prepare_wallet_files
 
 "$LOGOSCORE" --config-dir "$CORE_CFG" -D -m "$MODULES_DIR" >"$CORE_LOG" 2>&1 &
@@ -465,6 +670,10 @@ assert_balance_result "$RUN_ROOT/balance-before.json"
 call_agent invoke wallet.send "$(wallet_send_params)" >"$RUN_ROOT/wallet-send.json"
 assert_json_ok "$RUN_ROOT/wallet-send.json" "wallet.send"
 TX_HASH="$(assert_transfer_result "$RUN_ROOT/wallet-send.json")"
+wait_for_transfer_balance_delta \
+  "$RUN_ROOT/chain-balances-before-transfer.json" \
+  "$RUN_ROOT/chain-balances-after-transfer.json" \
+  "$RUN_ROOT/wallet-transfer-balance-delta.json"
 
 call_agent invoke wallet.history '{}' >"$RUN_ROOT/wallet-history.json"
 assert_json_ok "$RUN_ROOT/wallet-history.json" "wallet.history"
@@ -489,6 +698,9 @@ summary = {
     "tx_hash": sys.argv[5],
     "balance_before": json.loads((run_root / "balance-before.json").read_text()).get("balance"),
     "balance_after": json.loads((run_root / "balance-after.json").read_text()).get("balance"),
+    "chain_balance_before_transfer": json.loads((run_root / "chain-balances-before-transfer.json").read_text()),
+    "chain_balance_after_transfer": json.loads((run_root / "chain-balances-after-transfer.json").read_text()),
+    "balance_delta": json.loads((run_root / "wallet-transfer-balance-delta.json").read_text()),
 }
 print(json.dumps(summary, indent=2))
 PY

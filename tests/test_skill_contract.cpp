@@ -107,3 +107,27 @@ LOGOS_TEST(owner_chat_messaging_send_uses_stable_owner_alias)
     LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("\"recipient\":\"owner\"")));
     LOGOS_ASSERT_FALSE(guideText.contains(QStringLiteral("\"recipient\":\"6ceca915db6fcc4c3869e08f480469cc14c0\"")));
 }
+
+LOGOS_TEST(wallet_smoke_records_distinct_balance_delta_evidence)
+{
+    QFile script(QDir(QStringLiteral(LOGOS_AGENT_SOURCE_DIR)).filePath(QStringLiteral("scripts/agent-wallet-smoke.sh")));
+    LOGOS_ASSERT_TRUE(script.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString scriptText = QString::fromUtf8(script.readAll());
+
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("chain-balances-before-topup.json")));
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("chain-balances-before-transfer.json")));
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("chain-balances-after-transfer.json")));
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("wallet-transfer-balance-delta.json")));
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("sender_delta == -amount")));
+    LOGOS_ASSERT_TRUE(scriptText.contains(QStringLiteral("recipient_delta == amount")));
+
+    QFile guide(QDir(QStringLiteral(LOGOS_AGENT_SOURCE_DIR)).filePath(QStringLiteral("docs/final-demo-recording-guide.md")));
+    LOGOS_ASSERT_TRUE(guide.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QString guideText = QString::fromUtf8(guide.readAll());
+
+    LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("wallet-transfer-balance-delta.json")));
+    LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("sender balance went down")));
+    LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("recipient balance")));
+    LOGOS_ASSERT_TRUE(guideText.contains(QStringLiteral("went up by exactly the transfer amount")));
+    LOGOS_ASSERT_FALSE(guideText.contains(QStringLiteral("can look unchanged if top-up")));
+}

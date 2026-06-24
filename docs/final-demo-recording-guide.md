@@ -582,7 +582,10 @@ Run:
 export RUN=.local/video/wallet-$(date -u +%Y%m%dT%H%M%SZ)
 ./scripts/agent-wallet-smoke.sh --run-root "$RUN" --localnet-timeout 240
 cat "$RUN/wallet-send-approval-required.json"
+cat "$RUN/chain-balances-before-transfer.json"
 cat "$RUN/wallet-send.json"
+cat "$RUN/chain-balances-after-transfer.json"
+cat "$RUN/wallet-transfer-balance-delta.json"
 cat "$RUN/wallet-history.json"
 ```
 
@@ -600,9 +603,27 @@ Explain the script output:
 - `amount`: transfer amount.
 - `topup.status: success`: the local faucet funded the sender for this proof.
 - `tx_hash`: localnet transaction hash.
-- `balance_before` and `balance_after` can look unchanged if top-up and
-  transfer happen in the same smoke flow; the stronger evidence is the tx hash
-  and wallet history.
+- `balance_delta.ok: true`: the chain balances moved exactly as expected after
+  the agent-controlled transfer.
+
+Explain `chain-balances-before-transfer.json` and
+`chain-balances-after-transfer.json`:
+
+- These are direct chain reads from the local sequencer.
+- The before file is captured after faucet topup, immediately before
+  `wallet.send`.
+- The after file is captured immediately after `wallet.send`.
+- This separates setup funding from the actual agent transfer.
+
+Explain `wallet-transfer-balance-delta.json`:
+
+- `ok: true`: sender and recipient balance movement matched the transfer.
+- `sender.before_balance` and `sender.after_balance`: sender balance went down
+  by exactly the transfer amount.
+- `recipient.before_balance` and `recipient.after_balance`: recipient balance
+  went up by exactly the transfer amount.
+- `expected.sender_delta: -1` and `expected.recipient_delta: 1`: the assertion
+  the script enforced.
 
 Explain `wallet-send-approval-required.json`:
 
