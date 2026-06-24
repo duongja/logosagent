@@ -290,7 +290,39 @@ Explain the important output:
 - The evidence doc lists the JSON skill calls already proven through Basecamp
   Chat.
 
-### 2. Open Basecamp And Send Owner Commands
+### 2. Get The Agent Intro Bundle
+
+Run:
+
+```bash
+RUN="$(cat .local/owner-chat-agent/latest-run-root.txt)"
+cat "$RUN/chat-intro-bundle.txt"
+rg -n "chat_intro_bundle|chat_started" "$RUN/status.raw.json"
+```
+
+If `latest-run-root.txt` is missing, use the captured owner-chat evidence run:
+
+```bash
+RUN=.local/owner-chat-agent/20260622T144124Z-peers
+cat "$RUN/chat-intro-bundle.txt"
+rg -n "chat_intro_bundle|chat_started" "$RUN/status.raw.json"
+```
+
+Say:
+
+> This intro bundle is the invitation Basecamp needs to open a private Chat
+> conversation with the headless agent. The agent generated it when it started
+> with `create_intro_bundle: true`, and the evidence run saved it as
+> `chat-intro-bundle.txt`.
+
+Explain:
+
+- The bundle starts with `logos_chatintro_...`.
+- Copy the full bundle value from the terminal.
+- `chat_started` in `status.raw.json` proves the agent Chat adapter was running.
+- In Basecamp Chat, create a private conversation by pasting this intro bundle.
+
+### 3. Open Basecamp And Send Owner Commands
 
 In Basecamp Chat, paste each JSON command one at a time.
 
