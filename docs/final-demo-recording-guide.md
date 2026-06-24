@@ -295,32 +295,43 @@ Explain the important output:
 Run:
 
 ```bash
-RUN="$(cat .local/owner-chat-agent/latest-run-root.txt)"
-cat "$RUN/chat-intro-bundle.txt"
-rg -n "chat_intro_bundle|chat_started" "$RUN/status.raw.json"
+./scripts/start-owner-chat-agent.sh
 ```
 
-If `latest-run-root.txt` is missing, use the captured owner-chat evidence run:
+Then keep this run root for checks during the recording:
 
 ```bash
-RUN=.local/owner-chat-agent/20260622T144124Z-peers
+RUN="$(cat .local/owner-chat-agent/latest-run-root.txt)"
+cat "$RUN/owner-chat-live-summary.json"
 cat "$RUN/chat-intro-bundle.txt"
-rg -n "chat_intro_bundle|chat_started" "$RUN/status.raw.json"
+.local/logoscore-bin/bin/logoscore --config-dir "$RUN/core" status
 ```
 
 Say:
 
 > This intro bundle is the invitation Basecamp needs to open a private Chat
-> conversation with the headless agent. The agent generated it when it started
-> with `create_intro_bundle: true`, and the evidence run saved it as
-> `chat-intro-bundle.txt`.
+> conversation with the headless agent. I am starting a fresh live headless
+> agent first, then copying the new `logos_chatintro_...` bundle from this run.
 
 Explain:
 
+- `start-owner-chat-agent.sh` packages/installs the module set, starts
+  `logoscore` under `systemd-run --user`, loads Delivery, Storage, Chat, LEZ,
+  and the Agent module, starts the agent, and waits for Chat to be ready.
+- `launcher: systemd-run` means the headless agent remains running while
+  Basecamp is open.
+- `modules_loaded: 6` means all required modules are loaded.
+- `chat_started: true` means the agent Chat adapter is live.
 - The bundle starts with `logos_chatintro_...`.
 - Copy the full bundle value from the terminal.
-- `chat_started` in `status.raw.json` proves the agent Chat adapter was running.
 - In Basecamp Chat, create a private conversation by pasting this intro bundle.
+
+If you need to stop the live headless agent after the video, run:
+
+```bash
+RUN="$(cat .local/owner-chat-agent/latest-run-root.txt)"
+systemctl --user stop "$(cat "$RUN/systemd-unit.txt")"
+```
 
 ### 3. Open Basecamp And Send Owner Commands
 
