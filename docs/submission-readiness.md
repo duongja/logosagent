@@ -264,6 +264,7 @@ Run these from a clean checkout after `scripts/bootstrap-workspace.sh`:
 
 ```bash
 ./scripts/preflight-submission.sh
+./scripts/preflight-submission.sh --package-dev
 ./scripts/preflight-submission.sh --full
 SCAFFOLD_BIN=../scaffold/target/release/logos-scaffold ./scripts/preflight-submission.sh --localnet
 ./scripts/create-submission-bundle.py

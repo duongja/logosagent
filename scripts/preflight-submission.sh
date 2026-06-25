@@ -18,12 +18,12 @@ Default checks are intentionally fast:
   - agent_lez formatting/check
   - required submission files
   - local deterministic demo smoke
-  - Basecamp profile package-manager install smoke
 
 Options:
   --full         Also run Nix fast/full tests and build the official LGX package.
   --localnet     Also run the standalone LEZ localnet integration harness.
-  --package-dev  Also regenerate a dev LGX from .local/live-modules/logos_agent.
+  --package-dev  Also regenerate a dev LGX from .local/live-modules/logos_agent
+                 and run the Basecamp profile package-manager install smoke.
 
 Environment for --localnet is forwarded to scripts/localnet-integration.sh,
 including SCAFFOLD_BIN, SCAFFOLD_REPO, CARGO_BUILD_JOBS, and PORT.
@@ -97,7 +97,6 @@ bash -n \
 
 ./scripts/demo-local.sh
 ./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.dev >/dev/null
-./scripts/basecamp-profile-install-smoke.sh --run-root .local/preflight-basecamp-profile-install >/dev/null
 ./scripts/create-submission-bundle.py --out-dir .local/preflight-submission-bundle >/dev/null
 
 if [ "$RUN_PACKAGE_DEV" -eq 1 ]; then
