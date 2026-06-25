@@ -229,6 +229,15 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   Balance evidence showed payer `3647 -> 3646` and recipient `4001 -> 4002`;
   transaction lookup returned the tx. See
   `docs/testnet-a2a-payment-evidence-20260619.md`.
+- Post-redeploy v0.2 compatibility checked on 2026-06-25 UTC:
+  LEZ `v0.2.0-rc5` at commit
+  `27360cb7d6ccb2bfbcca7d171bab8a3938490264` was built locally with
+  `cargo +1.94.0 build -p wallet --release -j1`. The advertised endpoint
+  `https://testnet.lez.logos.co/` returned `METHOD_NOT_FOUND` for the v0.2
+  wallet's expected sequencer RPC methods (`checkHealth`, `getProgramIds`,
+  `getLastBlockId`), so current post-redeploy hosted tx hashes are blocked on
+  endpoint confirmation. See
+  `docs/testnet-v020-compatibility-evidence-20260625.md`.
 - Narrated demo videos recorded and linked in `docs/demo-video-links.md`:
   - Video 1: repository readiness, package/evidence bundle, hosted-testnet
     transaction evidence, and submission overview:
@@ -241,19 +250,21 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 
 ## Hosted Testnet Wallet Version
 
-- The current public LEZ `main` wallet built from commit `feb6cb7` does not
-  match `https://testnet.lez.logos.co/`; its builtin program IDs differ from
-  the hosted testnet IDs.
-- A full public artifact scan found matching builtin program IDs on LEZ tag
-  `v0.1.2` / commit `cf3639d8` (also tag `v0.2.0-rc3`). Use that wallet for
-  hosted-testnet tx evidence unless Logos redeploys the testnet.
+- Pre-redeploy evidence used LEZ tag `v0.1.2` / commit `cf3639d8`, which
+  matched the hosted testnet on 2026-06-19 UTC.
+- Logos redeployed/wiped LEZ on 2026-06-25 for v0.2. Those June 19 tx hashes
+  are now historical evidence only.
+- The current post-redeploy target is LEZ `v0.2.0-rc5`. The wallet builds
+  locally, but fresh hosted tx evidence requires the active v0.2 sequencer RPC
+  URL/funding path to pass `wallet check-health`.
 
 ## Evidence Status
 
 - CU status is documented in `docs/cu-report.md`. Hosted-testnet tx hashes
-  exist for `wallet.send`, `program.deploy`, `program.call`, and `agent.task`
-  payment. CU remains `TBD` because the current wallet/RPC output does not
-  expose CU fields; the report names acceptable sources for replacing `TBD`.
+  exist historically for `wallet.send`, `program.deploy`, `program.call`, and
+  `agent.task` payment. CU remains `TBD` because the current wallet/RPC output
+  does not expose CU fields and the v0.2 endpoint is pending confirmation; the
+  report names acceptable sources for replacing `TBD`.
 - Official clean-machine LGX package build. A current dev LGX exists at
   `result/logos-logos_agent-module-lib.lgx`, produced from the locally tested
   module payload. Before final submission, also rerun the official clean Nix

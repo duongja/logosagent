@@ -37,11 +37,12 @@ hosted testnet on 2026-06-19 UTC, but the 2026-06-25 v0.2 redeploy wiped state.
 Those hashes are historical pre-redeploy evidence, not current post-redeploy
 proof.
 
-Post-redeploy checks against `https://testnet.lez.logos.co/` showed the old
-methods used by the evidence scripts (`checkHealth`, `getProgramIds`,
+Post-redeploy checks against `https://testnet.lez.logos.co/` showed the
+sequencer methods used by the evidence scripts (`checkHealth`, `getProgramIds`,
 `getTransaction`, `getAccount`) now return `METHOD_NOT_FOUND`. The `v0.2.0-rc5`
-LEZ release also requires Rust `1.94.0`; this machine currently has Rust/Cargo
-`1.80.1`. Keep CU as `TBD` until one of these sources is available:
+LEZ wallet was built locally with Rust `1.94.0`, and it still expects those
+method names, so the current blocker is the hosted endpoint/proxy or an
+unpublished RPC URL. Keep CU as `TBD` until one of these sources is available:
 
 - a Logos explorer transaction details page with CU/cycle fields;
 - a sequencer metadata endpoint that returns CU/cycle fields for a transaction;

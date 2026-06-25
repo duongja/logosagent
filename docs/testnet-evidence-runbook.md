@@ -8,9 +8,10 @@ state was wiped for the `v0.2.0-rc5` redeploy, so the old tx hashes should be
 treated as historical evidence only. See
 `docs/testnet-redeploy-note-20260625.md`.
 
-Before final review, rerun the hosted-testnet evidence against the current
-`v0.2.0-rc5` wallet/toolchain once the endpoint methods and wallet config are
-aligned.
+The `v0.2.0-rc5` wallet has been built locally, but the advertised endpoint
+`https://testnet.lez.logos.co/` did not expose the sequencer RPC methods during
+the 2026-06-25 check. See
+`docs/testnet-v020-compatibility-evidence-20260625.md`.
 
 This is the remaining proof path for prize readiness. The local implementation
 is already exercised by the smoke scripts; final submission needs the same
@@ -28,16 +29,15 @@ and CU/cycle evidence.
 ## Hosted LEZ Testnet Compatibility Gate
 
 Before attempting hosted-testnet transactions, build the LEZ wallet that matches
-the hosted testnet artifacts. As of 2026-06-19 UTC, the matching public tag was
-`v0.1.2` / commit `cf3639d8`. After the 2026-06-25 redeploy, refresh this path
-for `v0.2.0-rc5`:
+the hosted testnet artifacts. For the current post-redeploy testnet, use
+`v0.2.0-rc5`:
 
 ```bash
-git -C ../logos-execution-zone fetch --depth=1 origin tag v0.1.2
-git -C ../logos-execution-zone worktree add --detach ../logos-execution-zone-v0.1.2-testnet v0.1.2
-cd ../logos-execution-zone-v0.1.2-testnet
+git -C ../logos-execution-zone fetch --depth=1 origin tag v0.2.0-rc5
+git -C ../logos-execution-zone worktree add --detach ../logos-execution-zone-v0.2.0-rc5-testnet v0.2.0-rc5
+cd ../logos-execution-zone-v0.2.0-rc5-testnet
 LOGOS_BLOCKCHAIN_CIRCUITS=$HOME/.cache/logos/blockchain/logos-blockchain-circuits-v0.5.0-linux-x86_64 \
-  CARGO_BUILD_JOBS=1 cargo build -p wallet --release
+  CARGO_BUILD_JOBS=1 cargo +1.94.0 build -p wallet --release -j1
 cd ../logos-agent
 ```
 
@@ -45,8 +45,8 @@ Then run:
 
 ```bash
 ./scripts/lez-testnet-compatibility-evidence.sh \
-  --lez-repo ../logos-execution-zone-v0.1.2-testnet \
-  --wallet ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
+  --lez-repo ../logos-execution-zone-v0.2.0-rc5-testnet \
+  --wallet ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet
 ```
 
 This writes `.local/testnet-evidence/<timestamp>-lez-compat/summary.json` and
@@ -62,9 +62,22 @@ Only proceed to real `wallet.send`, A2A payment, `program.deploy`, or
 `program.call` evidence when `summary.json` reports
 `"transaction_submission_allowed": true`.
 
-As of the 2026-06-19 UTC run against `https://testnet.lez.logos.co/`, the
-current public `main` wallet artifacts fail `check-health`, but LEZ tag
-`v0.1.2` passes and can produce hosted-testnet transaction evidence.
+As of the 2026-06-25 UTC run against `https://testnet.lez.logos.co/`, the
+locally built `v0.2.0-rc5` wallet fails before transaction submission because
+the advertised endpoint returns `METHOD_NOT_FOUND` for the expected sequencer
+methods. Do not attempt funded hosted-testnet transactions until the endpoint
+returns a passing `wallet check-health`.
+
+For a fresh wiped v0.2 testnet, do not reuse the pre-redeploy funded accounts
+from the June 19 evidence. Once the endpoint is healthy, fund accounts through
+the confirmed faucet or v0.2 vault flow:
+
+```bash
+wallet vault claim --account-id Public/<sender> --amount <amount>
+wallet auth-transfer init --account-id Public/<sender>
+wallet auth-transfer init --account-id Public/<recipient>
+wallet auth-transfer send --from Public/<sender> --to Public/<recipient> --amount 1
+```
 
 ## Captured Hosted Program Evidence
 

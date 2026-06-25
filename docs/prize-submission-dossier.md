@@ -89,7 +89,10 @@ testnet program IDs.
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
 - Hosted LEZ evidence was captured before the 2026-06-25 v0.2 redeploy. The
-  redeploy wiped state, so a v0.2 refresh is pending.
+  redeploy wiped state. The `v0.2.0-rc5` wallet now builds locally, but the
+  advertised hosted endpoint returned `METHOD_NOT_FOUND` for the wallet's
+  expected sequencer methods during the 2026-06-25 check, so fresh hosted tx
+  hashes are pending endpoint confirmation.
 - CU values are documented in `docs/cu-report.md` as `TBD` because the previous
   wallet/RPC output did not expose CU fields and the v0.2 endpoint/toolchain
   changed during submission preparation. The Logos team advised applying anyway

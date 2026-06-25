@@ -8,7 +8,11 @@ if [ -f "$ROOT/.local/last-testnet-evidence-run-root" ]; then
   DEFAULT_COMPAT_RUN="$(cat "$ROOT/.local/last-testnet-evidence-run-root")"
 fi
 
-LEZ_REPO="${LEZ_REPO:-$WORKSPACE/logos-execution-zone-v0.1.2-testnet}"
+DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
+  DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.1.2-testnet"
+fi
+LEZ_REPO="${LEZ_REPO:-$DEFAULT_LEZ_REPO}"
 WALLET="${WALLET:-$LEZ_REPO/target/release/wallet}"
 TESTNET_URL="${TESTNET_URL:-https://testnet.lez.logos.co/}"
 RUN_ROOT="${RUN_ROOT:-$DEFAULT_COMPAT_RUN}"
@@ -33,7 +37,7 @@ lifecycle evidence; it does not claim to prove the live Delivery transport run.
 
 Options:
   --run-root PATH       Existing hosted-testnet evidence run root with wallet-home.
-  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
+  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet when present, else ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
   --lez-repo PATH       LEZ checkout for local commit/tag metadata.
   --testnet-url URL     Sequencer JSON-RPC URL. Default: https://testnet.lez.logos.co/
   --circuits-dir PATH   LOGOS_BLOCKCHAIN_CIRCUITS directory.
@@ -92,6 +96,23 @@ Run scripts/lez-testnet-compatibility-evidence.sh first, or pass --run-root to
 an existing compatibility run that contains wallet-home.
 EOF
   exit 1
+fi
+if [ -f "$RUN_ROOT/summary.json" ]; then
+  python3 - "$RUN_ROOT/summary.json" <<'PY'
+import json
+import pathlib
+import sys
+
+summary = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
+if summary.get("transaction_submission_allowed") is not True:
+    print(
+        "compatibility gate blocks transaction submission: "
+        f"check_health_exit_code={summary.get('check_health_exit_code')} "
+        f"endpoint_health_ok={summary.get('endpoint_health_ok')}",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
+PY
 fi
 
 WALLET_HOME_ENV_VAR="LEE_WALLET_HOME_DIR"

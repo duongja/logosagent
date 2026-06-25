@@ -56,5 +56,8 @@ that LEZ tag `v0.1.2` / commit `cf3639d8` matches the hosted testnet program
 IDs. The successful hosted-testnet transfer evidence is recorded in
 `docs/testnet-wallet-transfer-evidence-20260619.md`.
 
-Use the `v0.1.2` wallet unless Logos redeploys the hosted testnet or publishes
-a newer matching prebuilt wallet.
+At the time, the correct action was to use the `v0.1.2` wallet unless Logos
+redeployed the hosted testnet or published a newer matching prebuilt wallet.
+Logos did redeploy/wipe LEZ on 2026-06-25 for v0.2, so this document is now
+historical background only. The post-redeploy v0.2 check is documented in
+`docs/testnet-v020-compatibility-evidence-20260625.md`.

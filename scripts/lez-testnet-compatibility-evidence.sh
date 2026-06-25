@@ -3,7 +3,11 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE="$(cd "$ROOT/.." && pwd)"
-LEZ_REPO="${LEZ_REPO:-$WORKSPACE/logos-execution-zone}"
+DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
+  DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone"
+fi
+LEZ_REPO="${LEZ_REPO:-$DEFAULT_LEZ_REPO}"
 WALLET="${WALLET:-$LEZ_REPO/target/release/wallet}"
 TESTNET_URL="${TESTNET_URL:-https://testnet.lez.logos.co/}"
 RUN_ROOT="${RUN_ROOT:-$ROOT/.local/testnet-evidence/$(date -u +%Y%m%dT%H%M%SZ)-lez-compat}"
@@ -19,12 +23,13 @@ Usage: scripts/lez-testnet-compatibility-evidence.sh [options]
 
 Collects hosted LEZ testnet compatibility evidence without submitting a
 transaction. It verifies JSON-RPC reachability, records remote builtin program
-IDs, runs wallet check-health, and captures read-only chain/account evidence.
+IDs when the endpoint exposes them, runs wallet check-health, and captures
+read-only chain/account evidence.
 
 Options:
   --run-root PATH       Output directory. Default: .local/testnet-evidence/<utc>-lez-compat
-  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone/target/release/wallet
-  --lez-repo PATH       LEZ checkout for local commit/id metadata. Default: ../logos-execution-zone
+  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet when present, else ../logos-execution-zone/target/release/wallet
+  --lez-repo PATH       LEZ checkout for local commit/id metadata. Default: ../logos-execution-zone-v0.2.0-rc5-testnet when present, else ../logos-execution-zone
   --testnet-url URL     Sequencer JSON-RPC URL. Default: https://testnet.lez.logos.co/
   --circuits-dir PATH   LOGOS_BLOCKCHAIN_CIRCUITS directory.
   -h, --help            Show this help.
@@ -234,7 +239,14 @@ summary = {
     "wallet": wallet,
     "wallet_home": wallet_home,
     "wallet_home_env_var": wallet_home_env_var,
-    "endpoint_health_ok": isinstance(endpoint_health, dict) and endpoint_health.get("result") is None,
+    "endpoint_health_ok": (
+        isinstance(endpoint_health, dict)
+        and "error" not in endpoint_health
+        and endpoint_health.get("result") is None
+    ),
+    "endpoint_health_error": (
+        endpoint_health.get("error") if isinstance(endpoint_health, dict) else None
+    ),
     "check_health_exit_code": check_health_status,
     "current_block_exit_code": current_block_status,
     "account_list_exit_code": account_list_status,
