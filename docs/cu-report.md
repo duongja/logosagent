@@ -8,8 +8,10 @@ metadata, wallet logs, or an evaluator-approved benchmark-to-CU mapping.
 
 The Logos team advised submitting the LP-0008 PR while they clarify the exact CU
 expectation, and suggested the `fryorcraken/lez-signature-bench` approach as a
-measurement model. This report therefore keeps verifiable tx hashes in the main
-table and documents the benchmark method we will apply if reviewers ask for a
+measurement model. During submission preparation, Logos also redeployed LEZ for
+v0.2 and wiped state. This report therefore keeps the historical pre-redeploy tx
+hashes in the main table, marks current hosted-testnet CU as pending, and
+documents the benchmark method we will apply if reviewers ask for a
 cycles/proving-cost supplement.
 
 | Operation | Network | Program/Method | CU | Tx Hash | Notes |
@@ -29,13 +31,17 @@ cycles/proving-cost supplement.
 
 ## Hosted Testnet CU Status
 
-Hosted-testnet tx evidence must use a wallet whose builtin program IDs match
-the endpoint. The current public `main` wallet mismatches
-`https://testnet.lez.logos.co/`; LEZ tag `v0.1.2` / commit `cf3639d8` matches
-and passed `wallet check-health` on 2026-06-19 UTC.
+Hosted-testnet tx evidence must use a wallet whose builtin program IDs and RPC
+client match the endpoint. LEZ tag `v0.1.2` / commit `cf3639d8` matched the
+hosted testnet on 2026-06-19 UTC, but the 2026-06-25 v0.2 redeploy wiped state.
+Those hashes are historical pre-redeploy evidence, not current post-redeploy
+proof.
 
-The wallet output does not currently expose CU directly. Keep CU as `TBD` until
-one of these sources is available:
+Post-redeploy checks against `https://testnet.lez.logos.co/` showed the old
+methods used by the evidence scripts (`checkHealth`, `getProgramIds`,
+`getTransaction`, `getAccount`) now return `METHOD_NOT_FOUND`. The `v0.2.0-rc5`
+LEZ release also requires Rust `1.94.0`; this machine currently has Rust/Cargo
+`1.80.1`. Keep CU as `TBD` until one of these sources is available:
 
 - a Logos explorer transaction details page with CU/cycle fields;
 - a sequencer metadata endpoint that returns CU/cycle fields for a transaction;

@@ -35,6 +35,12 @@ the current sanitized evidence view:
 
 ## Hosted-Testnet Evidence
 
+Important: the hosted-testnet transaction evidence below was captured before
+the 2026-06-25 LEZ v0.2 redeploy. The builders channel announced that LEZ state
+was wiped for the `v0.2.0-rc5` redeploy, so these hashes are historical
+pre-redeploy evidence and require a v0.2 refresh before being claimed as current
+hosted-testnet proof. See `docs/testnet-redeploy-note-20260625.md`.
+
 | Operation | Tx Hash | Status |
 | --- | --- | --- |
 | `wallet.send` | `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0` | confirmed by transaction lookup and balance deltas |
@@ -82,12 +88,14 @@ testnet program IDs.
 - `program.call` uses the current supported signed public call path. The
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
-- CU values are documented in `docs/cu-report.md` as `TBD` because the current
-  wallet/RPC output does not expose CU fields. The Logos team advised applying
-  anyway while they clarify CU expectations, and suggested the
+- Hosted LEZ evidence was captured before the 2026-06-25 v0.2 redeploy. The
+  redeploy wiped state, so a v0.2 refresh is pending.
+- CU values are documented in `docs/cu-report.md` as `TBD` because the previous
+  wallet/RPC output did not expose CU fields and the v0.2 endpoint/toolchain
+  changed during submission preparation. The Logos team advised applying anyway
+  while they clarify CU expectations, and suggested the
   `fryorcraken/lez-signature-bench` style of real `RISC0_DEV_MODE=0`
-  cycle/prove-time measurement as the follow-up method. The report lists the
-  exact tx hashes, balance/account evidence, and proposed benchmark shape.
+  cycle/prove-time measurement as the follow-up method.
 
 ## Manual-Only Items Left
 

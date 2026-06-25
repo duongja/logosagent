@@ -63,6 +63,7 @@ require_file docs/deployment-guide.md
 require_file docs/owner-channel-basecamp.md
 require_file docs/cu-report.md
 require_file docs/testnet-evidence-runbook.md
+require_file docs/testnet-redeploy-note-20260625.md
 require_file docs/submission-readiness.md
 require_file docs/prize-submission-dossier.md
 require_file docs/manual-intervention-checklist.md

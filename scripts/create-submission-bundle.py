@@ -30,6 +30,7 @@ DEFAULT_DOCS = [
     "docs/submission-readiness.md",
     "docs/prize-submission-dossier.md",
     "docs/testnet-evidence-runbook.md",
+    "docs/testnet-redeploy-note-20260625.md",
     "docs/testnet-compatibility-evidence-20260619.md",
     "docs/testnet-wallet-transfer-evidence-20260619.md",
     "docs/testnet-program-evidence-20260619.md",

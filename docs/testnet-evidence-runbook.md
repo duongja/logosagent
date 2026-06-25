@@ -1,5 +1,17 @@
 # Testnet Evidence Runbook
 
+## v0.2 Redeploy Warning
+
+The 2026-06-19 hosted-testnet evidence in this repository was captured before
+the 2026-06-25 LEZ v0.2 redeploy. The builders channel announced that all LEZ
+state was wiped for the `v0.2.0-rc5` redeploy, so the old tx hashes should be
+treated as historical evidence only. See
+`docs/testnet-redeploy-note-20260625.md`.
+
+Before final review, rerun the hosted-testnet evidence against the current
+`v0.2.0-rc5` wallet/toolchain once the endpoint methods and wallet config are
+aligned.
+
 This is the remaining proof path for prize readiness. The local implementation
 is already exercised by the smoke scripts; final submission needs the same
 flows recorded against the target LEZ testnet/devnet environment with tx hashes
@@ -16,8 +28,9 @@ and CU/cycle evidence.
 ## Hosted LEZ Testnet Compatibility Gate
 
 Before attempting hosted-testnet transactions, build the LEZ wallet that matches
-the hosted testnet artifacts. As of 2026-06-19 UTC, the matching public tag is
-`v0.1.2` / commit `cf3639d8`:
+the hosted testnet artifacts. As of 2026-06-19 UTC, the matching public tag was
+`v0.1.2` / commit `cf3639d8`. After the 2026-06-25 redeploy, refresh this path
+for `v0.2.0-rc5`:
 
 ```bash
 git -C ../logos-execution-zone fetch --depth=1 origin tag v0.1.2

@@ -32,6 +32,12 @@ demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
    - Run `nix build --impure .#lgx -L` on a stable machine or GitHub workflow.
    - Keep the generated `.lgx` checksum with the final evidence bundle.
 
+2. Post-redeploy LEZ v0.2 hosted-testnet refresh
+   - Logos redeployed LEZ on 2026-06-25 and wiped state for v0.2.
+   - The old June 19 tx hashes are now historical pre-redeploy evidence.
+   - Rebuild/use `logos-execution-zone` `v0.2.0-rc5` with Rust `1.94.0`, then
+     rerun wallet transfer, program deploy/call, and A2A payment evidence.
+
 ## CU Status
 
 `docs/cu-report.md` documents CU as `TBD` because the current LEZ wallet/RPC
