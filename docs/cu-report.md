@@ -6,6 +6,12 @@ this submission does not expose compute-unit (CU) values directly. CU is
 therefore reported as `TBD` until Logos provides explorer metadata, sequencer
 metadata, wallet logs, or an evaluator-approved benchmark-to-CU mapping.
 
+The Logos team advised submitting the LP-0008 PR while they clarify the exact CU
+expectation, and suggested the `fryorcraken/lez-signature-bench` approach as a
+measurement model. This report therefore keeps verifiable tx hashes in the main
+table and documents the benchmark method we will apply if reviewers ask for a
+cycles/proving-cost supplement.
+
 | Operation | Network | Program/Method | CU | Tx Hash | Notes |
 | --- | --- | --- | --- | --- | --- |
 | localnet health smoke | local standalone sequencer | `wallet check-health` via `agent_lez query` and `agent_lez call` | N/A | N/A | verified 2026-06-10 with `risc0_dev_mode = false`; no transaction submitted |
@@ -38,3 +44,47 @@ one of these sources is available:
   to the requested prize CU field.
 
 Do not infer or invent CU numbers from transaction success alone.
+
+## Proposed Benchmark Method
+
+The suggested reference is:
+
+```text
+https://github.com/fryorcraken/lez-signature-bench
+```
+
+That repository is a research benchmark for signature verification cost on
+RISC Zero / LEZ, not a source of CU values for this agent. Its useful part for
+LP-0008 is the measurement shape:
+
+- run real proofs with `RISC0_DEV_MODE=0`;
+- capture RISC Zero `ProveInfo.stats` fields such as `total_cycles`,
+  `user_cycles`, `paging_cycles`, and `segments`;
+- record wall-clock prove time and receipt size;
+- for end-to-end cost, wrap a real private transaction submission against
+  localnet and measure the full call that performs proving, serialization,
+  sequencer round trip, and confirmation;
+- record machine, LEZ version, RISC Zero version, and whether the result is
+  local prove only or end-to-end transaction time.
+
+For LP-0008, the benchmark target is not a signature algorithm matrix. The
+target operations are the agent's on-chain actions:
+
+- `wallet.send`;
+- `agent.task` LEZ payment transfer;
+- `agent.cancel` refund transfer when applicable;
+- `program.deploy`;
+- `program.call`.
+
+The cleanest follow-up measurement is a small `agent_lez`/wallet-core benchmark
+runner that executes the same transaction builders used by the agent, with
+`RISC0_DEV_MODE=0`, and prints:
+
+```text
+operation | network | tx_hash | total_cycles | user_cycles | paging_cycles | segments | prove_seconds | receipt_bytes
+```
+
+Until that runner exists or the hosted testnet exposes CU/cycle metadata, the
+submission should keep the current tx evidence and explicitly mark CU as
+pending team clarification. This matches the team's guidance to apply now and
+continue the CU discussion in the PR.

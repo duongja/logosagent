@@ -83,9 +83,11 @@ testnet program IDs.
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
 - CU values are documented in `docs/cu-report.md` as `TBD` because the current
-  wallet/RPC output does not expose CU fields. The report lists the exact tx
-  hashes and balance/account evidence and names the acceptable sources needed
-  to replace `TBD`.
+  wallet/RPC output does not expose CU fields. The Logos team advised applying
+  anyway while they clarify CU expectations, and suggested the
+  `fryorcraken/lez-signature-bench` style of real `RISC0_DEV_MODE=0`
+  cycle/prove-time measurement as the follow-up method. The report lists the
+  exact tx hashes, balance/account evidence, and proposed benchmark shape.
 
 ## Manual-Only Items Left
 
