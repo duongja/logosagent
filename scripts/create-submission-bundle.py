@@ -19,6 +19,7 @@ DEFAULT_DOCS = [
     "docs/security-model.md",
     "docs/deployment-guide.md",
     "docs/owner-channel-basecamp.md",
+    "docs/demo-video-links.md",
     "docs/basecamp-owner-chat-evidence-20260622.md",
     "docs/basecamp-v012-agent-evidence-20260622.md",
     "docs/localnet-prize-evidence-refresh-20260622.md",
@@ -36,11 +37,12 @@ DEFAULT_DOCS = [
     "docs/manual-intervention-checklist.md",
     ".github/workflows/ci.yml",
 ]
+DEMO_VIDEOS = [
+    ("Video 1", "Repository readiness, package/evidence bundle, hosted-testnet transaction evidence, and submission overview", "https://www.youtube.com/watch?v=fYlokf7NIfI"),
+    ("Video 2", "Basecamp owner-to-agent Chat flow and owner-channel skill calls", "https://www.youtube.com/watch?v=nS8928doTkE"),
+    ("Video 3", "Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations", "https://www.youtube.com/watch?v=hxRQejaBhxo"),
+]
 MANUAL_ITEMS = [
-    "Record the working Basecamp owner Chat proof in the final narrated demo, or replay the same owner-to-agent JSON skill flow.",
-    "Record the proven headless two-agent Delivery/A2A discovery + payment flow, or rerun it on the final demo host.",
-    "Record at least three illustrative use cases end-to-end using the accepted devnet/testnet/local sequencer mix.",
-    "Capture a narrated demo video that shows terminal proof output, tx hashes, Basecamp Chat, and RISC0_DEV_MODE=0 for proof-generating runs.",
     "Fill CU values from a Logos explorer, sequencer metadata endpoint, logs, or evaluator-approved benchmark mapping if Logos does not expose CU directly.",
     "Run the official clean Nix package build on a stable machine or GitHub workflow: nix build --impure .#lgx -L.",
 ]
@@ -186,6 +188,10 @@ def write_index(out_dir, reports, artifacts):
     else:
         lines.append("- No hosted-testnet tx hashes found in the current local evidence directory.")
 
+    lines.extend(["", "## Narrated Demo Videos", ""])
+    for label, focus, url in DEMO_VIDEOS:
+        lines.append(f"- `{label}`: {focus}. {url}")
+
     lines.extend(["", "## Local Evidence Summary", ""])
     if local_rows:
         for label, details, root in local_rows:
@@ -247,6 +253,10 @@ def main():
         "git_commit": git_commit(),
         "out_dir": str(out_dir),
         "copied_public_files": copied,
+        "demo_videos": [
+            {"label": label, "focus": focus, "url": url}
+            for label, focus, url in DEMO_VIDEOS
+        ],
         "artifacts": artifacts,
         "manual_items_remaining": MANUAL_ITEMS,
     }

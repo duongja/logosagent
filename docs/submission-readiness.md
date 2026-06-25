@@ -227,6 +227,15 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   Balance evidence showed payer `3647 -> 3646` and recipient `4001 -> 4002`;
   transaction lookup returned the tx. See
   `docs/testnet-a2a-payment-evidence-20260619.md`.
+- Narrated demo videos recorded and linked in `docs/demo-video-links.md`:
+  - Video 1: repository readiness, package/evidence bundle, hosted-testnet
+    transaction evidence, and submission overview:
+    https://www.youtube.com/watch?v=fYlokf7NIfI
+  - Video 2: Basecamp owner-to-agent Chat flow and owner-channel skill calls:
+    https://www.youtube.com/watch?v=nS8928doTkE
+  - Video 3: live skill proofs for Storage, wallet spending controls and
+    transfer history, Messaging/Delivery, paid A2A, and program operations:
+    https://www.youtube.com/watch?v=hxRQejaBhxo
 
 ## Hosted Testnet Wallet Version
 
@@ -248,11 +257,6 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   module payload. Before final submission, also rerun the official clean Nix
   package path (`nix build --impure .#lgx -L`) on a machine with enough memory or
   after cache warmup.
-- End-to-end recorded evidence for at least three illustrative use cases. The
-  implementation flows are now proven, including Basecamp owner Chat, but the
-  final prize submission still needs narrated video footage that shows the
-  evidence commands, visible Basecamp Chat interaction, tx hashes, and
-  `RISC0_DEV_MODE=0`.
 
 ## Pre-Submission Command Set
 

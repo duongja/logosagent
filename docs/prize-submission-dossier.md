@@ -13,6 +13,7 @@ It avoids raw `.local` runtime state, wallet storage, and other local secrets.
 - Security model: `docs/security-model.md`.
 - Deployment guide: `docs/deployment-guide.md`.
 - Evidence bundle generator: `scripts/create-submission-bundle.py`.
+- Narrated demo videos: `docs/demo-video-links.md`.
 
 ## Default Skill Coverage
 
@@ -44,6 +45,14 @@ the current sanitized evidence view:
 The hosted-testnet wallet/runtime used LEZ tag `v0.1.2` / commit `cf3639d8`
 because the current public LEZ `main` wallet did not match the deployed
 testnet program IDs.
+
+## Narrated Demo Videos
+
+| Video | Focus | Link |
+| --- | --- | --- |
+| Video 1 | Repository readiness, package/evidence bundle, hosted-testnet transaction evidence, and submission overview | https://www.youtube.com/watch?v=fYlokf7NIfI |
+| Video 2 | Basecamp owner-to-agent Chat flow and owner-channel skill calls | https://www.youtube.com/watch?v=nS8928doTkE |
+| Video 3 | Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations | https://www.youtube.com/watch?v=hxRQejaBhxo |
 
 ## Local Proof Highlights
 
@@ -81,7 +90,5 @@ testnet program IDs.
 
 See `docs/manual-intervention-checklist.md`. In short:
 
-- Final narrated video that includes Basecamp owner Chat, storage vault,
-  paid A2A marketplace, wallet/program evidence, tx hashes, and terminal output.
 - CU confirmation or accepted `TBD` policy from Logos.
 - Official clean package build on stable hardware or CI.

@@ -1,45 +1,38 @@
 # Manual Intervention Checklist
 
-Everything below needs either a GUI session, external Logos infrastructure
-decision, or final narrated recording. The repository now contains the local
-module implementation, local smoke evidence, hosted-testnet transaction
-evidence, and packaging helpers.
+The repository now contains the local module implementation, local smoke
+evidence, hosted-testnet transaction evidence, packaging helpers, and narrated
+demo videos.
 
-## Must Be Recorded For Final Prize Submission
+## Recorded Demo Videos
 
-1. Final Basecamp owner-channel recording
-   - The Basecamp `0.1.2` launch and inspector proof is now captured in
-     `docs/basecamp-v012-agent-evidence-20260622.md`.
-   - The owner-to-agent Chat UI proof is now captured in
-     `docs/basecamp-owner-chat-evidence-20260622.md`.
-   - For the final video, replay the same Chat flow or show the captured proof:
-     owner sends JSON skill calls, agent replies in the same conversation, and
-     `wallet.send` creates a pending approval.
+- Video 1: repository readiness, package/evidence bundle, hosted-testnet
+  transaction evidence, and submission overview.
+  https://www.youtube.com/watch?v=fYlokf7NIfI
+- Video 2: Basecamp owner-to-agent Chat flow and owner-channel skill calls.
+  https://www.youtube.com/watch?v=nS8928doTkE
+- Video 3: live skill proofs: Storage, wallet spending controls and transfer
+  history, Messaging/Delivery, paid A2A, and program operations.
+  https://www.youtube.com/watch?v=hxRQejaBhxo
 
-2. Recorded two-agent Delivery/A2A proof
-   - The headless CLI proof already shows Agent Card discovery, paid task
-     submission, terminal A2A state, and LEZ payment in one run.
-   - Record that command output, or rerun the same proof on the final demo host.
+## Completed Recording Coverage
 
-3. Three illustrative use cases
-   - Personal file vault: upload/list/share/download and hash-match the file.
-   - Paid skill marketplace: discover a priced Agent Card, pay, and receive the result.
-   - Program operation: deploy/call/query a LEZ program or show a monitoring/notary workflow.
+- Basecamp owner-channel recording: Video 2.
+- Two-agent Delivery/A2A proof: Video 3.
+- Three illustrative use cases:
+  - Personal file vault: Video 3.
+  - Paid skill marketplace: Video 3.
+  - Program operation: Video 3.
+- Terminal proof output, hosted-testnet tx hashes, and `RISC0_DEV_MODE=0`:
+  Videos 1 and 3.
 
-4. Narrated demo video
-   - Use `docs/final-demo-recording-guide.md` as the recording script. It
-     explains each command, output field, and narration point in simple terms.
-   - Explain what was built and why.
-   - Show terminal output for proof-generating runs.
-   - Show `RISC0_DEV_MODE=0`.
-   - Show hosted-testnet tx hashes from the evidence docs.
-   - Show or include the Basecamp owner Chat proof now that it is working.
+## Manual/External Items Still Open
 
-5. CU values
+1. CU values
    - Fill `docs/cu-report.md` if Logos exposes CU through explorer, sequencer metadata, or logs.
    - If CU is not exposed, get evaluator/Discord confirmation that `TBD` plus tx hashes and benchmark notes are acceptable.
 
-6. Official clean package build
+2. Official clean package build
    - Run `nix build --impure .#lgx -L` on a stable machine or GitHub workflow.
    - Keep the generated `.lgx` checksum with the final evidence bundle.
 
