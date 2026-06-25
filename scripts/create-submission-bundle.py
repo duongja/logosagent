@@ -13,6 +13,8 @@ DEFAULT_DOCS = [
     "README.md",
     "LICENSE",
     "metadata.json",
+    "module.json",
+    "demo.sh",
     "docs/architecture.md",
     "docs/skill-interface.md",
     "docs/a2a-logos-messaging-binding.md",

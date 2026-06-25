@@ -7,6 +7,8 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 ## Ready In Repo
 
 - MIT license: `LICENSE`.
+- Review demo entrypoint: `demo.sh`.
+- Basecamp/module descriptor for evaluator discovery: `module.json`.
 - Logos Core module package/build: `metadata.json`, `CMakeLists.txt`,
   `src/logos_agent_plugin.cpp`.
 - Full default skill surface: `docs/skill-interface.md` and

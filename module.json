@@ -1,0 +1,57 @@
+{
+  "schema": "logos.basecamp.module.v1",
+  "name": "logos_agent",
+  "display_name": "Logos Agent Module",
+  "version": "0.1.0",
+  "description": "Autonomous Logos-native agent runtime with LEZ wallet, Logos Storage, Logos Messaging owner chat, Delivery transport, and A2A-compatible coordination.",
+  "package": {
+    "lgx": "result/logos-logos_agent-module-lib.lgx",
+    "metadata": "metadata.json"
+  },
+  "entrypoints": {
+    "core_module": "logos_agent",
+    "cli": "cli/logos-agent-cli",
+    "owner_channel": "Logos Basecamp Chat"
+  },
+  "capabilities": [
+    "logos.chat",
+    "logos.messaging",
+    "delivery_module",
+    "storage_module",
+    "logos_execution_zone",
+    "wallet",
+    "logos.storage",
+    "a2a"
+  ],
+  "skills": [
+    "storage.upload",
+    "storage.download",
+    "storage.list",
+    "storage.share",
+    "messaging.send",
+    "messaging.join",
+    "messaging.create_group",
+    "wallet.balance",
+    "wallet.send",
+    "wallet.history",
+    "program.query",
+    "program.call",
+    "program.deploy",
+    "agent.card",
+    "agent.discover",
+    "agent.task",
+    "agent.subscribe",
+    "agent.cancel",
+    "meta.skills",
+    "meta.status",
+    "meta.configure"
+  ],
+  "docs": [
+    "README.md",
+    "docs/deployment-guide.md",
+    "docs/owner-channel-basecamp.md",
+    "docs/skill-interface.md",
+    "docs/a2a-logos-messaging-binding.md",
+    "docs/prize-submission-dossier.md"
+  ]
+}

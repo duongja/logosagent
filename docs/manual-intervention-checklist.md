@@ -1,8 +1,8 @@
 # Manual Intervention Checklist
 
 The repository now contains the local module implementation, local smoke
-evidence, hosted-testnet transaction evidence, packaging helpers, and narrated
-demo videos.
+evidence, hosted-testnet transaction evidence, packaging helpers, reviewer
+demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
 
 ## Recorded Demo Videos
 

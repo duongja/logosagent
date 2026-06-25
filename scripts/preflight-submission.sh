@@ -53,6 +53,8 @@ require_file() {
 require_file LICENSE
 require_file README.md
 require_file metadata.json
+require_file module.json
+require_file demo.sh
 require_file docs/architecture.md
 require_file docs/skill-interface.md
 require_file docs/a2a-logos-messaging-binding.md
@@ -69,6 +71,7 @@ python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scri
 ./cli/logos-agent-cli --help >/dev/null
 
 bash -n \
+  demo.sh \
   scripts/bootstrap-workspace.sh \
   scripts/demo-local.sh \
   scripts/basecamp-owner-channel.sh \
