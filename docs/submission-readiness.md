@@ -246,12 +246,12 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `v0.1.2` / commit `cf3639d8` (also tag `v0.2.0-rc3`). Use that wallet for
   hosted-testnet tx evidence unless Logos redeploys the testnet.
 
-## Evidence Still Required
+## Evidence Status
 
-- CU measurements in `docs/cu-report.md` for:
-  `wallet.send`, `program.deploy`, `program.call`, and `agent.task` payment.
-  Hosted-testnet tx hashes now exist for all four rows, but CU is still not
-  exposed by the wallet/RPC output.
+- CU status is documented in `docs/cu-report.md`. Hosted-testnet tx hashes
+  exist for `wallet.send`, `program.deploy`, `program.call`, and `agent.task`
+  payment. CU remains `TBD` because the current wallet/RPC output does not
+  expose CU fields; the report names acceptable sources for replacing `TBD`.
 - Official clean-machine LGX package build. A current dev LGX exists at
   `result/logos-logos_agent-module-lib.lgx`, produced from the locally tested
   module payload. Before final submission, also rerun the official clean Nix

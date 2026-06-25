@@ -43,7 +43,6 @@ DEMO_VIDEOS = [
     ("Video 3", "Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations", "https://www.youtube.com/watch?v=hxRQejaBhxo"),
 ]
 MANUAL_ITEMS = [
-    "Fill CU values from a Logos explorer, sequencer metadata endpoint, logs, or evaluator-approved benchmark mapping if Logos does not expose CU directly.",
     "Run the official clean Nix package build on a stable machine or GitHub workflow: nix build --impure .#lgx -L.",
 ]
 

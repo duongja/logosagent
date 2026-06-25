@@ -1,7 +1,10 @@
 # Compute Unit Report
 
-This document must be completed from devnet/testnet measurements before final
-submission.
+Current status: hosted-testnet and localnet transaction evidence exists for the
+required on-chain operations, but the current LEZ wallet/RPC output used for
+this submission does not expose compute-unit (CU) values directly. CU is
+therefore reported as `TBD` until Logos provides explorer metadata, sequencer
+metadata, wallet logs, or an evaluator-approved benchmark-to-CU mapping.
 
 | Operation | Network | Program/Method | CU | Tx Hash | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -16,6 +19,7 @@ submission.
 | `agent.task` discovery + payment local proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `81b55313e470325b17d58328dc03da9f03538d7c970a24b8d98ea23c83e0ed74` | verified 2026-06-20; two isolated Core daemons reached `TASK_STATE_COMPLETED`; CU not exposed by local wallet/RPC output |
 | `wallet.send` local refresh proof | local standalone sequencer | public token transfer through `logos_execution_zone` wallet FFI | TBD | `22b2daffa8a526f17b4b370afe408edacbdfe48c2078af07c128673d5e402547` | verified 2026-06-22 after Basecamp owner-chat fixes; approval gate was tested first with zero limits |
 | `agent.task` discovery + payment local refresh proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `cbe01582b0bd0fab691b73760b1919b94e9d2da3ae023e32d158b02404d29bd7` | verified 2026-06-22; client discovered signed card, paid price `1`, and both agents reached `TASK_STATE_COMPLETED` |
+| `wallet.send` local balance-delta proof | local standalone sequencer | public token transfer through `logos_execution_zone` wallet FFI | TBD | `7a0ea38183efaa41883f702be23829f23665550f54e4531c45d183bf8a83094b` | verified 2026-06-24 with separated topup and transfer windows; sender `5095 -> 5094`, recipient `5 -> 6`, both nonces advanced by one |
 
 ## Hosted Testnet CU Status
 
@@ -25,5 +29,12 @@ the endpoint. The current public `main` wallet mismatches
 and passed `wallet check-health` on 2026-06-19 UTC.
 
 The wallet output does not currently expose CU directly. Keep CU as `TBD` until
-an explorer, sequencer metadata endpoint, or evaluator-approved benchmark
-mapping is available.
+one of these sources is available:
+
+- a Logos explorer transaction details page with CU/cycle fields;
+- a sequencer metadata endpoint that returns CU/cycle fields for a transaction;
+- wallet or sequencer logs that print execution cycles or proof stats;
+- an evaluator-approved benchmark mapping from deterministic LEZ cycle counts
+  to the requested prize CU field.
+
+Do not infer or invent CU numbers from transaction success alone.

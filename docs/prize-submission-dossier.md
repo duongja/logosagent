@@ -82,13 +82,13 @@ testnet program IDs.
 - `program.call` uses the current supported signed public call path. The
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
-- CU values are not exposed by the current wallet/RPC output. Keep them as
-  `TBD` unless Logos provides explorer/sequencer metadata, logs, or an
-  evaluator-approved benchmark mapping.
+- CU values are documented in `docs/cu-report.md` as `TBD` because the current
+  wallet/RPC output does not expose CU fields. The report lists the exact tx
+  hashes and balance/account evidence and names the acceptable sources needed
+  to replace `TBD`.
 
 ## Manual-Only Items Left
 
 See `docs/manual-intervention-checklist.md`. In short:
 
-- CU confirmation or accepted `TBD` policy from Logos.
 - Official clean package build on stable hardware or CI.

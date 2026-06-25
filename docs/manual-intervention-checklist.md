@@ -28,13 +28,16 @@ demo videos.
 
 ## Manual/External Items Still Open
 
-1. CU values
-   - Fill `docs/cu-report.md` if Logos exposes CU through explorer, sequencer metadata, or logs.
-   - If CU is not exposed, get evaluator/Discord confirmation that `TBD` plus tx hashes and benchmark notes are acceptable.
-
-2. Official clean package build
+1. Official clean package build
    - Run `nix build --impure .#lgx -L` on a stable machine or GitHub workflow.
    - Keep the generated `.lgx` checksum with the final evidence bundle.
+
+## CU Status
+
+`docs/cu-report.md` documents CU as `TBD` because the current LEZ wallet/RPC
+outputs do not expose CU fields. Replace `TBD` if Logos provides explorer
+metadata, sequencer metadata, wallet/sequencer logs, or an evaluator-approved
+benchmark mapping.
 
 ## Bundle Command
 
