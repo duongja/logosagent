@@ -15,6 +15,7 @@ DEFAULT_DOCS = [
     "metadata.json",
     "module.json",
     "demo.sh",
+    "scripts/lez-v020-endpoint-diagnose.py",
     "docs/architecture.md",
     "docs/skill-interface.md",
     "docs/a2a-logos-messaging-binding.md",

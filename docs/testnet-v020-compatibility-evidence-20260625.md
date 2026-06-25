@@ -109,6 +109,19 @@ A pending `logos-docs` branch named `wallet-testnet-cli` still documents
 blocker appears to be deployment/proxy availability or an unpublished endpoint
 change, not an LP-0008 agent implementation issue.
 
+The repeatable diagnostic command is:
+
+```bash
+./scripts/lez-v020-endpoint-diagnose.py \
+  --url https://testnet.lez.logos.co/ \
+  --all-paths
+```
+
+Expected success condition: at least `checkHealth`, `getProgramIds`, and
+`getLastBlockId` return JSON-RPC `result` values at the wallet
+`sequencer_addr`. Current failure condition: all sequencer/indexer methods at
+the documented root return `METHOD_NOT_FOUND`.
+
 ## Submission Impact
 
 This check proves that the local environment has adapted far enough to build
