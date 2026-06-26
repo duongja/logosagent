@@ -33,6 +33,7 @@ DEFAULT_DOCS = [
     "docs/testnet-evidence-runbook.md",
     "docs/testnet-redeploy-note-20260625.md",
     "docs/testnet-v020-compatibility-evidence-20260625.md",
+    "docs/testnet-v020-live-evidence-20260626.md",
     "docs/testnet-compatibility-evidence-20260619.md",
     "docs/testnet-wallet-transfer-evidence-20260619.md",
     "docs/testnet-program-evidence-20260619.md",
@@ -49,7 +50,7 @@ DEMO_VIDEOS = [
 ]
 MANUAL_ITEMS = [
     "Run the official clean Nix package build on a stable machine or GitHub workflow: nix build --impure .#lgx -L.",
-    "Refresh hosted LEZ v0.2 tx evidence after Logos confirms the active v0.2 sequencer RPC URL and funding path; the local v0.2 wallet builds, but https://testnet.lez.logos.co/ returned METHOD_NOT_FOUND for wallet sequencer methods on 2026-06-25.",
+    "Fill CU values if Logos provides explorer/sequencer CU metadata, wallet/sequencer proof stats, or an evaluator-approved benchmark mapping. Current hosted-testnet v0.2 tx evidence is refreshed, but CU remains TBD.",
 ]
 
 

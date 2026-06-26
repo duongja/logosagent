@@ -59,5 +59,7 @@ IDs. The successful hosted-testnet transfer evidence is recorded in
 At the time, the correct action was to use the `v0.1.2` wallet unless Logos
 redeployed the hosted testnet or published a newer matching prebuilt wallet.
 Logos did redeploy/wipe LEZ on 2026-06-25 for v0.2, so this document is now
-historical background only. The post-redeploy v0.2 check is documented in
-`docs/testnet-v020-compatibility-evidence-20260625.md`.
+historical background only. The failed outage-era post-redeploy check is
+documented in `docs/testnet-v020-compatibility-evidence-20260625.md`; the
+current successful v0.2 hosted evidence is documented in
+`docs/testnet-v020-live-evidence-20260626.md`.

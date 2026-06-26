@@ -189,6 +189,18 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
     Delivery transport proof is captured locally in
     `docs/localnet-a2a-discovery-payment-evidence-20260620.md` and should be
     included in the final recording or rerun on the demo host.
+- Hosted LEZ v0.2 testnet evidence refreshed on 2026-06-26 after the
+  `v0.2.0-rc5` redeploy/outage:
+  - `wallet.send` tx:
+    `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`.
+  - `agent.task` payment tx:
+    `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`.
+  - `program.deploy` tx:
+    `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`.
+  - `program.call` tx:
+    `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`.
+  - `getAccount` returned data bytes for `LP0008-v020`; see
+    `docs/testnet-v020-live-evidence-20260626.md`.
 - Three headless category-agent deployments captured on 2026-06-20:
   - Storage, Messaging, and Blockchain agents installed the verified LGX module
     set, loaded `logos_agent`, initialized, started, generated signed Agent

@@ -8,11 +8,10 @@ metadata, wallet logs, or an evaluator-approved benchmark-to-CU mapping.
 
 The Logos team advised submitting the LP-0008 PR while they clarify the exact CU
 expectation, and suggested the `fryorcraken/lez-signature-bench` approach as a
-measurement model. During submission preparation, Logos also redeployed LEZ for
-v0.2 and wiped state. This report therefore keeps the historical pre-redeploy tx
-hashes in the main table, marks current hosted-testnet CU as pending, and
-documents the benchmark method we will apply if reviewers ask for a
-cycles/proving-cost supplement.
+measurement model. During submission preparation, Logos redeployed LEZ for
+v0.2 and later restored the hosted endpoint. This report includes the fresh
+`v0.2.0-rc5` hosted-testnet hashes and keeps CU as `TBD` until a CU/cycle data
+source is available.
 
 | Operation | Network | Program/Method | CU | Tx Hash | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -24,6 +23,10 @@ cycles/proving-cost supplement.
 | `program.deploy` hosted testnet proof | hosted LEZ testnet | `hello_world_with_authorization` deployment tx | TBD | `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb` | verified 2026-06-19 with LEZ `v0.1.2` / `cf3639d8`; RPC/wallet output does not expose CU |
 | `program.call` hosted testnet proof | hosted LEZ testnet | signed public call, instruction `Hola mundo!` | TBD | `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518` | verified 2026-06-19; `getAccount` returned data bytes for `Hola mundo!` and nonce `1`; CU not exposed by RPC/wallet output |
 | `agent.task` payment hosted testnet proof | hosted LEZ testnet | token transfer for declared A2A skill price | TBD | `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494` | verified 2026-06-19 with LEZ `v0.1.2` / `cf3639d`; payer `3647 -> 3646`, recipient `4001 -> 4002`; CU not exposed by wallet/RPC output |
+| `wallet.send` hosted v0.2 testnet proof | hosted LEZ testnet | authenticated transfer, public-to-public | TBD | `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86` | verified 2026-06-26 with LEZ `v0.2.0-rc5` / `27360cb` and `RISC0_DEV_MODE=0`; sender `10000 -> 9999`, recipient `20000 -> 20001`; CU not exposed by wallet/RPC output |
+| `agent.task` payment hosted v0.2 testnet proof | hosted LEZ testnet | token transfer for declared A2A skill price | TBD | `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4` | verified 2026-06-26 with LEZ `v0.2.0-rc5` / `27360cb`; payer `9999 -> 9998`, recipient `20001 -> 20002`; CU not exposed by wallet/RPC output |
+| `program.deploy` hosted v0.2 testnet proof | hosted LEZ testnet | `data_changer.bin` deployment tx | TBD | `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03` | verified 2026-06-26 with bytecode SHA-256 `7040a6af83a92834f947c366cf12255bcdbaf943401a131bf03345635801785f`; transaction lookup returned the deployment |
+| `program.call` hosted v0.2 testnet proof | hosted LEZ testnet | signed public call, instruction `LP0008-v020` | TBD | `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30` | verified 2026-06-26; `getAccount` for `Public/HMeNkN8qAD5Ek8qK4SVBrUHZ1AQbTgnKf4C5EyfYfMB2` returned data bytes for `LP0008-v020` and nonce `1` |
 | `agent.task` discovery + payment local proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `81b55313e470325b17d58328dc03da9f03538d7c970a24b8d98ea23c83e0ed74` | verified 2026-06-20; two isolated Core daemons reached `TASK_STATE_COMPLETED`; CU not exposed by local wallet/RPC output |
 | `wallet.send` local refresh proof | local standalone sequencer | public token transfer through `logos_execution_zone` wallet FFI | TBD | `22b2daffa8a526f17b4b370afe408edacbdfe48c2078af07c128673d5e402547` | verified 2026-06-22 after Basecamp owner-chat fixes; approval gate was tested first with zero limits |
 | `agent.task` discovery + payment local refresh proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `cbe01582b0bd0fab691b73760b1919b94e9d2da3ae023e32d158b02404d29bd7` | verified 2026-06-22; client discovered signed card, paid price `1`, and both agents reached `TASK_STATE_COMPLETED` |
@@ -33,16 +36,12 @@ cycles/proving-cost supplement.
 
 Hosted-testnet tx evidence must use a wallet whose builtin program IDs and RPC
 client match the endpoint. LEZ tag `v0.1.2` / commit `cf3639d8` matched the
-hosted testnet on 2026-06-19 UTC, but the 2026-06-25 v0.2 redeploy wiped state.
-Those hashes are historical pre-redeploy evidence, not current post-redeploy
-proof.
+hosted testnet on 2026-06-19 UTC, and LEZ `v0.2.0-rc5` / commit `27360cb`
+matched the restored hosted testnet on 2026-06-26 UTC. The June 25
+`METHOD_NOT_FOUND` compatibility failure is retained in
+`docs/testnet-v020-compatibility-evidence-20260625.md` as outage diagnosis.
 
-Post-redeploy checks against `https://testnet.lez.logos.co/` showed the
-sequencer methods used by the evidence scripts (`checkHealth`, `getProgramIds`,
-`getTransaction`, `getAccount`) now return `METHOD_NOT_FOUND`. The `v0.2.0-rc5`
-LEZ wallet was built locally with Rust `1.94.0`, and it still expects those
-method names, so the current blocker is the hosted endpoint/proxy or an
-unpublished RPC URL. Keep CU as `TBD` until one of these sources is available:
+Keep CU as `TBD` until one of these sources is available:
 
 - a Logos explorer transaction details page with CU/cycle fields;
 - a sequencer metadata endpoint that returns CU/cycle fields for a transaction;

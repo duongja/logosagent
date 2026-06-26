@@ -35,22 +35,21 @@ the current sanitized evidence view:
 
 ## Hosted-Testnet Evidence
 
-Important: the hosted-testnet transaction evidence below was captured before
-the 2026-06-25 LEZ v0.2 redeploy. The builders channel announced that LEZ state
-was wiped for the `v0.2.0-rc5` redeploy, so these hashes are historical
-pre-redeploy evidence and require a v0.2 refresh before being claimed as current
-hosted-testnet proof. See `docs/testnet-redeploy-note-20260625.md`.
+Current hosted-testnet evidence was refreshed on 2026-06-26 after Logos
+reported that the v0.2 testnet endpoint was back online. The run used LEZ
+`v0.2.0-rc5` / commit `27360cb7d6ccb2bfbcca7d171bab8a3938490264` with
+`RISC0_DEV_MODE=0`. See
+`docs/testnet-v020-live-evidence-20260626.md`.
 
 | Operation | Tx Hash | Status |
 | --- | --- | --- |
-| `wallet.send` | `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0` | confirmed by transaction lookup and balance deltas |
-| `program.deploy` | `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb` | confirmed by hosted-testnet RPC lookup |
-| `program.call` | `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518` | confirmed by account data `Hola mundo!` |
-| `agent.task` payment leg | `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494` | confirmed by transaction lookup and balance deltas |
+| `wallet.send` | `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86` | confirmed by transaction lookup and balance deltas: sender `10000 -> 9999`, recipient `20000 -> 20001` |
+| `program.deploy` | `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03` | `data_changer.bin` deployment confirmed by hosted-testnet RPC lookup |
+| `program.call` | `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30` | confirmed by account data `LP0008-v020` and nonce `1` |
+| `agent.task` payment leg | `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4` | confirmed by transaction lookup and balance deltas: payer `9999 -> 9998`, recipient `20001 -> 20002` |
 
-The hosted-testnet wallet/runtime used LEZ tag `v0.1.2` / commit `cf3639d8`
-because the current public LEZ `main` wallet did not match the deployed
-testnet program IDs.
+The older June 19 hosted-testnet tx hashes are retained in separate evidence
+docs as historical pre-v0.2-redeploy context only.
 
 ## Narrated Demo Videos
 
@@ -88,15 +87,9 @@ testnet program IDs.
 - `program.call` uses the current supported signed public call path. The
   generic arbitrary-program CLI/API should replace the helper bridge when LEZ
   exposes a stable interface for it.
-- Hosted LEZ evidence was captured before the 2026-06-25 v0.2 redeploy. The
-  redeploy wiped state. The `v0.2.0-rc5` wallet now builds locally, but the
-  advertised hosted endpoint returned `METHOD_NOT_FOUND` for the wallet's
-  expected sequencer methods during the 2026-06-25 check, so fresh hosted tx
-  hashes are pending endpoint confirmation.
 - CU values are documented in `docs/cu-report.md` as `TBD` because the previous
-  wallet/RPC output did not expose CU fields and the v0.2 endpoint/toolchain
-  changed during submission preparation. The Logos team advised applying anyway
-  while they clarify CU expectations, and suggested the
+  wallet/RPC output did not expose CU fields. The Logos team advised applying
+  anyway while they clarify CU expectations, and suggested the
   `fryorcraken/lez-signature-bench` style of real `RISC0_DEV_MODE=0`
   cycle/prove-time measurement as the follow-up method.
 

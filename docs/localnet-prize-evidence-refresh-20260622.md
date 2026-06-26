@@ -101,7 +101,19 @@ python3 scripts/collect-prize-evidence.py \
 
 ## Hosted-Testnet Relationship
 
-The localnet refresh complements the hosted-testnet evidence captured on
+The localnet refresh complements hosted-testnet evidence. The current hosted
+v0.2 evidence was refreshed on 2026-06-26 after the LEZ `v0.2.0-rc5` redeploy:
+
+- Hosted v0.2 `wallet.send` tx:
+  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
+- Hosted v0.2 `program.deploy` tx:
+  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
+- Hosted v0.2 `program.call` tx:
+  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
+- Hosted v0.2 paid A2A payment leg tx:
+  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+
+The historical pre-redeploy hosted-testnet evidence was captured on
 2026-06-19:
 
 - Hosted `wallet.send` tx:
@@ -116,4 +128,3 @@ The localnet refresh complements the hosted-testnet evidence captured on
 The hosted testnet does not currently expose Storage or Delivery as a hosted
 testnet network in the same way LEZ does, so those modules are proven through
 local Logos Core/Basecamp/Delivery evidence.
-

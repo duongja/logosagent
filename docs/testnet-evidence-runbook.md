@@ -1,6 +1,6 @@
 # Testnet Evidence Runbook
 
-## v0.2 Redeploy Warning
+## v0.2 Redeploy Status
 
 The 2026-06-19 hosted-testnet evidence in this repository was captured before
 the 2026-06-25 LEZ v0.2 redeploy. The builders channel announced that all LEZ
@@ -8,10 +8,11 @@ state was wiped for the `v0.2.0-rc5` redeploy, so the old tx hashes should be
 treated as historical evidence only. See
 `docs/testnet-redeploy-note-20260625.md`.
 
-The `v0.2.0-rc5` wallet has been built locally, but the advertised endpoint
-`https://testnet.lez.logos.co/` did not expose the sequencer RPC methods during
-the 2026-06-25 check. See
-`docs/testnet-v020-compatibility-evidence-20260625.md`.
+On 2026-06-26 Logos reported that the hosted testnet was back online. A fresh
+`v0.2.0-rc5` run then passed the compatibility gate and produced current
+hosted-testnet tx hashes for `wallet.send`, `agent.task` payment,
+`program.deploy`, and `program.call`. See
+`docs/testnet-v020-live-evidence-20260626.md`.
 
 This is the remaining proof path for prize readiness. The local implementation
 is already exercised by the smoke scripts; final submission needs the same
@@ -62,11 +63,10 @@ Only proceed to real `wallet.send`, A2A payment, `program.deploy`, or
 `program.call` evidence when `summary.json` reports
 `"transaction_submission_allowed": true`.
 
-As of the 2026-06-25 UTC run against `https://testnet.lez.logos.co/`, the
-locally built `v0.2.0-rc5` wallet fails before transaction submission because
-the advertised endpoint returns `METHOD_NOT_FOUND` for the expected sequencer
-methods. Do not attempt funded hosted-testnet transactions until the endpoint
-returns a passing `wallet check-health`.
+On 2026-06-25 UTC this gate failed because the endpoint returned
+`METHOD_NOT_FOUND` while Logos was updating infrastructure. On 2026-06-26 UTC
+the same endpoint passed the gate again. Treat the June 25 failure as historical
+diagnosis, not the current state.
 
 For a fresh wiped v0.2 testnet, do not reuse the pre-redeploy funded accounts
 from the June 19 evidence. Once the endpoint is healthy, fund accounts through
@@ -79,7 +79,33 @@ wallet auth-transfer init --account-id Public/<recipient>
 wallet auth-transfer send --from Public/<sender> --to Public/<recipient> --amount 1
 ```
 
-## Captured Hosted Program Evidence
+## Captured Hosted v0.2 Evidence
+
+Hosted testnet evidence was refreshed on 2026-06-26 UTC with LEZ
+`v0.2.0-rc5`, commit `27360cb7d6ccb2bfbcca7d171bab8a3938490264`, and
+`RISC0_DEV_MODE=0`:
+
+- Wallet transfer tx:
+  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
+- A2A payment tx:
+  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+- Program deploy tx:
+  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
+- Program call tx:
+  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
+- Program call account:
+  `Public/HMeNkN8qAD5Ek8qK4SVBrUHZ1AQbTgnKf4C5EyfYfMB2`
+- Account data after call: `LP0008-v020`
+
+The compact local run root is:
+
+```text
+.local/testnet-evidence/v020-rc5-live-tx-20260626T101906Z
+```
+
+Raw wallet state under that directory must not be committed.
+
+## Historical Hosted Program Evidence
 
 Hosted testnet `program.deploy` and signed `program.call` evidence was captured
 on 2026-06-19 UTC with the matching `v0.1.2` LEZ checkout:
@@ -100,7 +126,7 @@ the same binary to the same testnet state can be dropped as
 `ProgramAlreadyExists`. For a fresh reproducible run, rebuild a unique demo
 program or deploy to a fresh local sequencer/testnet state.
 
-## Captured Hosted A2A Payment Evidence
+## Historical Hosted A2A Payment Evidence
 
 Hosted testnet LEZ payment evidence for a paid A2A task was captured on
 2026-06-19 UTC:

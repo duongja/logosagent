@@ -32,15 +32,11 @@ demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
    - Run `nix build --impure .#lgx -L` on a stable machine or GitHub workflow.
    - Keep the generated `.lgx` checksum with the final evidence bundle.
 
-2. Post-redeploy LEZ v0.2 hosted-testnet refresh
-   - Logos redeployed LEZ on 2026-06-25 and wiped state for v0.2.
-   - The old June 19 tx hashes are now historical pre-redeploy evidence.
-   - `logos-execution-zone` `v0.2.0-rc5` now builds locally with Rust
-     `1.94.0`.
-   - The advertised endpoint `https://testnet.lez.logos.co/` returned
-     `METHOD_NOT_FOUND` for the v0.2 wallet's expected sequencer RPC methods.
-   - Once Logos confirms the active v0.2 sequencer RPC URL/funding path, rerun
-     wallet transfer, program deploy/call, and A2A payment evidence.
+2. CU values
+   - Hosted `v0.2.0-rc5` tx evidence was refreshed on 2026-06-26.
+   - Keep CU as `TBD` unless Logos provides explorer metadata, sequencer
+     metadata, wallet/sequencer proof stats, or an evaluator-approved benchmark
+     mapping.
 
 ## CU Status
 

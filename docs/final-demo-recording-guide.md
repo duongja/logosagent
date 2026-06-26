@@ -128,6 +128,7 @@ Explain the important output:
 Run:
 
 ```bash
+sed -n '1,180p' docs/testnet-v020-live-evidence-20260626.md
 sed -n '1,160p' docs/testnet-wallet-transfer-evidence-20260619.md
 sed -n '1,180p' docs/testnet-program-evidence-20260619.md
 sed -n '1,160p' docs/testnet-a2a-payment-evidence-20260619.md
@@ -141,15 +142,28 @@ Explain:
 > in local Logos Core/Basecamp because they are module-level systems, not the
 > same hosted LEZ transaction endpoint.
 
+> The June 19 hashes shown in the recorded video are historical pre-v0.2
+> evidence. After the June 25 redeploy and outage, the current hosted v0.2
+> evidence was refreshed on June 26 in
+> `docs/testnet-v020-live-evidence-20260626.md`.
+
 Call out these values:
 
-- `wallet.send` hosted testnet tx:
+- Current `wallet.send` hosted v0.2 testnet tx:
+  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
+- Current `program.deploy` hosted v0.2 testnet tx:
+  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
+- Current `program.call` hosted v0.2 testnet tx:
+  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
+- Current paid A2A payment-leg hosted v0.2 testnet tx:
+  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+- Historical `wallet.send` hosted testnet tx:
   `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0`
-- `program.deploy` hosted testnet tx:
+- Historical `program.deploy` hosted testnet tx:
   `c766019cf9e0161e174cea15fd5fe6232a94213b61a66f7ad3eb620e489bdcfb`
-- `program.call` hosted testnet tx:
+- Historical `program.call` hosted testnet tx:
   `4feba206274c89b7cc6372e48f297d754b03d1746df75a8cdc5ff11f2653f518`
-- Paid A2A payment-leg hosted testnet tx:
+- Historical paid A2A payment-leg hosted testnet tx:
   `cd6bc3d08782f8ba5d2e3b4dc89cdf93288268092c6347930dded76deb156494`
 
 Explain wallet evidence:
