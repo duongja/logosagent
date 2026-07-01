@@ -58,6 +58,11 @@ separate evidence docs as historical context only.
 | Video 2 | Basecamp owner-to-agent Chat flow and owner-channel skill calls | https://www.youtube.com/watch?v=nS8928doTkE |
 | Video 3 | Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations | https://www.youtube.com/watch?v=hxRQejaBhxo |
 
+These videos demonstrate the implementation and end-to-end flows. They were
+recorded before the final hosted-testnet evidence refresh, so
+`docs/testnet-v020-final-evidence-20260701.md` is the source of truth for the
+current LEZ `v0.2.0` tx hashes.
+
 ## Local Proof Highlights
 
 - Storage upload/list/share/download completed and downloaded bytes matched the
