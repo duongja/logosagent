@@ -61,5 +61,5 @@ redeployed the hosted testnet or published a newer matching prebuilt wallet.
 Logos did redeploy/wipe LEZ on 2026-06-25 for v0.2, so this document is now
 historical background only. The failed outage-era post-redeploy check is
 documented in `docs/testnet-v020-compatibility-evidence-20260625.md`; the
-current successful v0.2 hosted evidence is documented in
-`docs/testnet-v020-live-evidence-20260626.md`.
+current successful final v0.2.0 hosted evidence is documented in
+`docs/testnet-v020-final-evidence-20260701.md`.

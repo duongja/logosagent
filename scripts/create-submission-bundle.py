@@ -34,6 +34,7 @@ DEFAULT_DOCS = [
     "docs/testnet-redeploy-note-20260625.md",
     "docs/testnet-v020-compatibility-evidence-20260625.md",
     "docs/testnet-v020-live-evidence-20260626.md",
+    "docs/testnet-v020-final-evidence-20260701.md",
     "docs/testnet-compatibility-evidence-20260619.md",
     "docs/testnet-wallet-transfer-evidence-20260619.md",
     "docs/testnet-program-evidence-20260619.md",

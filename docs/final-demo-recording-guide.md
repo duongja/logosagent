@@ -128,6 +128,7 @@ Explain the important output:
 Run:
 
 ```bash
+sed -n '1,220p' docs/testnet-v020-final-evidence-20260701.md
 sed -n '1,180p' docs/testnet-v020-live-evidence-20260626.md
 sed -n '1,160p' docs/testnet-wallet-transfer-evidence-20260619.md
 sed -n '1,180p' docs/testnet-program-evidence-20260619.md
@@ -143,20 +144,20 @@ Explain:
 > same hosted LEZ transaction endpoint.
 
 > The June 19 hashes shown in the recorded video are historical pre-v0.2
-> evidence. After the June 25 redeploy and outage, the current hosted v0.2
-> evidence was refreshed on June 26 in
-> `docs/testnet-v020-live-evidence-20260626.md`.
+> evidence. After the June 25 redeploy, the current hosted final v0.2.0
+> evidence was refreshed on July 1 in
+> `docs/testnet-v020-final-evidence-20260701.md`.
 
 Call out these values:
 
-- Current `wallet.send` hosted v0.2 testnet tx:
-  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
-- Current `program.deploy` hosted v0.2 testnet tx:
-  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
-- Current `program.call` hosted v0.2 testnet tx:
-  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
-- Current paid A2A payment-leg hosted v0.2 testnet tx:
-  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+- Current `wallet.send` hosted final v0.2.0 testnet tx:
+  `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1`
+- Current `program.deploy` hosted final v0.2.0 testnet tx:
+  `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02`
+- Current paid A2A payment-leg hosted final v0.2.0 testnet tx:
+  `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894`
+- Current `program.call` hosted final v0.2.0 testnet tx:
+  `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f`
 - Historical `wallet.send` hosted testnet tx:
   `c2c0ef4f32afe5ebc971161f542917157859789b8c1e3e2e78a583a61b9b3da0`
 - Historical `program.deploy` hosted testnet tx:
@@ -174,9 +175,11 @@ Explain wallet evidence:
 
 Explain program evidence:
 
-> The program evidence shows a deploy transaction and a signed call transaction.
-> The called account data becomes `Hola mundo!`, which is the simple readable
-> proof that the deployed program executed and changed account state.
+> The final v0.2.0 program evidence shows a live deploy transaction and a live
+> program-call transaction. The call uses the stable `auth-transfer init` wallet
+> facade, and the account nonce advancing to `1` proves the instruction landed.
+> The heavier arbitrary-program example runner can still be rerun separately on
+> a larger host if reviewers ask for that exact custom-program path.
 
 Explain A2A payment evidence:
 

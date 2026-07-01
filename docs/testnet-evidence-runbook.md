@@ -9,10 +9,10 @@ treated as historical evidence only. See
 `docs/testnet-redeploy-note-20260625.md`.
 
 On 2026-06-26 Logos reported that the hosted testnet was back online. A fresh
-`v0.2.0-rc5` run then passed the compatibility gate and produced current
-hosted-testnet tx hashes for `wallet.send`, `agent.task` payment,
-`program.deploy`, and `program.call`. See
-`docs/testnet-v020-live-evidence-20260626.md`.
+`v0.2.0-rc5` run then passed the compatibility gate. On 2026-07-01, after
+Logos announced the final `v0.2.0` tag, hosted evidence was refreshed again for
+`wallet.send`, `agent.task` payment, `program.deploy`, and `program.call`. See
+`docs/testnet-v020-final-evidence-20260701.md`.
 
 This is the remaining proof path for prize readiness. The local implementation
 is already exercised by the smoke scripts; final submission needs the same
@@ -30,13 +30,13 @@ and CU/cycle evidence.
 ## Hosted LEZ Testnet Compatibility Gate
 
 Before attempting hosted-testnet transactions, build the LEZ wallet that matches
-the hosted testnet artifacts. For the current post-redeploy testnet, use
-`v0.2.0-rc5`:
+the hosted testnet artifacts. For the current post-redeploy testnet, use final
+`v0.2.0`:
 
 ```bash
-git -C ../logos-execution-zone fetch --depth=1 origin tag v0.2.0-rc5
-git -C ../logos-execution-zone worktree add --detach ../logos-execution-zone-v0.2.0-rc5-testnet v0.2.0-rc5
-cd ../logos-execution-zone-v0.2.0-rc5-testnet
+git -C ../logos-execution-zone fetch --depth=1 origin tag v0.2.0
+git -C ../logos-execution-zone worktree add --detach ../logos-execution-zone-v0.2.0-testnet v0.2.0
+cd ../logos-execution-zone-v0.2.0-testnet
 LOGOS_BLOCKCHAIN_CIRCUITS=$HOME/.cache/logos/blockchain/logos-blockchain-circuits-v0.5.0-linux-x86_64 \
   CARGO_BUILD_JOBS=1 cargo +1.94.0 build -p wallet --release -j1
 cd ../logos-agent
@@ -46,8 +46,8 @@ Then run:
 
 ```bash
 ./scripts/lez-testnet-compatibility-evidence.sh \
-  --lez-repo ../logos-execution-zone-v0.2.0-rc5-testnet \
-  --wallet ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet
+  --lez-repo ../logos-execution-zone-v0.2.0-testnet \
+  --wallet ../logos-execution-zone-v0.2.0-testnet/target/release/wallet
 ```
 
 This writes `.local/testnet-evidence/<timestamp>-lez-compat/summary.json` and
@@ -81,29 +81,28 @@ wallet auth-transfer send --from Public/<sender> --to Public/<recipient> --amoun
 
 ## Captured Hosted v0.2 Evidence
 
-Hosted testnet evidence was refreshed on 2026-06-26 UTC with LEZ
-`v0.2.0-rc5`, commit `27360cb7d6ccb2bfbcca7d171bab8a3938490264`, and
+Hosted testnet evidence was refreshed on 2026-07-01 UTC with final LEZ
+`v0.2.0`, commit `a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a`, and
 `RISC0_DEV_MODE=0`:
 
 - Wallet transfer tx:
-  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
+  `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1`
 - A2A payment tx:
-  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+  `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894`
 - Program deploy tx:
-  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
-- Program call tx:
-  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
-- Program call account:
-  `Public/HMeNkN8qAD5Ek8qK4SVBrUHZ1AQbTgnKf4C5EyfYfMB2`
-- Account data after call: `LP0008-v020`
+  `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02`
+- Final hosted program call tx:
+  `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f`
 
 The compact local run root is:
 
 ```text
-.local/testnet-evidence/v020-rc5-live-tx-20260626T101906Z
+.local/testnet-evidence/v020-final-live-20260701T092833Z
 ```
 
-Raw wallet state under that directory must not be committed.
+Raw wallet state under that directory must not be committed. The earlier
+`v0.2.0-rc5` evidence remains documented in
+`docs/testnet-v020-live-evidence-20260626.md`.
 
 ## Historical Hosted Program Evidence
 

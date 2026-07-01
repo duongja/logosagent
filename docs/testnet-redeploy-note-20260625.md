@@ -13,22 +13,21 @@ hashes remain accurate historical evidence for the previous hosted LEZ testnet
 state, but they should not be presented as currently queryable post-redeploy
 evidence.
 
-## 2026-06-26 Update
+## 2026-07-01 Update
 
-Logos later reported that the testnet was back online and that chain state was
-the same as before the outage. A fresh `v0.2.0-rc5` evidence run against
-`https://testnet.lez.logos.co/` then passed the compatibility gate and produced
-new hosted-testnet transaction evidence:
+Logos later announced that builders should use the final `v0.2.0` tag. A fresh
+`v0.2.0` evidence run against `https://testnet.lez.logos.co/` passed the
+compatibility gate and produced new hosted-testnet transaction evidence:
 
 | Operation | Tx Hash |
 | --- | --- |
-| `wallet.send` | `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86` |
-| `agent.task` payment leg | `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4` |
-| `program.deploy` | `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03` |
-| `program.call` | `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30` |
+| `wallet.send` | `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1` |
+| `agent.task` payment leg | `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894` |
+| `program.deploy` | `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02` |
+| `program.call` | `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f` |
 
-See `docs/testnet-v020-live-evidence-20260626.md`. The June 25 endpoint
-failure below is retained as historical diagnosis only.
+See `docs/testnet-v020-final-evidence-20260701.md`. The June 25 endpoint
+failure and June 26 rc5 evidence are retained as historical context.
 
 ## Current Checks
 
@@ -69,16 +68,17 @@ The Basecamp owner-channel, Storage, Messaging/Delivery, local A2A, local
 wallet, and local program-operation evidence are not invalidated by the hosted
 LEZ redeploy.
 
-The hosted LEZ testnet evidence has now been refreshed for `v0.2.0-rc5`. The
+The hosted LEZ testnet evidence has now been refreshed for final `v0.2.0`. The
 current PR should explicitly say:
 
 - pre-redeploy hosted LEZ evidence exists from 2026-06-19;
 - Logos redeployed/wiped LEZ on 2026-06-25 for v0.2;
-- the local `v0.2.0-rc5` wallet builds and passed the hosted compatibility
-  gate after the endpoint came back;
-- fresh hosted v0.2 transaction evidence was captured on 2026-06-26;
+- the local final `v0.2.0` wallet builds and passed the hosted compatibility
+  gate;
+- fresh hosted final v0.2.0 evidence was captured on 2026-07-01 for
+  `wallet.send`, `agent.task` payment, `program.deploy`, and `program.call`;
 - the Logos team advised applying for LP-0008 anyway and continuing the CU /
   testnet refresh discussion in the PR.
 
 Do not reuse the old June 19 tx hashes as current post-redeploy proof. Use the
-June 26 v0.2 hashes in `docs/testnet-v020-live-evidence-20260626.md`.
+July 1 final v0.2.0 hashes in `docs/testnet-v020-final-evidence-20260701.md`.

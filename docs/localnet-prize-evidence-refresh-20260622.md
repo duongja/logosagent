@@ -102,16 +102,16 @@ python3 scripts/collect-prize-evidence.py \
 ## Hosted-Testnet Relationship
 
 The localnet refresh complements hosted-testnet evidence. The current hosted
-v0.2 evidence was refreshed on 2026-06-26 after the LEZ `v0.2.0-rc5` redeploy:
+final v0.2.0 evidence was refreshed on 2026-07-01:
 
-- Hosted v0.2 `wallet.send` tx:
-  `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86`
-- Hosted v0.2 `program.deploy` tx:
-  `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03`
-- Hosted v0.2 `program.call` tx:
-  `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`
-- Hosted v0.2 paid A2A payment leg tx:
-  `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4`
+- Hosted final v0.2.0 `wallet.send` tx:
+  `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1`
+- Hosted final v0.2.0 `program.deploy` tx:
+  `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02`
+- Hosted final v0.2.0 `program.call` tx:
+  `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f`
+- Hosted final v0.2.0 paid A2A payment leg tx:
+  `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894`
 
 The historical pre-redeploy hosted-testnet evidence was captured on
 2026-06-19:

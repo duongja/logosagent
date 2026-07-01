@@ -239,9 +239,15 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `docs/testnet-v020-compatibility-evidence-20260625.md`.
 - Post-outage v0.2 hosted-testnet evidence refreshed on 2026-06-26 UTC:
   the same endpoint passed `wallet check-health`, hosted/local program IDs
-  matched, and compact RPC lookups returned current transactions for
-  `wallet.send`, `agent.task` payment, `program.deploy`, and `program.call`.
-  See `docs/testnet-v020-live-evidence-20260626.md`.
+  matched, and compact RPC lookups returned transactions for `wallet.send`,
+  `agent.task` payment, `program.deploy`, and `program.call`. This rc5 run is
+  now historical because final `v0.2.0` was announced later. See
+  `docs/testnet-v020-live-evidence-20260626.md`.
+- Final LEZ `v0.2.0` hosted-testnet evidence refreshed on 2026-07-01 UTC:
+  `wallet.send`, `agent.task` payment, `program.deploy`, and `program.call`
+  were confirmed by hosted RPC lookup and balance/account evidence. The final
+  `program.call` proof uses the stable `auth-transfer init` wallet facade. See
+  `docs/testnet-v020-final-evidence-20260701.md`.
 - Narrated demo videos recorded and linked in `docs/demo-video-links.md`:
   - Video 1: repository readiness, package/evidence bundle, hosted-testnet
     transaction evidence, and submission overview:
@@ -258,17 +264,17 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   matched the hosted testnet on 2026-06-19 UTC.
 - Logos redeployed/wiped LEZ on 2026-06-25 for v0.2. Those June 19 tx hashes
   are now historical evidence only.
-- The current post-redeploy target is LEZ `v0.2.0-rc5`. The wallet builds
-  locally and fresh hosted tx evidence was captured on 2026-06-26 after
+- The current post-redeploy target is final LEZ `v0.2.0`. The wallet builds
+  locally and fresh hosted tx evidence was captured on 2026-07-01 after
   `wallet check-health` passed.
 
 ## Evidence Status
 
 - CU status is documented in `docs/cu-report.md`. Hosted-testnet tx hashes
-  exist for current `v0.2.0-rc5` `wallet.send`, `program.deploy`,
-  `program.call`, and `agent.task` payment. CU remains `TBD` because the
-  current wallet/RPC output does not expose CU fields; the report names
-  acceptable sources for replacing `TBD`.
+  exist for final `v0.2.0` `wallet.send`, `program.deploy`, `program.call`,
+  and `agent.task` payment. CU remains `TBD` because the current wallet/RPC
+  output does not expose CU fields; the report names acceptable sources for
+  replacing `TBD`.
 - Official clean-machine LGX package build. A current dev LGX exists at
   `result/logos-logos_agent-module-lib.lgx`, produced from the locally tested
   module payload. Before final submission, also rerun the official clean Nix

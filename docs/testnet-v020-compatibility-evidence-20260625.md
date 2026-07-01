@@ -3,16 +3,18 @@
 This is the sanitized post-redeploy compatibility check for the LEZ
 `v0.2.0-rc5` wallet against the advertised hosted testnet endpoint.
 
-## Superseded By 2026-06-26 Live Run
+## Superseded By 2026-07-01 Final Run
 
 This June 25 check captured the endpoint outage/proxy failure while Logos was
 updating infrastructure. On 2026-06-26 Logos reported that the testnet was back
 online, and a fresh `v0.2.0-rc5` run passed `wallet check-health`, matched
-hosted/local program IDs, and produced current hosted-testnet tx hashes for
+hosted/local program IDs, and produced hosted-testnet tx hashes for
 `wallet.send`, `agent.task` payment, `program.deploy`, and `program.call`.
+On 2026-07-01, final LEZ `v0.2.0` evidence superseded that rc5 run.
 
-Use `docs/testnet-v020-live-evidence-20260626.md` as the current hosted-testnet
-evidence. This file is retained as historical diagnosis for the outage.
+Use `docs/testnet-v020-final-evidence-20260701.md` as the current
+hosted-testnet evidence. This file is retained as historical diagnosis for the
+outage.
 
 The Logos builders channel announced a LEZ redeploy on 2026-06-25 in
 preparation for v0.2 Testnet. The announcement said state was wiped and

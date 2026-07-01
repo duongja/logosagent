@@ -201,6 +201,18 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
     `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30`.
   - `getAccount` returned data bytes for `LP0008-v020`; see
     `docs/testnet-v020-live-evidence-20260626.md`.
+- Hosted LEZ final v0.2.0 testnet evidence refreshed on 2026-07-01:
+  - `wallet.send` tx:
+    `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1`.
+  - `agent.task` payment tx:
+    `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894`.
+  - `program.deploy` tx:
+    `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02`.
+  - `program.call` tx:
+    `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f`.
+  - `getAccount` for the called account returned the authenticated-transfer
+    program owner and nonce `1`; see
+    `docs/testnet-v020-final-evidence-20260701.md`.
 - Three headless category-agent deployments captured on 2026-06-20:
   - Storage, Messaging, and Blockchain agents installed the verified LGX module
     set, loaded `logos_agent`, initialized, started, generated signed Agent

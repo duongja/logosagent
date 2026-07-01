@@ -33,7 +33,6 @@ demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
    - Keep the generated `.lgx` checksum with the final evidence bundle.
 
 2. CU values
-   - Hosted `v0.2.0-rc5` tx evidence was refreshed on 2026-06-26.
    - Keep CU as `TBD` unless Logos provides explorer metadata, sequencer
      metadata, wallet/sequencer proof stats, or an evaluator-approved benchmark
      mapping.

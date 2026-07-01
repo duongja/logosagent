@@ -8,7 +8,10 @@ if [ -f "$ROOT/.local/last-testnet-evidence-run-root" ]; then
   DEFAULT_COMPAT_RUN="$(cat "$ROOT/.local/last-testnet-evidence-run-root")"
 fi
 
-DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-testnet"
+if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
+  DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+fi
 if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
   DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.1.2-testnet"
 fi
@@ -37,7 +40,7 @@ lifecycle evidence; it does not claim to prove the live Delivery transport run.
 
 Options:
   --run-root PATH       Existing hosted-testnet evidence run root with wallet-home.
-  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet when present, else ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
+  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-testnet/target/release/wallet when present, else ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet, else ../logos-execution-zone-v0.1.2-testnet/target/release/wallet
   --lez-repo PATH       LEZ checkout for local commit/tag metadata.
   --testnet-url URL     Sequencer JSON-RPC URL. Default: https://testnet.lez.logos.co/
   --circuits-dir PATH   LOGOS_BLOCKCHAIN_CIRCUITS directory.

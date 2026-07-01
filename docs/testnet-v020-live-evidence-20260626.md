@@ -85,7 +85,7 @@ the narrated demo videos.
 | Block observed | `3405` |
 | Transaction lookup returned transaction | `true` |
 
-The current `v0.2.0-rc5` `wallet deploy-program` command exits successfully but
+The `v0.2.0-rc5` `wallet deploy-program` command exits successfully but
 does not print the sequencer response. The hash above was derived from the LEZ
 `ProgramDeploymentTransaction` Borsh bytes and then verified through
 `getTransaction`.

@@ -3,7 +3,10 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE="$(cd "$ROOT/.." && pwd)"
-DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-testnet"
+if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
+  DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone-v0.2.0-rc5-testnet"
+fi
 if [ ! -d "$DEFAULT_LEZ_REPO" ]; then
   DEFAULT_LEZ_REPO="$WORKSPACE/logos-execution-zone"
 fi
@@ -28,8 +31,8 @@ read-only chain/account evidence.
 
 Options:
   --run-root PATH       Output directory. Default: .local/testnet-evidence/<utc>-lez-compat
-  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet when present, else ../logos-execution-zone/target/release/wallet
-  --lez-repo PATH       LEZ checkout for local commit/id metadata. Default: ../logos-execution-zone-v0.2.0-rc5-testnet when present, else ../logos-execution-zone
+  --wallet PATH         LEZ wallet binary. Default: ../logos-execution-zone-v0.2.0-testnet/target/release/wallet when present, else ../logos-execution-zone-v0.2.0-rc5-testnet/target/release/wallet, else ../logos-execution-zone/target/release/wallet
+  --lez-repo PATH       LEZ checkout for local commit/id metadata. Default: ../logos-execution-zone-v0.2.0-testnet when present, else ../logos-execution-zone-v0.2.0-rc5-testnet, else ../logos-execution-zone
   --testnet-url URL     Sequencer JSON-RPC URL. Default: https://testnet.lez.logos.co/
   --circuits-dir PATH   LOGOS_BLOCKCHAIN_CIRCUITS directory.
   -h, --help            Show this help.

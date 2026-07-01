@@ -35,21 +35,20 @@ the current sanitized evidence view:
 
 ## Hosted-Testnet Evidence
 
-Current hosted-testnet evidence was refreshed on 2026-06-26 after Logos
-reported that the v0.2 testnet endpoint was back online. The run used LEZ
-`v0.2.0-rc5` / commit `27360cb7d6ccb2bfbcca7d171bab8a3938490264` with
-`RISC0_DEV_MODE=0`. See
-`docs/testnet-v020-live-evidence-20260626.md`.
+Current hosted-testnet evidence was refreshed on 2026-07-01 after Logos
+announced the final LEZ `v0.2.0` tag. The run used LEZ commit
+`a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a` with `RISC0_DEV_MODE=0`.
+See `docs/testnet-v020-final-evidence-20260701.md`.
 
 | Operation | Tx Hash | Status |
 | --- | --- | --- |
-| `wallet.send` | `3f140331aee32dba313d0eb73e47b1aad7e6f1dd5dfc8721460c16ac8a011c86` | confirmed by transaction lookup and balance deltas: sender `10000 -> 9999`, recipient `20000 -> 20001` |
-| `program.deploy` | `1db8975f24b5f27a4c271ea17f7db33e9d654964af8ab980ee78d0e351537f03` | `data_changer.bin` deployment confirmed by hosted-testnet RPC lookup |
-| `program.call` | `e752295333411623035c660016e8b1fb8deffdb4b7fc5c87fa0007eb004a8f30` | confirmed by account data `LP0008-v020` and nonce `1` |
-| `agent.task` payment leg | `2111c69569e0804e28ca4210e9850a7db4171d6d7f3787d10c0f426629e461b4` | confirmed by transaction lookup and balance deltas: payer `9999 -> 9998`, recipient `20001 -> 20002` |
+| `wallet.send` | `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1` | confirmed by transaction lookup and balance deltas: sender `10000 -> 9999`, recipient `20000 -> 20001` |
+| `agent.task` payment leg | `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894` | confirmed by transaction lookup and balance deltas: payer `9999 -> 9998`, recipient `20001 -> 20002` |
+| `program.deploy` | `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02` | `hello_world_with_authorization.bin` deployment confirmed by hosted-testnet RPC lookup |
+| `program.call` | `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f` | stable wallet-facade call to `authenticated_transfer` confirmed by transaction lookup and account nonce `1` |
 
-The older June 19 hosted-testnet tx hashes are retained in separate evidence
-docs as historical pre-v0.2-redeploy context only.
+The June 26 `v0.2.0-rc5` hashes and June 19 pre-v0.2 hashes are retained in
+separate evidence docs as historical context only.
 
 ## Narrated Demo Videos
 
@@ -84,9 +83,10 @@ docs as historical pre-v0.2-redeploy context only.
 - The three-agent deployment evidence is headless CLI evidence. Basecamp
   owner-chat evidence is now captured separately with a headless agent and the
   Basecamp owner app.
-- `program.call` uses the current supported signed public call path. The
-  generic arbitrary-program CLI/API should replace the helper bridge when LEZ
-  exposes a stable interface for it.
+- Final hosted `program.call` evidence uses the stable wallet facade for the
+  builtin `authenticated_transfer` program. A heavier arbitrary-program example
+  runner can still be rerun on a larger host if reviewers require that exact
+  custom-program path.
 - CU values are documented in `docs/cu-report.md` as `TBD` because the previous
   wallet/RPC output did not expose CU fields. The Logos team advised applying
   anyway while they clarify CU expectations, and suggested the

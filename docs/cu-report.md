@@ -10,8 +10,8 @@ The Logos team advised submitting the LP-0008 PR while they clarify the exact CU
 expectation, and suggested the `fryorcraken/lez-signature-bench` approach as a
 measurement model. During submission preparation, Logos redeployed LEZ for
 v0.2 and later restored the hosted endpoint. This report includes the fresh
-`v0.2.0-rc5` hosted-testnet hashes and keeps CU as `TBD` until a CU/cycle data
-source is available.
+final `v0.2.0` hosted-testnet hashes where available and keeps CU as `TBD`
+until a CU/cycle data source is available.
 
 | Operation | Network | Program/Method | CU | Tx Hash | Notes |
 | --- | --- | --- | --- | --- | --- |
@@ -30,15 +30,20 @@ source is available.
 | `agent.task` discovery + payment local proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `81b55313e470325b17d58328dc03da9f03538d7c970a24b8d98ea23c83e0ed74` | verified 2026-06-20; two isolated Core daemons reached `TASK_STATE_COMPLETED`; CU not exposed by local wallet/RPC output |
 | `wallet.send` local refresh proof | local standalone sequencer | public token transfer through `logos_execution_zone` wallet FFI | TBD | `22b2daffa8a526f17b4b370afe408edacbdfe48c2078af07c128673d5e402547` | verified 2026-06-22 after Basecamp owner-chat fixes; approval gate was tested first with zero limits |
 | `agent.task` discovery + payment local refresh proof | local standalone sequencer | signed Agent Card discovery, task lifecycle, and LEZ payment | TBD | `cbe01582b0bd0fab691b73760b1919b94e9d2da3ae023e32d158b02404d29bd7` | verified 2026-06-22; client discovered signed card, paid price `1`, and both agents reached `TASK_STATE_COMPLETED` |
+| `wallet.send` hosted final v0.2.0 testnet proof | hosted LEZ testnet | authenticated transfer, public-to-public | TBD | `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1` | verified 2026-07-01 with LEZ `v0.2.0` / `a58fbce` and `RISC0_DEV_MODE=0`; sender `10000 -> 9999`, recipient `20000 -> 20001`; CU not exposed by wallet/RPC output |
+| `agent.task` payment hosted final v0.2.0 testnet proof | hosted LEZ testnet | token transfer for declared A2A skill price | TBD | `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894` | verified 2026-07-01 with LEZ `v0.2.0` / `a58fbce`; payer `9999 -> 9998`, recipient `20001 -> 20002`; CU not exposed by wallet/RPC output |
+| `program.deploy` hosted final v0.2.0 testnet proof | hosted LEZ testnet | `hello_world_with_authorization.bin` deployment tx | TBD | `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02` | verified 2026-07-01 with bytecode SHA-256 `a72944403dee3c259f87aa5fda684376ce53afd15b5ed541dd28147788f6de6f`; transaction lookup returned the deployment |
+| `program.call` hosted final v0.2.0 testnet proof | hosted LEZ testnet | signed public call via `auth-transfer init` wallet facade | TBD | `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f` | verified 2026-07-01 with LEZ `v0.2.0` / `a58fbce`; `getAccount` for `Public/CpF3WDqzMuPFtjwzdoiYZZv2p8gzEPM8uQToEZ2VfPDd` returned authenticated-transfer owner and nonce `1`; CU not exposed by wallet/RPC output |
 | `wallet.send` local balance-delta proof | local standalone sequencer | public token transfer through `logos_execution_zone` wallet FFI | TBD | `7a0ea38183efaa41883f702be23829f23665550f54e4531c45d183bf8a83094b` | verified 2026-06-24 with separated topup and transfer windows; sender `5095 -> 5094`, recipient `5 -> 6`, both nonces advanced by one |
 
 ## Hosted Testnet CU Status
 
 Hosted-testnet tx evidence must use a wallet whose builtin program IDs and RPC
 client match the endpoint. LEZ tag `v0.1.2` / commit `cf3639d8` matched the
-hosted testnet on 2026-06-19 UTC, and LEZ `v0.2.0-rc5` / commit `27360cb`
-matched the restored hosted testnet on 2026-06-26 UTC. The June 25
-`METHOD_NOT_FOUND` compatibility failure is retained in
+hosted testnet on 2026-06-19 UTC, LEZ `v0.2.0-rc5` / commit `27360cb`
+matched the restored hosted testnet on 2026-06-26 UTC, and final LEZ `v0.2.0`
+/ commit `a58fbce` matched the current hosted testnet on 2026-07-01 UTC. The
+June 25 `METHOD_NOT_FOUND` compatibility failure is retained in
 `docs/testnet-v020-compatibility-evidence-20260625.md` as outage diagnosis.
 
 Keep CU as `TBD` until one of these sources is available:

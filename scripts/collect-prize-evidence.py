@@ -388,6 +388,7 @@ def summarize_testnet_compatibility(path):
             "call_instruction_ascii": str(call.get("instruction_ascii", "")),
             "call_account_data_ascii": str(call.get("account_data_ascii", "")),
             "call_account_nonce": str((call.get("account_state") or {}).get("nonce", "")),
+            "call_failure_reason": str(call.get("failure_reason", "")),
         }
     a2a_payment = load_json(path / "testnet-a2a-payment-summary.json")
     if isinstance(a2a_payment, dict):
@@ -520,6 +521,8 @@ def markdown_report(report):
             lines.append(f"- Program call account: `{program.get('call_account_id', '')}`")
             lines.append(f"- Program call instruction: `{program.get('call_instruction_ascii', '')}`")
             lines.append(f"- Program call account data: `{program.get('call_account_data_ascii', '')}`")
+            if program.get("call_failure_reason"):
+                lines.append(f"- Program call note: {program.get('call_failure_reason', '')}")
             lines.append(f"- Program evidence RISC0_DEV_MODE: `{program.get('risc0_dev_mode', '')}`")
         a2a_payment = compatibility.get("a2a_payment") or {}
         if a2a_payment:
@@ -680,7 +683,7 @@ def main():
         {"operation": "agent.task payment", "network": args.network, "tx_hash": paid_a2a_payment_tx, "cu": "TBD", "notes": "LEZ payment attached to A2A task receipt"},
         {"operation": "agent.task refund", "network": args.network, "tx_hash": paid_a2a_refund_tx, "cu": "TBD", "notes": "LEZ refund attached to A2A cancellation receipt when present"},
         {"operation": "program.deploy", "network": args.network, "tx_hash": program_deploy_tx, "cu": "TBD", "notes": "hosted testnet ProgramDeploymentTransaction; CU not exposed by wallet/RPC output"},
-        {"operation": "program.call", "network": args.network, "tx_hash": program_call_tx, "cu": "TBD", "notes": "hosted testnet signed public call; account data confirms instruction output"},
+        {"operation": "program.call", "network": args.network, "tx_hash": program_call_tx, "cu": "TBD", "notes": "hosted testnet signed public call through the stable wallet facade when present"},
     ]
 
     report = {
