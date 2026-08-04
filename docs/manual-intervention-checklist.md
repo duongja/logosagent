@@ -38,21 +38,24 @@ workspace. The generated LGX is 4,138,893 bytes with SHA-256
 Its manifest root is
 `1c7b162f7b1bed7a65c45e9fe57e3586ac05367893c3a3a1df50b709d2e7e9a0`.
 
+## Completed Public CI Verification
+
+Public Actions run
+[30932258747](https://github.com/duongja/logosagent/actions/runs/30932258747)
+passed submission preflight, released-interface tests, and the full local
+two-agent E2E. The E2E covered Storage, Delivery discovery and task traffic,
+unsigned and paid A2A lifecycles, LEZ wallet transfer, and program
+query/call/deploy. The run published the sanitized
+[E2E evidence artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988192)
+and the
+[v0.2 dependency/LGX artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988755).
+
 ## Manual/External Items Still Open
 
 1. Replacement public-testnet video
    - Record one continuous run showing the two agents, module versions,
      Delivery discovery/task events, Storage verification, LEZ transaction
      lookup, evidence validation, and the public CI result.
-
-2. Public Actions URL
-   - Push the repository changes and link the first passing automatic local E2E
-     run. The self-hosted public-testnet workflow remains scheduled/manual.
-
-3. CU values
-   - Keep CU as `TBD` unless Logos provides explorer metadata, sequencer
-     metadata, wallet/sequencer proof stats, or an evaluator-approved benchmark
-     mapping.
 
 ## CU Status
 

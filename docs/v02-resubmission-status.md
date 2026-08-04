@@ -23,8 +23,13 @@ Exact source revisions are recorded in `dependencies-v0.2.json`.
 ## Acceptance status
 
 - Repository migration and evidence tooling: implemented.
-- Automatic local module E2E workflow: configured; a public passing Actions run
-  is required before resubmission.
+- Automatic local module E2E workflow: complete. Public Actions run
+  [30932258747](https://github.com/duongja/logosagent/actions/runs/30932258747)
+  passed submission preflight, released-interface tests, and the full local
+  Storage, Delivery, A2A, LEZ payment, and program-operation sequence. Its
+  sanitized [E2E evidence artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988192)
+  and [v0.2 dependency/LGX artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988755)
+  are available from the run.
 - Public two-agent Testnet v0.2 proof: complete. The authoritative run is
   `run_62d7e4e3fbc2439594822ec3ac835c1a` under
   `evidence/current/testnet-v02/`.
@@ -38,8 +43,9 @@ Exact source revisions are recorded in `dependencies-v0.2.json`.
 - Replacement narrated video: pending a continuous recording of the successful
   public run and evidence validator.
 
-The public proof is committed and independently verifiable. Do not describe the
-replacement video or public Actions run as complete until their links are added.
+The public proof is committed and independently verifiable. The automatic local
+E2E run is publicly linked above. Do not describe the replacement video as
+complete until its link is added.
 
 ## LEZ compatibility resolution
 
