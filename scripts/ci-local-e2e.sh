@@ -38,14 +38,14 @@ fi
 export SCAFFOLD_BIN="${SCAFFOLD_BIN:-$SCAFFOLD_REPO/target/release/logos-scaffold}"
 export SCAFFOLD_PROJECT
 
+PROGRAM_BINARY="${PROGRAM_BINARY:-$("$ROOT/scripts/prepare-v02-program-fixture.sh")}"
+export PROGRAM_BINARY
+
 if [ ! -f "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" ] \
   || [ ! -f "$SCAFFOLD_PROJECT/scaffold.toml" ] \
   || ! grep -Fq 'pin = "a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a"' "$SCAFFOLD_PROJECT/scaffold.toml"; then
   TIMEOUT_SEC=240 "$ROOT/scripts/localnet-integration.sh" --setup --prebuilt
 fi
-
-PROGRAM_BINARY="${PROGRAM_BINARY:-$("$ROOT/scripts/prepare-v02-program-fixture.sh")}"
-export PROGRAM_BINARY
 
 "$ROOT/scripts/check-runtime-modules.sh"
 "$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"

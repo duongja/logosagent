@@ -80,6 +80,7 @@ jobs:
           cargo install --locked rzup --version 0.5.0
           rzup install r0vm 3.0.5
           rzup install cargo-risczero 3.0.5
+          rzup install rust 1.94.1
           r0vm_path="$HOME/.risc0/extensions/v3.0.5-cargo-risczero-x86_64-unknown-linux-gnu/r0vm"
           test -x "$r0vm_path"
           test "$(cargo risczero --version)" = "cargo-risczero 3.0.5"
