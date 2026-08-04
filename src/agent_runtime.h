@@ -52,6 +52,7 @@ private:
     void emitEvent(const QString& name, const QJsonObject& payload);
     void recordAsyncAdapterResult(const QString& adapter, const QJsonObject& result);
     void handleOwnerMessage(const QJsonObject& payload);
+    void auditSkill(const QString& skillName, const QJsonObject& params, const QJsonObject& result, const QString& origin) const;
 
     LogosModules* m_logos = nullptr;
     AgentState m_state;

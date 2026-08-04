@@ -101,11 +101,16 @@ void StorageAdapter::wireEvents()
         return;
     }
     m_logos->storage_module.on("storageUploadDone", [this](const QVariantList& data) {
-        if (data.size() < 3 || !data.at(0).toBool()) {
+        if (data.isEmpty()) {
             return;
         }
-        const QString sessionId = data.at(1).toString();
-        const QString cid = data.at(2).toString();
+        QString error;
+        const QJsonObject payload = JsonUtils::parseObject(data.at(0).toString(), &error);
+        if (!error.isEmpty() || !payload.value(QStringLiteral("success")).toBool(false)) {
+            return;
+        }
+        const QString sessionId = payload.value(QStringLiteral("sessionId")).toString();
+        const QString cid = payload.value(QStringLiteral("cid")).toString();
         QJsonObject patch{
             {QStringLiteral("address"), cid},
             {QStringLiteral("upload_session"), sessionId},
@@ -201,7 +206,7 @@ QJsonObject StorageAdapter::upload(const QJsonObject& params)
         return JsonUtils::error(QStringLiteral("storage.encrypt_failed"), encErr);
     }
 
-    LogosResult result = m_logos->storage_module.uploadUrl(QUrl::fromLocalFile(encryptedPath));
+    LogosResult result = m_logos->storage_module.uploadUrl(encryptedPath, 1024 * 64);
     if (!result.success) {
         return JsonUtils::error(QStringLiteral("storage.upload_failed"), result.getError());
     }
@@ -216,6 +221,12 @@ QJsonObject StorageAdapter::upload(const QJsonObject& params)
         {QStringLiteral("encryption"), encryption},
         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
     };
+    if (params.contains(QStringLiteral("run_id"))) {
+        entry.insert(QStringLiteral("run_id"), params.value(QStringLiteral("run_id")));
+    }
+    if (params.contains(QStringLiteral("invocation_id"))) {
+        entry.insert(QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id")));
+    }
     m_state->addFile(entry);
     m_state->save();
     return JsonUtils::ok(QJsonObject{{QStringLiteral("file"), publicFileEntry(entry)}});
@@ -254,7 +265,7 @@ QJsonObject StorageAdapter::download(const QJsonObject& params)
     }
 
     const QString encryptedPath = tempPath(QStringLiteral(".download.enc"));
-    LogosResult result = m_logos->storage_module.downloadToUrl(address, QUrl::fromLocalFile(encryptedPath), false, 1024 * 64);
+    LogosResult result = m_logos->storage_module.downloadToUrl(address, encryptedPath, false, 1024 * 64);
     if (!result.success) {
         return JsonUtils::error(QStringLiteral("storage.download_failed"), result.getError());
     }

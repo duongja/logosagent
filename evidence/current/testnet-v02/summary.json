@@ -1,0 +1,100 @@
+{
+  "schema": "logos.agent.testnet-e2e.v1",
+  "network": "logos-testnet-v0.2",
+  "delivery_preset": "logos.test",
+  "storage_network": "logos.test",
+  "sequencer_rpc": "https://testnet.lez.logos.co/",
+  "execution_path": "logos_agent",
+  "simulated": false,
+  "run_id": "run_62d7e4e3fbc2439594822ec3ac835c1a",
+  "agents": [
+    {
+      "agent_id": "logos-agent-v02-client-04535169",
+      "host": "railway-client"
+    },
+    {
+      "agent_id": "logos-agent-v02-server-04535169",
+      "host": "railway-server"
+    }
+  ],
+  "topics": {
+    "discovery": "/logos-agent/1/discovery-04535169/json",
+    "task": "/logos-agent/1/task-c0a796dd00945dba7d9a9a95c7bc420b/json",
+    "status": "/logos-agent/1/status-5a262c6c71252d1b5667c4584a2b7593/json"
+  },
+  "module_versions": {
+    "delivery_module": "0.1.3",
+    "storage_module": "2.0.1",
+    "chat_module": "0.2.1",
+    "lez_core": "0.2.0",
+    "logos_agent": "0.2.0"
+  },
+  "audit_files": [
+    "client-audit.jsonl",
+    "server-audit.jsonl"
+  ],
+  "core_logs": [
+    "client-core.log",
+    "server-core.log"
+  ],
+  "storage": {
+    "address": "zDvZRwzmAaw9AK9WMFPcWzhNKwHW4EdtuP62k5troeudkbCNRNvN",
+    "source_sha256": "2e36f5d965e6b5eb6fae2fcfcb41976d274922ad0cbd872e83e1ea1df75d0f35",
+    "download_sha256": "2e36f5d965e6b5eb6fae2fcfcb41976d274922ad0cbd872e83e1ea1df75d0f35"
+  },
+  "task": {
+    "task_id": "task_c766adf8fb544dafa9d4eed2fe3faeb2",
+    "state": "TASK_STATE_COMPLETED"
+  },
+  "payment": {
+    "tx_hash": "ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea",
+    "confirmed": true,
+    "invocation_id": "inv_91b725d28584f930f56c60b20a4762ed",
+    "balance_before": {
+      "account": "54d662b664519cb8aef608ae84a63e041cc16019e4a07c34828311996f0c817a",
+      "balance": "7369",
+      "invocation_id": "inv_e6ab9e9e6e392db5f15aff12119687e6",
+      "is_public": true,
+      "ok": true,
+      "run_id": "run_62d7e4e3fbc2439594822ec3ac835c1a"
+    },
+    "balance_after": {
+      "account": "54d662b664519cb8aef608ae84a63e041cc16019e4a07c34828311996f0c817a",
+      "balance": "7368",
+      "invocation_id": "inv_cae8bc35039fda9fcb80a27a0843524c",
+      "is_public": true,
+      "ok": true,
+      "run_id": "run_62d7e4e3fbc2439594822ec3ac835c1a"
+    }
+  },
+  "files": [
+    {
+      "path": "client-audit.jsonl",
+      "sha256": "d1307743860ae34cbf2dcbd39e08665c1a2032cbe3aef8fa28c528866cdf4c9a"
+    },
+    {
+      "path": "client-core.log",
+      "sha256": "cabaf8a292358268438209fd0f4f26971184971565f053d29b57a8403b679131"
+    },
+    {
+      "path": "command-transcript.txt",
+      "sha256": "39d3586a88a7ef6357bed4f7c1940b36bf36bfe27a6f6a863391665e5f910f10"
+    },
+    {
+      "path": "module-status.json",
+      "sha256": "bdcc2fa892b278ae2ec09673a11b21e5739221af57246385c1b5ab2c1ce0199e"
+    },
+    {
+      "path": "server-audit.jsonl",
+      "sha256": "7de767d8077168da461e1fa9cf1cde05a875de4e858360cbe167998d46f44005"
+    },
+    {
+      "path": "server-core.log",
+      "sha256": "d94d13b248d67a6cdd8b87b2c0d88f9b703d04f5f4c10fac3ab70a88843ed9b4"
+    },
+    {
+      "path": "transaction-confirmation.json",
+      "sha256": "0fe598c175d7741b4999dd1796367be17179daac20597910e7bd6ed6c033c9c8"
+    }
+  ]
+}

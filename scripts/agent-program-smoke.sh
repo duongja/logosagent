@@ -68,7 +68,7 @@ if [ ! -x "$LOGOSCORE" ]; then
   echo "logoscore not found or not executable: $LOGOSCORE" >&2
   exit 1
 fi
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   if [ ! -d "$MODULES_DIR/$module" ]; then
     echo "missing module under modules dir: $MODULES_DIR/$module" >&2
     exit 1
@@ -276,11 +276,10 @@ normalize_public_address() {
 topup_sender() {
   local funded_address
   funded_address="$(normalize_public_address "$FROM_ADDRESS")"
-  (
-    cd "$SCAFFOLD_PROJECT"
-    LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" \
-      "$SCAFFOLD_BIN" wallet topup --json "$funded_address"
-  ) >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
+  "$ROOT/scripts/v02-local-faucet.sh" \
+    --scaffold-project "$SCAFFOLD_PROJECT" \
+    --address "$funded_address" \
+    >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
   python3 - "$RUN_ROOT/wallet-topup.json" "$funded_address" <<'PY'
 import json
 import pathlib
@@ -303,18 +302,24 @@ import sys
 
 project = pathlib.Path(sys.argv[1])
 cfg = tomllib.loads((project / "scaffold.toml").read_text())
-cache_root = pathlib.Path(cfg["scaffold"]["cache_root"])
-if not cache_root.is_absolute():
-    cache_root = project / cache_root
-pin = cfg["repos"]["lez"]["pin"]
-candidate = cache_root / "repos" / "lez" / pin / "target" / "release" / "wallet"
+repo = cfg["repos"]["lez"]
+if repo.get("path"):
+    lez = pathlib.Path(repo["path"])
+    if not lez.is_absolute():
+        lez = project / lez
+else:
+    cache_root = pathlib.Path(cfg["scaffold"]["cache_root"])
+    if not cache_root.is_absolute():
+        cache_root = project / cache_root
+    lez = cache_root / "repos" / "lez" / repo["pin"]
+candidate = lez / "target" / "release" / "wallet"
 print(candidate)
 PY
 }
 
 write_config() {
   local wallet_bin_path="$1"
-  python3 - "$CONFIG_JSON" "$RUN_ROOT" "$WALLET_DIR" "$AGENT_LEZ" "$wallet_bin_path" "$FROM_ADDRESS" "$FROM_PRIVATE_KEY_HEX" <<'PY'
+  python3 - "$CONFIG_JSON" "$RUN_ROOT" "$WALLET_DIR" "$AGENT_LEZ" "$wallet_bin_path" "$FROM_ADDRESS" <<'PY'
 import json
 import pathlib
 import sys
@@ -322,7 +327,7 @@ import sys
 path = pathlib.Path(sys.argv[1])
 run_root = pathlib.Path(sys.argv[2])
 wallet_dir = pathlib.Path(sys.argv[3])
-agent_lez, wallet_bin, from_address, from_private_key = sys.argv[4:8]
+agent_lez, wallet_bin, from_address = sys.argv[4:7]
 config = {
     "identity": {
         "agent_id": "program-smoke-agent",
@@ -340,15 +345,6 @@ config = {
         "allow_dev_file_cipher": False,
         "allow_dev_a2a_secret": False,
     },
-    "wallet": {
-        "config_path": str(wallet_dir / "wallet_config.json"),
-        "storage_path": str(wallet_dir / "storage.json"),
-        "password": "wallet-smoke",
-        "create": True,
-        "public_import_account": from_address,
-        "public_import_private_key_hex": from_private_key,
-        "create_agent_account": False,
-    },
     "program": {
         "helper_path": agent_lez,
         "wallet_bin": wallet_bin,
@@ -357,6 +353,55 @@ config = {
 }
 path.write_text(json.dumps(config, separators=(",", ":")))
 PY
+}
+
+scaffold_public_account() {
+  local list_file="$RUN_ROOT/wallet-list.json"
+  (
+    cd "$SCAFFOLD_PROJECT"
+    LEE_WALLET_HOME_DIR="$SCAFFOLD_PROJECT/.scaffold/wallet" \
+      "$SCAFFOLD_BIN" wallet list --json
+  ) >"$list_file"
+  python3 - "$list_file" <<'PY'
+import json
+import pathlib
+import re
+import sys
+
+payload = json.loads(pathlib.Path(sys.argv[1]).read_text())
+for line in payload.get("accounts", []):
+    match = re.search(r"Public/[1-9A-HJ-NP-Za-km-z]{32,}", str(line))
+    if match:
+        print(match.group(0))
+        raise SystemExit(0)
+raise SystemExit(f"wallet list did not contain a public account: {json.dumps(payload, indent=2)[:1800]}")
+PY
+}
+
+initialize_scaffold_account() {
+  local wallet_bin_path="$1"
+  local account="$2"
+  local check_out="$RUN_ROOT/wallet-account-check.out"
+  local check_err="$RUN_ROOT/wallet-account-check.err"
+
+  set +e
+  printf 'logos-scaffold-v0\n' \
+    | LEE_WALLET_HOME_DIR="$SCAFFOLD_PROJECT/.scaffold/wallet" \
+        NSSA_WALLET_HOME_DIR="$SCAFFOLD_PROJECT/.scaffold/wallet" \
+        "$wallet_bin_path" account get --account-id "$account" \
+        >"$check_out" 2>"$check_err"
+  local check_status=$?
+  set -e
+  if grep -Eqi 'uninitialized|not initialized' "$check_out" "$check_err"; then
+    printf 'logos-scaffold-v0\n' \
+      | LEE_WALLET_HOME_DIR="$SCAFFOLD_PROJECT/.scaffold/wallet" \
+          NSSA_WALLET_HOME_DIR="$SCAFFOLD_PROJECT/.scaffold/wallet" \
+          "$wallet_bin_path" auth-transfer init --account-id "$account" \
+          >"$RUN_ROOT/wallet-account-init.out" 2>"$RUN_ROOT/wallet-account-init.err"
+  elif [ "$check_status" -ne 0 ]; then
+    cat "$check_err" >&2
+    return "$check_status"
+  fi
 }
 
 program_query_params() {
@@ -413,21 +458,24 @@ PY
 (cd "$SCAFFOLD_PROJECT" && LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" "$SCAFFOLD_BIN" localnet start --timeout-sec "$LOCALNET_TIMEOUT_SEC" >"$RUN_ROOT/localnet-start.out" 2>"$RUN_ROOT/localnet-start.err")
 LOCALNET_STARTED=1
 wait_for_localnet
-topup_sender
-
-cp "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" "$WALLET_DIR/wallet_config.json"
+FROM_ADDRESS="$(scaffold_public_account)"
 WALLET_BIN="$(wallet_bin)"
 if [ ! -x "$WALLET_BIN" ]; then
   echo "wallet binary not found: $WALLET_BIN" >&2
   exit 1
 fi
+initialize_scaffold_account "$WALLET_BIN" "$FROM_ADDRESS"
+topup_sender
+
+cp "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" "$WALLET_DIR/wallet_config.json"
+cp "$SCAFFOLD_PROJECT/.scaffold/wallet/storage.json" "$WALLET_DIR/storage.json"
 write_config "$WALLET_BIN"
 
 "$LOGOSCORE" --config-dir "$CORE_CFG" -D -m "$MODULES_DIR" >"$CORE_LOG" 2>&1 &
 CORE_PID=$!
 wait_for_daemon
 
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   "$LOGOSCORE" --config-dir "$CORE_CFG" load-module "$module" >"$RUN_ROOT/load-$module.out"
 done
 

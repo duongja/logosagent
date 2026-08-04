@@ -127,7 +127,7 @@ if [ ! -d "$BASECAMP_LGX_ROOT" ]; then
   fi
 fi
 
-modules=(delivery_module storage_module chat_module logos_execution_zone logos_agent)
+modules=(delivery_module storage_module chat_module lez_core logos_agent)
 for module in "${modules[@]}"; do
   lgx="$BASECAMP_LGX_ROOT/$module/$module.lgx"
   if [ ! -f "$lgx" ]; then

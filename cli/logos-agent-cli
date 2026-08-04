@@ -90,7 +90,9 @@ def cmd_deploy(args):
 
 
 def build_agent_config(args, root):
+    delivery_preset = args.delivery_preset or ("logos.test" if args.network == "logos-testnet-v0.2" else "logos.dev")
     return {
+        "network": args.network,
         "identity": {
             "agent_id": args.agent_id,
             "messaging_address": args.messaging_address,
@@ -118,6 +120,8 @@ def build_agent_config(args, root):
         "autostart_storage": args.autostart_storage,
         "chat": {
             "name": args.chat_name or args.agent_name,
+            "delivery_preset": delivery_preset,
+            "log_level": args.delivery_log_level.lower(),
             "port": args.chat_port,
             "clusterId": args.chat_cluster_id,
             "shardId": args.chat_shard_id,
@@ -130,11 +134,12 @@ def build_agent_config(args, root):
             "data-dir": str(root / "storage"),
             "log-level": "INFO",
             "log-file": str(root / "storage.log"),
+            "network": "logos.test" if args.network == "logos-testnet-v0.2" else "logos.dev",
         },
         "delivery": {
             "logLevel": args.delivery_log_level,
             "mode": args.delivery_mode,
-            "preset": args.delivery_preset,
+            "preset": delivery_preset,
         },
         "a2a": {
             "discovery_topic": args.discovery_topic,
@@ -143,7 +148,7 @@ def build_agent_config(args, root):
         "agent_card": {
             "name": args.agent_name,
             "description": args.agent_description,
-            "version": "0.1.0",
+            "version": "0.2.0",
         },
     }
 
@@ -202,6 +207,20 @@ def cmd_provision(args):
     print(json.dumps(result, indent=2))
 
 
+def cmd_verify_evidence(args):
+    script = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "verify-evidence.py"
+    cmd = [sys.executable, str(script), args.evidence_dir]
+    if args.allow_localnet:
+        cmd.append("--allow-localnet")
+    raise SystemExit(subprocess.run(cmd).returncode)
+
+
+def cmd_testnet_e2e(args):
+    script = pathlib.Path(__file__).resolve().parents[1] / "scripts" / "testnet-v02-e2e.py"
+    cmd = [sys.executable, str(script), "--config", args.config, "--out-dir", args.out_dir, "--timeout", str(args.timeout)]
+    raise SystemExit(subprocess.run(cmd).returncode)
+
+
 def add_config_args(p, output_required=True):
     p.add_argument("--output-dir", required=output_required)
     p.add_argument("--agent-id", default="agent-local")
@@ -212,7 +231,8 @@ def add_config_args(p, output_required=True):
     p.add_argument("--per-tx-limit", default="0")
     p.add_argument("--period-limit", default="0")
     p.add_argument("--period-seconds", type=int, default=86400)
-    p.add_argument("--delivery-preset", default="logos.dev")
+    p.add_argument("--delivery-preset", choices=["logos.dev", "logos.test"], help="Defaults to logos.test for v0.2 testnet and logos.dev for localnet.")
+    p.add_argument("--network", default="logos-testnet-v0.2", choices=["localnet", "logos-testnet-v0.2"])
     p.add_argument("--delivery-mode", default="Core", choices=["Core", "Edge", "noMode"])
     p.add_argument("--delivery-log-level", default="INFO", choices=["TRACE", "DEBUG", "INFO", "WARN"])
     p.add_argument("--discovery-topic", default="/logos-agent/1/discovery/json")
@@ -288,6 +308,17 @@ def build_parser():
     p.add_argument("--approved", action=argparse.BooleanOptionalAction, default=True)
     p.add_argument("--decision")
     p.set_defaults(func=cmd_approve)
+
+    p = sub.add_parser("verify-evidence")
+    p.add_argument("evidence_dir")
+    p.add_argument("--allow-localnet", action="store_true")
+    p.set_defaults(func=cmd_verify_evidence)
+
+    p = sub.add_parser("testnet-e2e")
+    p.add_argument("--config", required=True)
+    p.add_argument("--out-dir", required=True)
+    p.add_argument("--timeout", type=int, default=300)
+    p.set_defaults(func=cmd_testnet_e2e)
 
     return parser
 

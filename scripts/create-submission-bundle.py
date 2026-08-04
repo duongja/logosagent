@@ -14,9 +14,12 @@ DEFAULT_DOCS = [
     "LICENSE",
     "metadata.json",
     "module.json",
+    "dependencies-v0.2.json",
     "demo.sh",
     "scripts/lez-v020-endpoint-diagnose.py",
     "docs/architecture.md",
+    "docs/v02-resubmission-status.md",
+    "evidence/README.md",
     "docs/skill-interface.md",
     "docs/a2a-logos-messaging-binding.md",
     "docs/security-model.md",
@@ -43,6 +46,7 @@ DEFAULT_DOCS = [
     "docs/three-agent-headless-evidence-20260620.md",
     "docs/manual-intervention-checklist.md",
     ".github/workflows/ci.yml",
+    ".github/workflows/testnet-v02-e2e.yml",
 ]
 DEMO_VIDEOS = [
     ("Video 1", "Repository readiness, package/evidence bundle, hosted-testnet transaction evidence, and submission overview", "https://www.youtube.com/watch?v=fYlokf7NIfI"),
@@ -186,7 +190,9 @@ def write_index(out_dir, reports, artifacts):
         "- `artifact-checksums.json`: local package artifact checksums when artifacts exist.",
         "- `manual-intervention-checklist.md`: tasks that still require user/UI/external action.",
         "",
-        "## Hosted-Testnet Tx Evidence",
+        "## Historical Standalone Hosted-LEZ Tx Evidence",
+        "",
+        "These hashes are not proof that the logos_agent module ran on Testnet v0.2.",
         "",
     ]
     if tx_rows:

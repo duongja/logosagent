@@ -2,7 +2,7 @@
   "schema": "logos.basecamp.module.v1",
   "name": "logos_agent",
   "display_name": "Logos Agent Module",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Autonomous Logos-native agent runtime with LEZ wallet, Logos Storage, Logos Messaging owner chat, Delivery transport, and A2A-compatible coordination.",
   "package": {
     "lgx": "result/logos-logos_agent-module-lib.lgx",
@@ -18,7 +18,7 @@
     "logos.messaging",
     "delivery_module",
     "storage_module",
-    "logos_execution_zone",
+    "lez_core",
     "wallet",
     "logos.storage",
     "a2a"
@@ -38,6 +38,7 @@
     "program.call",
     "program.deploy",
     "agent.card",
+    "agent.publish",
     "agent.discover",
     "agent.task",
     "agent.subscribe",

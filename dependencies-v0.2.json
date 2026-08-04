@@ -1,0 +1,146 @@
+{
+  "schema": "logos.agent.dependencies.v1",
+  "profile": "logos-testnet-v0.2",
+  "network": {
+    "delivery_preset": "logos.test",
+    "storage_network": "logos.test",
+    "lez_endpoint": "https://testnet.lez.logos.co/"
+  },
+  "sources": [
+    {
+      "name": "logoscore",
+      "repository": "https://github.com/logos-co/logos-logoscore-cli.git",
+      "ref": "0.2.0",
+      "commit": "797b98a02bb009c477cfe82a7bb75f5fc6cb75d7"
+    },
+    {
+      "name": "logos-cpp-sdk",
+      "repository": "https://github.com/logos-co/logos-cpp-sdk.git",
+      "ref": "0.2.0",
+      "commit": "350a2891e60a40aba93f273d85e8accb4803ac29"
+    },
+    {
+      "name": "logos-protocol",
+      "repository": "https://github.com/logos-co/logos-protocol.git",
+      "ref": "v0.2 SDK lock",
+      "commit": "d5d58e7e230768505c683150f651358612abd442"
+    },
+    {
+      "name": "logos-qt-sdk",
+      "repository": "https://github.com/logos-co/logos-qt-sdk.git",
+      "ref": "v0.2 SDK lock",
+      "commit": "6c9a0de131fee6a0fa2edff924913bb76caf0316"
+    },
+    {
+      "name": "logos-module-builder",
+      "repository": "https://github.com/logos-co/logos-module-builder.git",
+      "ref": "0.2.6",
+      "commit": "2b59cb8e855894f7e7a064b15bfae409f288080b"
+    },
+    {
+      "name": "logos-module",
+      "repository": "https://github.com/logos-co/logos-module.git",
+      "ref": "logos-module-builder 0.2.6 lock",
+      "commit": "2ec64c4a65f8966b5137cdba3a19a6498ce17b6d"
+    },
+    {
+      "name": "logos-plugin-qt",
+      "repository": "https://github.com/logos-co/logos-plugin-qt.git",
+      "ref": "logos-module-builder 0.2.6 lock",
+      "commit": "f33f264abb6d628cc78cf926f9f33c7cc8252151"
+    },
+    {
+      "name": "logos-test-framework",
+      "repository": "https://github.com/logos-co/logos-test-framework.git",
+      "ref": "master",
+      "commit": "eb1600cc6f61b66f6d75edd4773a58f0d1fa1ca4"
+    },
+    {
+      "name": "lgpd",
+      "repository": "https://github.com/logos-co/logos-package-downloader.git",
+      "ref": "0.2.0",
+      "commit": "cf814220bfd78a0e07e042a8d29fae026bf652fd"
+    },
+    {
+      "name": "lgpm",
+      "repository": "https://github.com/logos-co/logos-package-manager.git",
+      "ref": "0.2.0",
+      "commit": "7a1f1cf35b22dc1a3407d6b5cafce333321be584"
+    },
+    {
+      "name": "delivery_module",
+      "repository": "https://github.com/logos-co/logos-delivery-module.git",
+      "ref": "v0.1.3",
+      "commit": "794c21cbe177bdea16d4907468eaf52d4282dda7"
+    },
+    {
+      "name": "storage_module",
+      "repository": "https://github.com/logos-co/logos-storage-module.git",
+      "ref": "v2.0.1",
+      "commit": "8feb7cc0f7806bc2b25faa884e1bb9076b993969"
+    },
+    {
+      "name": "chat_module",
+      "repository": "https://github.com/logos-co/logos-chat-module.git",
+      "ref": "v0.2.1",
+      "commit": "894526024dadd641a88a7b3b23de6a1edb8a8dff"
+    },
+    {
+      "name": "lez_core",
+      "repository": "https://github.com/logos-blockchain/logos-execution-zone-module.git",
+      "ref": "92dd9e25bcc6be04f841671e8da7b94bd2449f39",
+      "commit": "92dd9e25bcc6be04f841671e8da7b94bd2449f39"
+    },
+    {
+      "name": "logos-execution-zone",
+      "repository": "https://github.com/logos-blockchain/logos-execution-zone.git",
+      "ref": "v0.2.0",
+      "commit": "a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a"
+    }
+  ],
+  "artifacts": [
+    {
+      "name": "delivery_module",
+      "version": "0.1.3",
+      "source_url": "https://github.com/logos-co/logos-modules-release/releases/download/delivery_module-v0.1.3/delivery_module-0.1.3.lgx",
+      "bytes": 58334786,
+      "sha256": "9d48412fa855eb98122ed2b829ee3968be3cd9fdce7faf153104e444829c7699",
+      "root_hash": "7101c901b655e0be5e2a0d03cce548418e9b2ed6472c16d1a1c2d49d0e6dd147"
+    },
+    {
+      "name": "storage_module",
+      "version": "2.0.1",
+      "source_url": "https://github.com/logos-co/logos-modules-release/releases/download/storage_module-v2.0.1/storage_module-2.0.1.lgx",
+      "bytes": 36755332,
+      "sha256": "942661caaff6cece560b3d3bd61118d937179abb52e156beb6020a9be47eab3b",
+      "root_hash": "41b5b68fd0571ee3a78cf0f49afc48c0a68836ffee9ef687acbd3e2cf1c70817"
+    },
+    {
+      "name": "chat_module",
+      "version": "0.2.1",
+      "source_url": "https://github.com/logos-co/logos-modules-release/releases/download/chat_module-v0.2.1/chat_module-0.2.1.lgx",
+      "bytes": 48046793,
+      "sha256": "325b90a8abb82035f07a0c57463d4ea1af31981f52746dff3e7b81ca5dd65937",
+      "root_hash": "4a644c0d5b7f49cddae6fcec4f0313edaa452ddf4b85533074186d3f231865f9"
+    },
+    {
+      "name": "lez_core",
+      "version": "0.2.0",
+      "source_url": "https://github.com/logos-blockchain/logos-execution-zone-module/tree/92dd9e25bcc6be04f841671e8da7b94bd2449f39",
+      "build_output": "nix build github:logos-blockchain/logos-execution-zone-module/92dd9e25bcc6be04f841671e8da7b94bd2449f39#lgx-portable",
+      "variant": "linux-amd64",
+      "bytes": 75945406,
+      "sha256": "6ddc9d3de03592759b6529d019160f290bae3c8884113541cfdbddb8a940fc71",
+      "root_hash": "306fab5e3c9e7cbe75c7087e3e253b8fb7cf45b647c66f5f00cb592d77b13b04"
+    },
+    {
+      "name": "logos_agent",
+      "version": "0.2.0",
+      "source_url": "https://github.com/duongja/logosagent",
+      "variant": "linux-amd64",
+      "bytes": 4139661,
+      "sha256": "5e1de2c30d40c47804c4713bd753d4ca0334ef6df7a51c11ae8a5e82d5b3c78d",
+      "root_hash": "d9619ba8611fefd91a3777294285508573bbe53b5ae7480f46d11d2fd26ec15b"
+    }
+  ]
+}

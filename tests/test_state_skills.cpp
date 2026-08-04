@@ -4,6 +4,8 @@
 #include "skill_registry.h"
 
 #include <QDir>
+#include <QFile>
+#include <QJsonDocument>
 
 LOGOS_TEST(state_persists_files_and_approvals)
 {
@@ -55,4 +57,51 @@ LOGOS_TEST(skill_registry_describes_registered_skill)
     });
     LOGOS_ASSERT_TRUE(registry.contains(QStringLiteral("meta.status")));
     LOGOS_ASSERT_EQ(registry.describe().size(), 1);
+}
+
+LOGOS_TEST(audit_events_are_append_only_and_sanitized_by_construction)
+{
+    const QString path = QDir::tempPath() + QStringLiteral("/logos-agent-test-audit");
+    QFile::remove(path + QStringLiteral("/audit.jsonl"));
+    AgentState state;
+    state.setPersistencePath(path);
+    LOGOS_ASSERT_TRUE(state.load());
+
+    const QJsonObject first{
+        {QStringLiteral("schema"), QStringLiteral("logos.agent.evidence.v1")},
+        {QStringLiteral("run_id"), QStringLiteral("run_test")},
+        {QStringLiteral("invocation_id"), QStringLiteral("inv_test")},
+        {QStringLiteral("skill"), QStringLiteral("wallet.send")},
+        {QStringLiteral("password"), QStringLiteral("must-not-be-written")},
+        {QStringLiteral("details"), QJsonObject{
+            {QStringLiteral("payload"), QStringLiteral("plaintext")},
+            {QStringLiteral("tx_hash"), QStringLiteral("public-hash")}
+        }},
+        {QStringLiteral("ok"), true}
+    };
+    const QJsonObject second{
+        {QStringLiteral("schema"), QStringLiteral("logos.agent.evidence.v1")},
+        {QStringLiteral("run_id"), QStringLiteral("run_test")},
+        {QStringLiteral("invocation_id"), QStringLiteral("inv_second")},
+        {QStringLiteral("skill"), QStringLiteral("storage.upload")},
+        {QStringLiteral("ok"), true}
+    };
+    LOGOS_ASSERT_TRUE(state.appendAuditEvent(first));
+    LOGOS_ASSERT_TRUE(state.appendAuditEvent(second));
+
+    QFile audit(state.auditFilePath());
+    LOGOS_ASSERT_TRUE(audit.open(QIODevice::ReadOnly | QIODevice::Text));
+    const QList<QByteArray> lines = audit.readAll().trimmed().split('\n');
+    LOGOS_ASSERT_EQ(lines.size(), 2);
+    const QJsonObject parsed = QJsonDocument::fromJson(lines.at(0)).object();
+    LOGOS_ASSERT_EQ(parsed.value(QStringLiteral("run_id")).toString().toStdString(), std::string("run_test"));
+    LOGOS_ASSERT_FALSE(parsed.contains(QStringLiteral("params")));
+    LOGOS_ASSERT_FALSE(parsed.contains(QStringLiteral("payload")));
+    LOGOS_ASSERT_FALSE(parsed.contains(QStringLiteral("private_key_hex")));
+    LOGOS_ASSERT_FALSE(parsed.contains(QStringLiteral("key_hex")));
+    LOGOS_ASSERT_FALSE(parsed.contains(QStringLiteral("password")));
+    LOGOS_ASSERT_FALSE(parsed.value(QStringLiteral("details")).toObject().contains(QStringLiteral("payload")));
+    LOGOS_ASSERT_EQ(
+        parsed.value(QStringLiteral("details")).toObject().value(QStringLiteral("tx_hash")).toString().toStdString(),
+        std::string("public-hash"));
 }

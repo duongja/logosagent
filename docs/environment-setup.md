@@ -41,7 +41,7 @@ integration tests, plug in AC power, close browser-heavy workloads, and use the
 stable runner:
 
 ```bash
-./scripts/stable-test-runner.sh -- nix build --impure .#unit-tests-fast -L --max-jobs 1 --cores 2
+./scripts/stable-test-runner.sh -- nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L --max-jobs 1 --cores 2
 ./scripts/stable-test-runner.sh -- ./scripts/delivery-smoke.sh --preset logos.dev --api-only
 ```
 
@@ -100,9 +100,9 @@ Full project checks:
 
 ```bash
 cd logos-agent
-./scripts/stable-test-runner.sh -- nix build --impure .#unit-tests-fast -L --max-jobs 1 --cores 2
-./scripts/stable-test-runner.sh -- nix build --impure .#unit-tests -L --max-jobs 1 --cores 2
-./scripts/stable-test-runner.sh -- nix build --impure .#lgx -L --max-jobs 1 --cores 2
+./scripts/stable-test-runner.sh -- nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L --max-jobs 1 --cores 2
+./scripts/stable-test-runner.sh -- nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests -L --max-jobs 1 --cores 2
+./scripts/stable-test-runner.sh -- nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L --max-jobs 1 --cores 2
 ```
 
 `unit-tests-fast` is the quick local C++ test target. It avoids realizing the

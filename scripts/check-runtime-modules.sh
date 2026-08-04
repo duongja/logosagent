@@ -40,11 +40,22 @@ required_modules=(
   delivery_module
   storage_module
   chat_module
-  logos_execution_zone
+  lez_core
   logos_agent
 )
 
 missing=0
+
+case "$(uname -s)-$(uname -m)" in
+  Linux-x86_64) platform="linux-amd64" ;;
+  Linux-aarch64|Linux-arm64) platform="linux-arm64" ;;
+  Darwin-arm64) platform="darwin-arm64" ;;
+  Darwin-x86_64) platform="darwin-amd64" ;;
+  *)
+    echo "unsupported runtime platform: $(uname -s)-$(uname -m)" >&2
+    exit 1
+    ;;
+esac
 
 if [ ! -d "$MODULES_DIR" ]; then
   echo "modules dir does not exist: $MODULES_DIR" >&2
@@ -68,16 +79,15 @@ for module in "${required_modules[@]}"; do
   fi
 
   plugin=$(
-    python3 - "$manifest" <<'PY'
+    python3 - "$manifest" "$platform" <<'PY'
 import json
 import sys
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     manifest = json.load(f)
 main = manifest.get("main") or {}
-if not isinstance(main, dict) or not main:
+if not isinstance(main, dict) or sys.argv[2] not in main:
     raise SystemExit(2)
-variant = next(iter(main))
-print(main[variant])
+print(main[sys.argv[2]])
 PY
   ) || {
     echo "manifest has no usable main entry: $manifest" >&2
@@ -95,15 +105,19 @@ PY
     continue
   fi
 
+  if command -v readelf >/dev/null 2>&1 && ! readelf -h "$plugin_path" >/dev/null 2>&1; then
+    echo "plugin is not a valid ELF shared library: $plugin_path" >&2
+    missing=1
+    continue
+  fi
+
   if command -v ldd >/dev/null 2>&1; then
-    if ! ldd "$plugin_path" >/dev/null 2>&1; then
-      echo "plugin dependency inspection failed: $plugin_path" >&2
-      missing=1
-      continue
-    fi
-    if ldd "$plugin_path" 2>/dev/null | grep -F "not found" >/dev/null; then
+    unresolved="$(ldd "$plugin_path" 2>/dev/null \
+      | awk '/=> not found/ {print $1}' \
+      | grep -Ev '^libQt6(Core|Network|RemoteObjects)\.so\.6$' || true)"
+    if [ -n "$unresolved" ]; then
       echo "plugin has unresolved shared libraries: $plugin_path" >&2
-      ldd "$plugin_path" 2>/dev/null | grep -F "not found" >&2 || true
+      printf '  %s\n' $unresolved >&2
       missing=1
       continue
     fi

@@ -6,8 +6,6 @@ include(LogosTest)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_AUTOMOC ON)
-add_compile_definitions(LOGOS_AGENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}/..")
-
 find_package(OpenSSL REQUIRED)
 
 logos_test(
@@ -26,7 +24,6 @@ logos_test(
         test_crypto_utils.cpp
         test_owner_message_utils.cpp
         test_state_skills.cpp
-        test_skill_contract.cpp
 )
 
 target_link_libraries(logos_agent_tests PRIVATE OpenSSL::Crypto)

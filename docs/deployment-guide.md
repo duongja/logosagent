@@ -9,7 +9,7 @@ From a clean workspace, first prepare sibling Logos sources:
 ```
 
 ```bash
-nix build --impure .#lgx -L
+nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L
 ```
 
 On this development machine, when the module has already been built and

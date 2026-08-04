@@ -48,7 +48,7 @@ if [ ! -x "$LOGOSCORE" ]; then
   echo "logoscore not found or not executable: $LOGOSCORE" >&2
   exit 1
 fi
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   if [ ! -d "$MODULES_DIR/$module" ]; then
     echo "missing module under modules dir: $MODULES_DIR/$module" >&2
     exit 1
@@ -325,7 +325,7 @@ PY
 CORE_PID=$!
 wait_for_daemon
 
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   "$LOGOSCORE" --config-dir "$CORE_CFG" load-module "$module" >"$RUN_ROOT/load-$module.out"
 done
 

@@ -1,0 +1,30 @@
+{
+  "network": "logos-testnet-v0.2",
+  "delivery_preset": "logos.test",
+  "sequencer_rpc": "https://testnet.lez.logos.co/",
+  "payment_amount": "1",
+  "payment_mode": "public",
+  "module_versions": {
+    "delivery_module": "0.1.3",
+    "storage_module": "2.0.1",
+    "chat_module": "0.2.1",
+    "lez_core": "0.2.0",
+    "logos_agent": "0.2.0"
+  },
+  "client": {
+    "agent_id": "replace-with-client-agent-id",
+    "host": "ssh-client-host",
+    "logoscore": "/opt/logos/bin/logoscore",
+    "modules_dir": "/var/lib/logos-agent/client-core/modules",
+    "config_dir": "/var/lib/logos-agent/client-core",
+    "core_log": "/var/log/logos-agent/client-core.log"
+  },
+  "server": {
+    "agent_id": "replace-with-server-agent-id",
+    "host": "ssh-server-host",
+    "logoscore": "/opt/logos/bin/logoscore",
+    "modules_dir": "/var/lib/logos-agent/server-core/modules",
+    "config_dir": "/var/lib/logos-agent/server-core",
+    "core_log": "/var/log/logos-agent/server-core.log"
+  }
+}

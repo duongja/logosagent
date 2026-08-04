@@ -1,0 +1,12 @@
+{
+  "endpoint": "https://testnet.lez.logos.co/",
+  "query": {
+    "method": "getTransaction",
+    "tx_hash": "ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea"
+  },
+  "response": {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "result": "ANy7/rzVk5mWHtmXO4MH3Edf1MXKV3mqz+dYj328P0pxAgAAAFTWYrZkUZy4rvYIroSmPgQcwWAZ5KB8NIKDEZlvDIF6Zw5W/GQLsqDjFLYFRjgLATrt1ZHLPkawEbFA1FJB8SACAAAAJAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAFAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAACAAAAgAA2YPwmGhfRPDbsrWGlFK5hwhyWOnfwUXVMsfzUJCux57vlNR3OpNDBh0J2AEx02tzcgdTozRQql6qDqEuNUrbrDlmMsfvLj/uxO9ne7w5K1Ma7OTgoc/e1CeBfMhT6wXoSET4xnHkpLF6pbMw11H10rszHbCL9Gy3Q6/HRynICLSrF6/IbGoi61B4FpnEA+gpJqKU3SaZWOaYMoQ7c7Zf0nRyBdDS9777vL6hW0WAt5spO1vcsbzhTvn5v6X9H"
+  }
+}

@@ -9,11 +9,8 @@ SCAFFOLD_BIN="${SCAFFOLD_BIN:-}"
 LOGOS_BLOCKCHAIN_CIRCUITS="${LOGOS_BLOCKCHAIN_CIRCUITS:-$WORKSPACE/logos-blockchain-circuits}"
 LOCALNET_TIMEOUT_SEC="${LOCALNET_TIMEOUT_SEC:-180}"
 KEEP_LOCALNET="${KEEP_LOCALNET:-0}"
-FROM_ADDRESS="${FROM_ADDRESS:-CbgR6tj5kWx5oziiFptM7jMvrQeYY3Mzaao6ciuhSr2r}"
-FROM_PRIVATE_KEY_HEX="${FROM_PRIVATE_KEY_HEX:-7f273098f25b71e6c005a9519f2678da8d1c7f01f6a27778e2d9948abdf901fb}"
-# Scaffold public B. Use hex here because this pinned LEZ FFI lists and accepts
-# the account by hex, while its base58 decoder rejects the same account.
-TO_ADDRESS="${TO_ADDRESS:-15145aee2e6c9c57d2847b8ca2e100937f11ee76fdfd75fcb588488aa2064547}"
+FROM_ADDRESS=""
+TO_ADDRESS=""
 TASK_AMOUNT="${TASK_AMOUNT:-1}"
 CANCEL_REFUND="${CANCEL_REFUND:-0}"
 
@@ -30,9 +27,6 @@ Options:
   --scaffold-bin P        logos-scaffold binary path.
   --circuits-dir P        logos-blockchain-circuits path for sequencer.
   --localnet-timeout SEC  Scaffold localnet readiness timeout. Default: 180.
-  --from ADDRESS          Funded client sender. Default: scaffold public A.
-  --from-private-key HEX  Private signing key metadata for --from.
-  --to ADDRESS            Payment recipient. Default: scaffold public B.
   --amount N              LEZ units to pay. Default: 1.
   --cancel-refund         Cancel an input-required paid task and verify refund.
   --keep-localnet         Leave localnet running on exit.
@@ -46,9 +40,6 @@ while [ "$#" -gt 0 ]; do
     --scaffold-bin) SCAFFOLD_BIN="${2:-}"; shift ;;
     --circuits-dir) LOGOS_BLOCKCHAIN_CIRCUITS="${2:-}"; shift ;;
     --localnet-timeout) LOCALNET_TIMEOUT_SEC="${2:-}"; shift ;;
-    --from) FROM_ADDRESS="${2:-}"; shift ;;
-    --from-private-key) FROM_PRIVATE_KEY_HEX="${2:-}"; shift ;;
-    --to) TO_ADDRESS="${2:-}"; shift ;;
     --amount) TASK_AMOUNT="${2:-}"; shift ;;
     --cancel-refund) CANCEL_REFUND=1 ;;
     --keep-localnet) KEEP_LOCALNET=1 ;;
@@ -141,11 +132,10 @@ PY
 topup_sender() {
   local funded_address
   funded_address="$(normalize_public_address "$FROM_ADDRESS")"
-  (
-    cd "$SCAFFOLD_PROJECT"
-    LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" \
-      "$SCAFFOLD_BIN" wallet topup --json "$funded_address"
-  ) >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
+  "$ROOT/scripts/v02-local-faucet.sh" \
+    --scaffold-project "$SCAFFOLD_PROJECT" \
+    --address "$funded_address" \
+    >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
   python3 - "$RUN_ROOT/wallet-topup.json" "$funded_address" <<'PY'
 import json
 import pathlib
@@ -164,10 +154,24 @@ PY
 (cd "$SCAFFOLD_PROJECT" && LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" "$SCAFFOLD_BIN" localnet start --timeout-sec "$LOCALNET_TIMEOUT_SEC" >"$RUN_ROOT/localnet-start.out" 2>"$RUN_ROOT/localnet-start.err")
 LOCALNET_STARTED=1
 wait_for_localnet
-topup_sender
 
 cp "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" "$WALLET_DIR/wallet_config.json"
 cp "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" "$SERVER_WALLET_DIR/wallet_config.json"
+
+"$ROOT/scripts/provision-v02-wallet.sh" \
+  --wallet-dir "$WALLET_DIR" \
+  --wallet-config "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" \
+  --run-root "$RUN_ROOT/provision-client" \
+  --agent-id paid-a2a-client-provision >"$RUN_ROOT/client-provision.json"
+"$ROOT/scripts/provision-v02-wallet.sh" \
+  --wallet-dir "$SERVER_WALLET_DIR" \
+  --wallet-config "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" \
+  --run-root "$RUN_ROOT/provision-server" \
+  --agent-id paid-a2a-server-provision >"$RUN_ROOT/server-provision.json"
+
+FROM_ADDRESS="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["account"])' "$RUN_ROOT/client-provision.json")"
+TO_ADDRESS="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["account"])' "$RUN_ROOT/server-provision.json")"
+topup_sender
 
 A2A_ARGS=(
   --run-root "$RUN_ROOT/a2a"
@@ -179,7 +183,6 @@ A2A_ARGS=(
   --client-wallet-storage "$WALLET_DIR/storage.json"
   --client-wallet-password wallet-smoke
   --client-wallet-account "$FROM_ADDRESS"
-  --client-wallet-private-key "$FROM_PRIVATE_KEY_HEX"
   --server-wallet-config "$SERVER_WALLET_DIR/wallet_config.json"
   --server-wallet-storage "$SERVER_WALLET_DIR/storage.json"
   --server-wallet-password wallet-smoke
@@ -189,13 +192,11 @@ if [ "$CANCEL_REFUND" -eq 1 ]; then
     --cancel-after-submit
     --payment-recipient "$TO_ADDRESS"
     --server-lez-account "$TO_ADDRESS"
-    --server-wallet-private-key f434f8741720014586ae43356d2aec6257da086222f604ddb75d69733b86fc4c
   )
 else
   A2A_ARGS+=(
     --payment-recipient "$TO_ADDRESS"
     --server-lez-account "$TO_ADDRESS"
-    --server-wallet-private-key f434f8741720014586ae43356d2aec6257da086222f604ddb75d69733b86fc4c
   )
 fi
 

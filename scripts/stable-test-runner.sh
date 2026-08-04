@@ -28,7 +28,7 @@ Options:
   -h, --help          Show this help.
 
 Examples:
-  scripts/stable-test-runner.sh -- nix build --impure .#unit-tests-fast -L --max-jobs 1 --cores 2
+  scripts/stable-test-runner.sh -- nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L --max-jobs 1 --cores 2
   scripts/stable-test-runner.sh --allow-battery -- ./scripts/delivery-smoke.sh --preset logos.dev --api-only
 USAGE
 }

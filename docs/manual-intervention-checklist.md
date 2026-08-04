@@ -4,6 +4,10 @@ The repository now contains the local module implementation, local smoke
 evidence, hosted-testnet transaction evidence, packaging helpers, reviewer
 demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
 
+The three existing videos cover the earlier implementation. They are retained
+for historical context and do not replace the continuous Testnet v0.2 recording
+listed under the open items below.
+
 ## Recorded Demo Videos
 
 - Video 1: repository readiness, package/evidence bundle, hosted-testnet
@@ -26,13 +30,26 @@ demo entrypoint, Basecamp/module descriptor, and narrated demo videos.
 - Terminal proof output, hosted-testnet tx hashes, and `RISC0_DEV_MODE=0`:
   Videos 1 and 3.
 
+## Completed Package Verification
+
+The official v0.2 portable package build completed from the bootstrapped pinned
+workspace. The generated LGX is 4,139,661 bytes with SHA-256
+`5e1de2c30d40c47804c4713bd753d4ca0334ef6df7a51c11ae8a5e82d5b3c78d`.
+Its manifest root is
+`d9619ba8611fefd91a3777294285508573bbe53b5ae7480f46d11d2fd26ec15b`.
+
 ## Manual/External Items Still Open
 
-1. Official clean package build
-   - Run `nix build --impure .#lgx -L` on a stable machine or GitHub workflow.
-   - Keep the generated `.lgx` checksum with the final evidence bundle.
+1. Replacement public-testnet video
+   - Record one continuous run showing the two agents, module versions,
+     Delivery discovery/task events, Storage verification, LEZ transaction
+     lookup, evidence validation, and the public CI result.
 
-2. CU values
+2. Public Actions URL
+   - Push the repository changes and link the first passing automatic local E2E
+     run. The self-hosted public-testnet workflow remains scheduled/manual.
+
+3. CU values
    - Keep CU as `TBD` unless Logos provides explorer metadata, sequencer
      metadata, wallet/sequencer proof stats, or an evaluator-approved benchmark
      mapping.

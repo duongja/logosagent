@@ -6,6 +6,7 @@
 
 #include <QDateTime>
 #include <QJsonArray>
+#include <QStringList>
 #include <utility>
 
 namespace {
@@ -25,6 +26,47 @@ QJsonObject schema(std::initializer_list<QString> required)
 QString amountFromParams(const QJsonObject& params)
 {
     return params.value(QStringLiteral("amount")).toVariant().toString();
+}
+
+QString correlationValue(const QJsonObject& params, const QString& key, const QString& prefix)
+{
+    const QString supplied = params.value(key).toString().trimmed();
+    return supplied.isEmpty() ? CryptoUtils::randomId(prefix) : supplied;
+}
+
+void copyEvidenceIdentifier(QJsonObject& event, const QJsonObject& source, const QString& key)
+{
+    const QString value = source.value(key).toString();
+    if (!value.isEmpty()) {
+        event.insert(key, value);
+    }
+}
+
+QString findEvidenceIdentifier(const QJsonValue& value, const QStringList& keys)
+{
+    if (value.isObject()) {
+        const QJsonObject object = value.toObject();
+        for (const QString& key : keys) {
+            const QString candidate = object.value(key).toString();
+            if (!candidate.isEmpty()) {
+                return candidate;
+            }
+        }
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            const QString candidate = findEvidenceIdentifier(it.value(), keys);
+            if (!candidate.isEmpty()) {
+                return candidate;
+            }
+        }
+    } else if (value.isArray()) {
+        for (const QJsonValue& child : value.toArray()) {
+            const QString candidate = findEvidenceIdentifier(child, keys);
+            if (!candidate.isEmpty()) {
+                return candidate;
+            }
+        }
+    }
+    return {};
 }
 
 QJsonObject redactSecretFields(QJsonObject obj)
@@ -230,15 +272,25 @@ QJsonObject AgentRuntime::invokeObject(const QString& skillName, const QJsonObje
     if (!m_skills.contains(skillName)) {
         return JsonUtils::error(QStringLiteral("agent.unknown_skill"), QStringLiteral("unknown skill: %1").arg(skillName));
     }
+    QJsonObject correlatedParams = params;
+    correlatedParams.insert(QStringLiteral("run_id"), correlationValue(params, QStringLiteral("run_id"), QStringLiteral("run")));
+    correlatedParams.insert(QStringLiteral("invocation_id"), correlationValue(params, QStringLiteral("invocation_id"), QStringLiteral("inv")));
     const SkillDefinition def = m_skills.definition(skillName);
     if (def.spendsTokens) {
-        const QString amount = amountFromParams(params);
-        const QJsonObject gate = maybeGateSpend(skillName, amount.isEmpty() ? QStringLiteral("0") : amount, params, origin);
+        const QString amount = amountFromParams(correlatedParams);
+        QJsonObject gate = maybeGateSpend(skillName, amount.isEmpty() ? QStringLiteral("0") : amount, correlatedParams, origin);
         if (gate.value(QStringLiteral("requires_approval")).toBool(false)) {
+            gate.insert(QStringLiteral("run_id"), correlatedParams.value(QStringLiteral("run_id")));
+            gate.insert(QStringLiteral("invocation_id"), correlatedParams.value(QStringLiteral("invocation_id")));
+            auditSkill(skillName, correlatedParams, gate, origin);
             return JsonUtils::ok(gate);
         }
     }
-    return executeSkill(skillName, params, origin);
+    QJsonObject result = executeSkill(skillName, correlatedParams, origin);
+    result.insert(QStringLiteral("run_id"), correlatedParams.value(QStringLiteral("run_id")));
+    result.insert(QStringLiteral("invocation_id"), correlatedParams.value(QStringLiteral("invocation_id")));
+    auditSkill(skillName, correlatedParams, result, origin);
+    return result;
 }
 
 QJsonObject AgentRuntime::approve(const QString& approvalId, const QString& decisionJson)
@@ -264,14 +316,24 @@ QJsonObject AgentRuntime::approve(const QString& approvalId, const QString& deci
     };
     m_state.updateApproval(approvalId, patch);
     m_state.save();
-    if (!approved) {
-        emitEvent(QStringLiteral("approvalRejected"), patch);
-        return JsonUtils::ok(QJsonObject{{QStringLiteral("approval_id"), approvalId}, {QStringLiteral("status"), QStringLiteral("rejected")}});
-    }
-
     const QJsonObject request = approval.value(QStringLiteral("request")).toObject();
     const QString skill = approval.value(QStringLiteral("skill")).toString();
-    const QJsonObject result = executeSkill(skill, request, QStringLiteral("owner-approval"));
+    if (!approved) {
+        emitEvent(QStringLiteral("approvalRejected"), patch);
+        QJsonObject rejected = JsonUtils::ok(QJsonObject{
+            {QStringLiteral("approval_id"), approvalId},
+            {QStringLiteral("status"), QStringLiteral("rejected")},
+            {QStringLiteral("run_id"), request.value(QStringLiteral("run_id"))},
+            {QStringLiteral("invocation_id"), request.value(QStringLiteral("invocation_id"))}
+        });
+        auditSkill(skill, request, rejected, QStringLiteral("owner-approval"));
+        return rejected;
+    }
+
+    QJsonObject result = executeSkill(skill, request, QStringLiteral("owner-approval"));
+    result.insert(QStringLiteral("run_id"), request.value(QStringLiteral("run_id")));
+    result.insert(QStringLiteral("invocation_id"), request.value(QStringLiteral("invocation_id")));
+    auditSkill(skill, request, result, QStringLiteral("owner-approval"));
     emitEvent(QStringLiteral("approvalExecuted"), QJsonObject{{QStringLiteral("approval_id"), approvalId}, {QStringLiteral("result"), result}});
     return result;
 }
@@ -283,11 +345,15 @@ QJsonObject AgentRuntime::skills() const
 
 QJsonObject AgentRuntime::status()
 {
+    const QJsonObject config = m_state.config();
     QJsonObject status{
         {QStringLiteral("initialized"), m_initialized},
         {QStringLiteral("started"), m_started},
         {QStringLiteral("starting"), m_starting},
         {QStringLiteral("persistence_path"), m_state.persistencePath()},
+        {QStringLiteral("network"), config.value(QStringLiteral("network"))},
+        {QStringLiteral("delivery_preset"), config.value(QStringLiteral("delivery")).toObject().value(QStringLiteral("preset"))},
+        {QStringLiteral("storage_network"), config.value(QStringLiteral("storage")).toObject().value(QStringLiteral("network"))},
         {QStringLiteral("identity"), redactSecretFields(m_state.identity())},
         {QStringLiteral("policy"), m_state.policy()},
         {QStringLiteral("messaging"), m_messaging.status()},
@@ -387,6 +453,8 @@ void AgentRuntime::registerDefaultSkills()
 
     add({QStringLiteral("agent.card"), QStringLiteral("agent"), QStringLiteral("Return signed A2A-compatible Agent Card."), schema({}), {}, QStringLiteral("0"), false,
          [](AgentRuntime& rt, const QJsonObject&, const QString&) { return rt.a2a().card(); }});
+    add({QStringLiteral("agent.publish"), QStringLiteral("agent"), QStringLiteral("Publish the signed Agent Card on the Delivery discovery topic."), schema({}), {}, QStringLiteral("0"), false,
+         [](AgentRuntime& rt, const QJsonObject&, const QString&) { return rt.a2a().publishCard(); }});
     add({QStringLiteral("agent.discover"), QStringLiteral("agent"), QStringLiteral("Subscribe to an A2A discovery topic and return cached cards."), schema({}), {}, QStringLiteral("0"), false,
          [](AgentRuntime& rt, const QJsonObject& p, const QString&) { return rt.a2a().discover(p); }});
     add({QStringLiteral("agent.task"), QStringLiteral("agent"), QStringLiteral("Send an A2A task request and optional LEZ payment."), schema({QStringLiteral("agent_address"), QStringLiteral("skill")}), {}, QStringLiteral("0"), true,
@@ -447,6 +515,51 @@ void AgentRuntime::emitEvent(const QString& name, const QJsonObject& payload)
 {
     if (m_eventSink) {
         m_eventSink(name, payload);
+    }
+}
+
+void AgentRuntime::auditSkill(const QString& skillName, const QJsonObject& params, const QJsonObject& result, const QString& origin) const
+{
+    const QJsonObject identity = m_state.identity();
+    const QJsonObject config = m_state.config();
+    QJsonObject event{
+        {QStringLiteral("schema"), QStringLiteral("logos.agent.evidence.v1")},
+        {QStringLiteral("event"), QStringLiteral("skill.completed")},
+        {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)},
+        {QStringLiteral("agent_id"), identity.value(QStringLiteral("agent_id")).toString()},
+        {QStringLiteral("skill"), skillName},
+        {QStringLiteral("origin"), origin},
+        {QStringLiteral("network"), config.value(QStringLiteral("network")).toString(QStringLiteral("unspecified"))},
+        {QStringLiteral("delivery_preset"), config.value(QStringLiteral("delivery")).toObject().value(QStringLiteral("preset")).toString()},
+        {QStringLiteral("ok"), result.value(QStringLiteral("ok")).toBool(false)},
+        {QStringLiteral("requires_approval"), result.value(QStringLiteral("requires_approval")).toBool(false)}
+    };
+    copyEvidenceIdentifier(event, params, QStringLiteral("run_id"));
+    copyEvidenceIdentifier(event, params, QStringLiteral("invocation_id"));
+    copyEvidenceIdentifier(event, params, QStringLiteral("task_id"));
+    copyEvidenceIdentifier(event, params, QStringLiteral("address"));
+    copyEvidenceIdentifier(event, result, QStringLiteral("tx_hash"));
+    copyEvidenceIdentifier(event, result, QStringLiteral("address"));
+    if (!result.value(QStringLiteral("ok")).toBool(false)) {
+        const QString errorCode = result.value(QStringLiteral("code")).toString();
+        if (!errorCode.isEmpty()) {
+            event.insert(QStringLiteral("error_code"), errorCode);
+        }
+        copyEvidenceIdentifier(event, result, QStringLiteral("error"));
+    }
+    const QJsonObject task = result.value(QStringLiteral("task")).toObject();
+    copyEvidenceIdentifier(event, task, QStringLiteral("task_id"));
+    const QJsonObject transfer = result.value(QStringLiteral("transfer")).toObject();
+    copyEvidenceIdentifier(event, transfer, QStringLiteral("tx_hash"));
+    if (!event.contains(QStringLiteral("tx_hash"))) {
+        const QString txHash = findEvidenceIdentifier(result, {QStringLiteral("tx_hash"), QStringLiteral("transaction_hash")});
+        if (!txHash.isEmpty()) {
+            event.insert(QStringLiteral("tx_hash"), txHash);
+        }
+    }
+    QString error;
+    if (!m_state.appendAuditEvent(event, &error) && m_eventSink) {
+        m_eventSink(QStringLiteral("auditWriteFailed"), QJsonObject{{QStringLiteral("error"), error}});
     }
 }
 

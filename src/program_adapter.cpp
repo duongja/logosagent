@@ -26,6 +26,8 @@ QJsonObject ProgramAdapter::call(const QJsonObject& params)
             {QStringLiteral("type"), QStringLiteral("program.call")},
             {QStringLiteral("amount"), params.value(QStringLiteral("amount")).toVariant().toString()},
             {QStringLiteral("spending_controlled"), true},
+            {QStringLiteral("run_id"), params.value(QStringLiteral("run_id"))},
+            {QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id"))},
             {QStringLiteral("request"), params},
             {QStringLiteral("result"), result}
         });
@@ -45,6 +47,8 @@ QJsonObject ProgramAdapter::deploy(const QJsonObject& params)
                 ? QStringLiteral("0")
                 : params.value(QStringLiteral("amount")).toVariant().toString()},
             {QStringLiteral("spending_controlled"), true},
+            {QStringLiteral("run_id"), params.value(QStringLiteral("run_id"))},
+            {QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id"))},
             {QStringLiteral("request"), params},
             {QStringLiteral("result"), result}
         });

@@ -1,0 +1,38 @@
+name: testnet-v02-e2e
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 2"
+
+jobs:
+  testnet-v02-e2e:
+    runs-on: [self-hosted, linux, x64, logos-testnet-v02]
+    timeout-minutes: 45
+    environment: logos-testnet-v02
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Write protected deployment config
+        env:
+          TESTNET_CONFIG_JSON: ${{ secrets.LOGOS_AGENT_TESTNET_CONFIG_JSON }}
+        run: |
+          test -n "$TESTNET_CONFIG_JSON"
+          umask 077
+          mkdir -p .local/testnet-v02
+          printf '%s' "$TESTNET_CONFIG_JSON" > .local/testnet-v02/config.json
+
+      - name: Run public Testnet v0.2 two-agent E2E
+        run: |
+          ./demo.sh --testnet \
+            --config .local/testnet-v02/config.json \
+            --out-dir .local/testnet-v02/evidence
+
+      - name: Upload sanitized evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: testnet-v02-evidence-${{ github.run_id }}
+          path: .local/testnet-v02/evidence
+          if-no-files-found: error
+          include-hidden-files: true

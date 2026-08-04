@@ -43,11 +43,11 @@ This repo is now a concrete LP-0008 implementation scaffold, not just a plan.
   CU reporting.
 - Nix fast tests, full Logos-stack unit tests, and `.lgx` package build verified
   locally on 2026-06-09:
-  - `nix build --impure .#unit-tests-fast -L`
-  - `nix build --impure .#unit-tests -L`
-  - `nix build --impure .#lgx -L`
+  - `nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L`
+  - `nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests -L`
+  - `nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L`
 - Packaged module artifact was previously verified through the official Nix LGX
-  build on 2026-06-09. A fresh official `nix build --impure .#lgx -L --max-jobs 1 --cores 2`
+  build on 2026-06-09. A fresh official `nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L --max-jobs 1 --cores 2`
   was started on 2026-06-17 and stopped for memory safety after Nix grew past
   6 GB RSS while realizing the full Logos/Rust dependency graph. On 2026-06-19,
   `scripts/package-dev-lgx.sh` regenerated a current dev LGX from the already

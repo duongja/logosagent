@@ -52,6 +52,7 @@ private:
     QString m_chatIntroBundleLastError;
     QString m_chatLastError;
     QString m_deliveryLastError;
+    bool m_createChatIntroBundleOnStart = false;
 };
 
 #endif

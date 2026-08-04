@@ -92,7 +92,7 @@ QJsonObject A2AAdapter::card() const
         {QStringLiteral("description"), cardCfg.value(QStringLiteral("description")).toString(QStringLiteral("Logos-native autonomous agent"))},
         {QStringLiteral("url"), QStringLiteral("logosmsg://%1").arg(agentAddress)},
         {QStringLiteral("preferredTransport"), QStringLiteral("logos-messaging")},
-        {QStringLiteral("version"), cardCfg.value(QStringLiteral("version")).toString(QStringLiteral("0.1.0"))},
+        {QStringLiteral("version"), cardCfg.value(QStringLiteral("version")).toString(QStringLiteral("0.2.0"))},
         {QStringLiteral("capabilities"), QJsonObject{
             {QStringLiteral("streaming"), true},
             {QStringLiteral("pushNotifications"), false},
@@ -193,6 +193,8 @@ QJsonObject A2AAdapter::task(const QJsonObject& params)
     const QString taskId = params.value(QStringLiteral("task_id")).toString(CryptoUtils::randomId(QStringLiteral("task")));
     QJsonObject task{
         {QStringLiteral("task_id"), taskId},
+        {QStringLiteral("run_id"), params.value(QStringLiteral("run_id"))},
+        {QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id"))},
         {QStringLiteral("context_id"), params.value(QStringLiteral("context_id")).toString(CryptoUtils::randomId(QStringLiteral("ctx")))},
         {QStringLiteral("agent_address"), agentAddress},
         {QStringLiteral("skill"), skill},
@@ -406,7 +408,9 @@ QJsonObject A2AAdapter::payForTask(const QJsonObject& params)
     const QJsonObject transfer = m_wallet->send(QJsonObject{
         {QStringLiteral("recipient"), recipient},
         {QStringLiteral("amount"), amount},
-        {QStringLiteral("mode"), paymentModeFromParams(params)}
+        {QStringLiteral("mode"), paymentModeFromParams(params)},
+        {QStringLiteral("run_id"), params.value(QStringLiteral("run_id"))},
+        {QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id"))}
     });
     if (!transfer.value(QStringLiteral("ok")).toBool(false)) {
         return transfer;
@@ -480,7 +484,7 @@ QJsonObject A2AAdapter::envelope(const QString& kind, QJsonObject payload) const
     const QJsonObject signing = signingIdentity();
     QJsonObject env{
         {QStringLiteral("logos_agent_protocol"), QStringLiteral("a2a-logos-messaging-binding")},
-        {QStringLiteral("version"), QStringLiteral("0.1.0")},
+        {QStringLiteral("version"), QStringLiteral("0.2.0")},
         {QStringLiteral("kind"), kind},
         {QStringLiteral("payload"), payload},
         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
@@ -504,6 +508,8 @@ QJsonObject A2AAdapter::statusEnvelopePayload(const QJsonObject& task, const QSt
 {
     QJsonObject status{
         {QStringLiteral("task_id"), task.value(QStringLiteral("task_id")).toString()},
+        {QStringLiteral("run_id"), task.value(QStringLiteral("run_id"))},
+        {QStringLiteral("invocation_id"), task.value(QStringLiteral("invocation_id"))},
         {QStringLiteral("context_id"), task.value(QStringLiteral("context_id")).toString()},
         {QStringLiteral("agent_address"), task.value(QStringLiteral("agent_address")).toString()},
         {QStringLiteral("skill"), task.value(QStringLiteral("skill")).toString()},
@@ -534,7 +540,11 @@ void A2AAdapter::executeSubmittedTask(const QString&, const QJsonObject& task)
 
     QJsonObject result;
     if (m_taskExecutor) {
-        result = m_taskExecutor(skill, task.value(QStringLiteral("params")).toObject(), QStringLiteral("a2a-task"));
+        QJsonObject executionParams = task.value(QStringLiteral("params")).toObject();
+        executionParams.insert(QStringLiteral("run_id"), task.value(QStringLiteral("run_id")));
+        executionParams.insert(QStringLiteral("invocation_id"), task.value(QStringLiteral("invocation_id")));
+        executionParams.insert(QStringLiteral("task_id"), taskId);
+        result = m_taskExecutor(skill, executionParams, QStringLiteral("a2a-task"));
     } else {
         result = JsonUtils::error(QStringLiteral("a2a.executor_missing"), QStringLiteral("A2A task executor is not configured"));
     }

@@ -1,4 +1,8 @@
-# Hosted LEZ Testnet v0.2.0 Final Evidence - 2026-07-01 UTC
+# Hosted LEZ Testnet v0.2.0 Final Evidence - 2026-07-01 UTC (Historical)
+
+> This proves standalone LEZ wallet/program activity. It does not prove that
+> the `logos_agent` Core module initiated these transactions and is not the
+> authoritative evidence for the v0.2 resubmission.
 
 This is the sanitized hosted-testnet evidence refreshed after Logos announced
 that the final `v0.2.0` tag should be used for compatible wallets and programs.

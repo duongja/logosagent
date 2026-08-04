@@ -16,9 +16,10 @@ usage() {
   cat <<'USAGE'
 Usage: scripts/agent-messaging-smoke.sh [options]
 
-Starts one logos_agent instance and one raw Delivery receiver. The agent creates
-a Delivery-backed group, joins it, sends a JSON message through messaging.send,
-and the receiver proves the message arrived through Delivery.
+Starts one logos_agent instance and one independent Delivery receiver. The agent
+creates a Delivery-backed group, joins it, sends a JSON message through
+messaging.send, persists its Delivery callback, and the receiver proves the relay
+message arrived through Delivery.
 
 Options:
   --preset VALUE           Delivery preset. Default: logos.dev.
@@ -54,7 +55,7 @@ if [ ! -x "$LOGOSCORE" ]; then
   echo "logoscore not found or not executable: $LOGOSCORE" >&2
   exit 1
 fi
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   if [ ! -d "$MODULES_DIR/$module" ]; then
     echo "missing module under modules dir: $MODULES_DIR/$module" >&2
     exit 1
@@ -322,33 +323,77 @@ PY
 wait_for_delivery_message() {
   local deadline=$((SECONDS + MESSAGE_TIMEOUT_SEC))
   while [ "$SECONDS" -lt "$deadline" ]; do
-    if python3 - "$EVENTS" "$GROUP_ID" <<'PY'
+    if python3 - "$AGENT_CFG" "$RECEIVER_LOG" "$GROUP_ID" <<'PY'
 import json
 import pathlib
 import sys
 
-path = pathlib.Path(sys.argv[1])
-topic = sys.argv[2]
-if not path.exists():
+config_root = pathlib.Path(sys.argv[1])
+receiver_log = pathlib.Path(sys.argv[2])
+topic = sys.argv[3]
+state_paths = list((config_root / "data" / "logos_agent").glob("*/state.json"))
+if not state_paths or not receiver_log.exists():
     raise SystemExit(1)
-for line in path.read_text(errors="replace").splitlines():
-    if topic not in line or "messaging.smoke" not in line:
-        continue
-    try:
-        payload = json.loads(line)
-    except json.JSONDecodeError:
-        raise SystemExit(0)
-    if topic in json.dumps(payload) and "messaging.smoke" in json.dumps(payload):
-        raise SystemExit(0)
-raise SystemExit(1)
+try:
+    state = json.loads(state_paths[0].read_text())
+except (OSError, json.JSONDecodeError):
+    raise SystemExit(1)
+inbound = any(
+    message.get("transport") == "delivery"
+    and message.get("direction") == "in"
+    and message.get("topic") == topic
+    and message.get("payload", {}).get("kind") == "messaging.smoke"
+    and message.get("message_hash")
+    for message in state.get("messages", [])
+)
+receiver_received = any(
+    "received relay message" in line and f"contentTopic={topic}" in line
+    for line in receiver_log.read_text(errors="replace").splitlines()
+)
+raise SystemExit(0 if inbound and receiver_received else 1)
 PY
     then
       return 0
     fi
     sleep 1
   done
-  echo "timed out waiting for Delivery message on $GROUP_ID" >&2
+  echo "timed out waiting for agent callback and receiver relay on $GROUP_ID" >&2
   return 1
+}
+
+raw_watch_captured_message() {
+  python3 - "$EVENTS" "$GROUP_ID" <<'PY'
+import base64
+import json
+import pathlib
+import sys
+
+def decode_bytes(value):
+    if isinstance(value, dict):
+        if set(value) == {"_bytes"} and isinstance(value["_bytes"], str):
+            encoded = value["_bytes"]
+            padding = "=" * (-len(encoded) % 4)
+            return base64.urlsafe_b64decode(encoded + padding).decode("utf-8", errors="replace")
+        return {key: decode_bytes(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [decode_bytes(child) for child in value]
+    return value
+
+path = pathlib.Path(sys.argv[1])
+topic = sys.argv[2]
+if path.exists():
+    for line in path.read_text(errors="replace").splitlines():
+        if topic not in line:
+            continue
+        try:
+            payload = decode_bytes(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+        rendered = json.dumps(payload)
+        if topic in rendered and "messaging.smoke" in rendered:
+            raise SystemExit(0)
+raise SystemExit(1)
+PY
 }
 
 "$LOGOSCORE" --config-dir "$AGENT_CFG" -D -m "$MODULES_DIR" >"$AGENT_LOG" 2>&1 &
@@ -359,7 +404,7 @@ RECEIVER_PID=$!
 wait_for_daemon "$AGENT_CFG" "agent"
 wait_for_daemon "$RECEIVER_CFG" "receiver"
 
-for module in delivery_module storage_module chat_module logos_execution_zone logos_agent; do
+for module in delivery_module storage_module chat_module lez_core logos_agent; do
   "$LOGOSCORE" --config-dir "$AGENT_CFG" load-module "$module" >"$RUN_ROOT/agent-load-$module.out"
 done
 "$LOGOSCORE" --config-dir "$RECEIVER_CFG" load-module delivery_module >"$RUN_ROOT/receiver-load-delivery_module.out"
@@ -395,15 +440,20 @@ assert_send_result "$RUN_ROOT/messaging-send.json"
 
 wait_for_delivery_message
 
+RAW_WATCH_CAPTURED=false
+if raw_watch_captured_message; then
+  RAW_WATCH_CAPTURED=true
+fi
+
 call_agent invoke meta.status '{}' >"$RUN_ROOT/meta-status.json"
 assert_json_ok "$RUN_ROOT/meta-status.json" "meta.status"
 
-python3 - "$RUN_ROOT" "$PRESET" "$MODE" "$GROUP_ID" "$EVENTS" <<'PY'
+python3 - "$RUN_ROOT" "$PRESET" "$MODE" "$GROUP_ID" "$EVENTS" "$RECEIVER_LOG" "$RAW_WATCH_CAPTURED" <<'PY'
 import json
 import pathlib
 import sys
 
-run_root, preset, mode, group_id, events = sys.argv[1:6]
+run_root, preset, mode, group_id, events, receiver_log, raw_watch_captured = sys.argv[1:8]
 meta_status = json.loads((pathlib.Path(run_root) / "meta-status.json").read_text())
 persistence_path = pathlib.Path(meta_status["persistence_path"])
 state_path = persistence_path / "state.json"
@@ -417,6 +467,22 @@ if not any(
     for msg in messages
 ):
     raise SystemExit("agent state did not record the outbound messaging.send payload")
+inbound = [
+    msg for msg in messages
+    if msg.get("transport") == "delivery"
+    and msg.get("direction") == "in"
+    and msg.get("topic") == group_id
+    and msg.get("payload", {}).get("kind") == "messaging.smoke"
+    and msg.get("message_hash")
+]
+if not inbound:
+    raise SystemExit("agent state did not record the inbound Delivery callback")
+receiver_text = pathlib.Path(receiver_log).read_text(errors="replace")
+if not any(
+    "received relay message" in line and f"contentTopic={group_id}" in line
+    for line in receiver_text.splitlines()
+):
+    raise SystemExit("independent Delivery receiver did not log the relay message")
 
 print(json.dumps({
     "ok": True,
@@ -425,12 +491,15 @@ print(json.dumps({
     "node_mode": mode,
     "group_id": group_id,
     "events": events,
+    "message_hash": inbound[-1]["message_hash"],
+    "raw_watch_captured": raw_watch_captured == "true",
     "proofs": {
         "create_group": f"{run_root}/messaging-create-group.json",
         "join": f"{run_root}/messaging-join.json",
         "send": f"{run_root}/messaging-send.json",
         "meta_status": f"{run_root}/meta-status.json",
         "state": str(state_path),
+        "receiver_log": receiver_log,
     },
 }, indent=2))
 PY

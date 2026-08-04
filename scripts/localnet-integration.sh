@@ -10,6 +10,8 @@ SCAFFOLD_CACHE_ROOT="$RUN_ROOT/cache"
 SCAFFOLD_CIRCUITS_BOOTSTRAP="$RUN_ROOT/circuits-bootstrap"
 SCAFFOLD_REPO="${SCAFFOLD_REPO:-$WORKSPACE/scaffold}"
 SCAFFOLD_BIN="${SCAFFOLD_BIN:-}"
+V02_LEZ_COMMIT="a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a"
+V02_LEZ_REPO="${LOGOS_EXECUTION_ZONE_REPO:-}"
 KEEP_LOCALNET=0
 RUN_SETUP=0
 USE_PREBUILT=0
@@ -38,6 +40,8 @@ Options:
 Environment:
   SCAFFOLD_BIN   Path to logos-scaffold binary.
   SCAFFOLD_REPO  Path to logos-co/scaffold checkout.
+  LOGOS_EXECUTION_ZONE_REPO
+                 Exact v0.2.0 LEZ checkout used by the module and localnet.
   PORT           Localnet port, default 3040.
   TIMEOUT_SEC    Localnet start timeout, default 180.
   CARGO_BUILD_JOBS
@@ -83,6 +87,33 @@ EOF
 fi
 SCAFFOLD_BIN="$(cd "$(dirname "$SCAFFOLD_BIN")" && pwd)/$(basename "$SCAFFOLD_BIN")"
 
+if [ -z "$V02_LEZ_REPO" ]; then
+  for candidate in "$WORKSPACE/logos-execution-zone" "$ROOT/.local/v02-workspace/logos-execution-zone"; do
+    if [ -d "$candidate/.git" ] && [ "$(git -C "$candidate" rev-parse HEAD 2>/dev/null || true)" = "$V02_LEZ_COMMIT" ]; then
+      V02_LEZ_REPO="$candidate"
+      break
+    fi
+  done
+fi
+if [ -z "$V02_LEZ_REPO" ] || [ ! -d "$V02_LEZ_REPO/.git" ]; then
+  echo "exact Logos Execution Zone v0.2.0 checkout not found; run scripts/bootstrap-workspace.sh" >&2
+  exit 1
+fi
+V02_LEZ_REPO="$(cd "$V02_LEZ_REPO" && pwd)"
+if [ "$(git -C "$V02_LEZ_REPO" rev-parse HEAD)" != "$V02_LEZ_COMMIT" ]; then
+  echo "LEZ checkout is not the locked v0.2.0 commit: $V02_LEZ_REPO" >&2
+  exit 1
+fi
+
+# Scaffold v0.2 expects the pre-release directory layout. The released LEZ
+# moved these crates under lez/, so expose compatibility links without
+# changing tracked dependency sources.
+for crate in sequencer wallet; do
+  if [ ! -e "$V02_LEZ_REPO/$crate" ]; then
+    ln -s "lez/$crate" "$V02_LEZ_REPO/$crate"
+  fi
+done
+
 if [ ! -x "$ROOT/agent_lez/target/debug/agent_lez" ]; then
   (cd "$ROOT/agent_lez" && cargo build --locked)
 fi
@@ -113,16 +144,26 @@ fi
 (cd "$RUN_ROOT" && "$SCAFFOLD_BIN" new "$PROJECT_NAME" --cache-root "$SCAFFOLD_CACHE_ROOT")
 cd "$PROJECT_DIR"
 
-python3 - "$PORT" <<'PY'
+python3 - "$PORT" "$V02_LEZ_REPO" "$V02_LEZ_COMMIT" <<'PY'
 import re
 import sys
 from pathlib import Path
 
 port = sys.argv[1]
+lez_repo = sys.argv[2]
+lez_commit = sys.argv[3]
 path = Path("scaffold.toml")
 text = path.read_text()
 text = re.sub(r"(?m)^risc0_dev_mode = (true|false)$", "risc0_dev_mode = false", text)
 text = re.sub(r"(?m)^port = \d+$", f"port = {port}", text)
+text = re.sub(
+    r'(?ms)(^\[repos\.lez\]\n)(.*?)(?=^\[)',
+    lambda match: match.group(1)
+    + re.sub(r'(?m)^pin = "[^"]+"$', f'pin = "{lez_commit}"', match.group(2))
+    + f'path = "{lez_repo}"\n',
+    text,
+    count=1,
+)
 path.write_text(text)
 PY
 

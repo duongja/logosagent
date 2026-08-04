@@ -56,6 +56,7 @@ Programs:
 A2A:
 
 - `agent.card()`
+- `agent.publish()`
 - `agent.discover(topic?)`
 - `agent.task(agent_address, skill, params, amount?)`
 - `agent.subscribe(task_id)`

@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLI="$ROOT/cli/logos-agent-cli"
 OUT_DIR="$ROOT/.local/testnet-agents/latest"
 NETWORK="${NETWORK:-testnet}"
-DELIVERY_PRESET="${DELIVERY_PRESET:-logos.dev}"
+DELIVERY_PRESET="${DELIVERY_PRESET:-logos.test}"
 DELIVERY_MODE="${DELIVERY_MODE:-Core}"
 DISCOVERY_TOPIC="${DISCOVERY_TOPIC:-/logos-agent/1/discovery/json}"
 PER_TX_LIMIT="${PER_TX_LIMIT:-0}"
@@ -33,7 +33,7 @@ manifest. It does not start logoscore, Basecamp, or a network service.
 Options:
   --out-dir PATH              Output directory. Default: .local/testnet-agents/latest
   --network NAME              Evidence network label. Default: testnet
-  --delivery-preset NAME      Delivery preset. Default: logos.dev
+  --delivery-preset NAME      Delivery preset. Default: logos.test
   --delivery-mode NAME        Delivery mode. Default: Core
   --discovery-topic TOPIC     A2A discovery topic.
   --per-tx-limit AMOUNT       Autonomous per-transaction limit. Default: 0
@@ -95,6 +95,7 @@ for peer in "${BOOTSTRAP_PEERS[@]}"; do
 done
 
 common_config_args=(
+  --network "$( [ "$NETWORK" = testnet ] && printf logos-testnet-v0.2 || printf localnet )"
   --delivery-preset "$DELIVERY_PRESET"
   --delivery-mode "$DELIVERY_MODE"
   --discovery-topic "$DISCOVERY_TOPIC"
@@ -139,7 +140,7 @@ for lgx in \\
   "\$ROOT/.local/artifacts/basecamp-lgx/delivery_module/delivery_module.lgx" \\
   "\$ROOT/.local/artifacts/basecamp-lgx/storage_module/storage_module.lgx" \\
   "\$ROOT/.local/artifacts/basecamp-lgx/chat_module/chat_module.lgx" \\
-  "\$ROOT/.local/artifacts/basecamp-lgx/logos_execution_zone/logos_execution_zone.lgx" \\
+  "\$ROOT/.local/artifacts/basecamp-lgx/lez_core/lez_core.lgx" \\
   "\$ROOT/.local/artifacts/basecamp-lgx/logos_agent/logos_agent.lgx"
 do
   if [ ! -f "\$lgx" ]; then

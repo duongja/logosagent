@@ -1,0 +1,37 @@
+$ railway-sandbox railway-client -- cat /opt/logos/modules/delivery_module/manifest.json
+$ railway-sandbox railway-client -- cat /opt/logos/modules/storage_module/manifest.json
+$ railway-sandbox railway-client -- cat /opt/logos/modules/chat_module/manifest.json
+$ railway-sandbox railway-client -- cat /opt/logos/modules/lez_core/manifest.json
+$ railway-sandbox railway-client -- cat /opt/logos/modules/logos_agent/manifest.json
+$ railway-sandbox railway-server -- cat /opt/logos/modules/delivery_module/manifest.json
+$ railway-sandbox railway-server -- cat /opt/logos/modules/storage_module/manifest.json
+$ railway-sandbox railway-server -- cat /opt/logos/modules/chat_module/manifest.json
+$ railway-sandbox railway-server -- cat /opt/logos/modules/lez_core/manifest.json
+$ railway-sandbox railway-server -- cat /opt/logos/modules/logos_agent/manifest.json
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ railway-sandbox railway-server -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/server-core --json call logos_agent status
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke agent.discover '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-server -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/server-core --json call logos_agent invoke agent.card '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-server -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/server-core --json call logos_agent invoke agent.publish '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke agent.discover '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- umask 077; printf %s 'logos-agent-v02-run_62d7e4e3fbc2439594822ec3ac835c1a
+' > /tmp/run_62d7e4e3fbc2439594822ec3ac835c1a.txt
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke storage.upload '{"path":"/tmp/run_62d7e4e3fbc2439594822ec3ac835c1a.txt","label":"run_62d7e4e3fbc2439594822ec3ac835c1a","run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke storage.list '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke storage.download '{"address":"zDvZRwzmAaw9AK9WMFPcWzhNKwHW4EdtuP62k5troeudkbCNRNvN","path":"/tmp/run_62d7e4e3fbc2439594822ec3ac835c1a.download.txt","run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- sha256sum /tmp/run_62d7e4e3fbc2439594822ec3ac835c1a.download.txt | cut -d' ' -f1
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke wallet.balance '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke agent.subscribe '{"task_id":"task_c766adf8fb544dafa9d4eed2fe3faeb2","run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke agent.task '{"task_id":"task_c766adf8fb544dafa9d4eed2fe3faeb2","agent_address":"logos-agent-v02-server-04535169","payment_recipient":"7wHg9sbJwc6h3NP1S9bekfAzB8CHifEcxKswCKUt3YQo","skill":"meta.status","params":{},"amount":"1","payment_mode":"public","run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ POST https://testnet.lez.logos.co/ getTransaction ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent invoke wallet.balance '{"run_id":"run_62d7e4e3fbc2439594822ec3ac835c1a"}'
+$ railway-sandbox railway-client -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/client-core --json call logos_agent status
+$ railway-sandbox railway-server -- /opt/logos/runtime/logoscore/AppRun --config-dir /opt/logos/server-core --json call logos_agent status
+$ railway-sandbox railway-client -- cat /opt/logos/client-state/logos_agent/76da487c9b14/audit.jsonl
+$ railway-sandbox railway-server -- cat /opt/logos/server-state/logos_agent/02e42d54cb5b/audit.jsonl
+$ railway-sandbox railway-client -- grep -E 'Module loaded:|logos\.test|StorageModuleImpl::(init|start)|DeliveryModuleImpl::(createNode|start)|lez_core|logos_agent' /opt/logos/client-core/core.log | tail -n 500
+$ railway-sandbox railway-server -- grep -E 'Module loaded:|logos\.test|StorageModuleImpl::(init|start)|DeliveryModuleImpl::(createNode|start)|lez_core|logos_agent' /opt/logos/server-core/core.log | tail -n 500

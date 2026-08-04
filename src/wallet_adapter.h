@@ -22,7 +22,7 @@ public:
     QJsonObject account() const;
 
 private:
-    QJsonObject parseTransferResult(const QString& response, const QString& amount, const QString& recipient);
+    QJsonObject parseTransferResult(const QString& response, const QString& amount, const QString& recipient, const QJsonObject& params);
     QStringList ownedAccountHexes(bool isPublic) const;
     QJsonArray ownedAccountsDiagnostic() const;
     bool walletOwnsAccount(const QString& accountHex, bool isPublic) const;

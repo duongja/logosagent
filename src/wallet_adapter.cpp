@@ -99,9 +99,10 @@ QJsonObject WalletAdapter::init(const QJsonObject& config)
     int rc = 0;
     if (!configPath.isEmpty() && !storagePath.isEmpty()) {
         if (walletCfg.value(QStringLiteral("create")).toBool(false)) {
-            rc = m_logos->logos_execution_zone.create_new(configPath, storagePath, password);
+            const QString created = m_logos->lez_core.create_new(configPath, storagePath, password);
+            rc = created.startsWith(QStringLiteral("Error:"), Qt::CaseInsensitive) ? 1 : 0;
         } else {
-            rc = m_logos->logos_execution_zone.open(configPath, storagePath);
+            rc = m_logos->lez_core.open(configPath, storagePath);
         }
         if (rc != 0) {
             return JsonUtils::error(QStringLiteral("wallet.open_failed"), QStringLiteral("LEZ wallet open/create failed"), QJsonObject{{QStringLiteral("code"), rc}});
@@ -112,25 +113,11 @@ QJsonObject WalletAdapter::init(const QJsonObject& config)
     QJsonObject registration;
     if (m_walletOpen) {
         const QString importPrivateKey = walletCfg.value(QStringLiteral("public_import_private_key_hex")).toString();
-        const QStringList publicAccountsBeforeImport = ownedAccountHexes(true);
         QString importedPublicAccount;
         if (!importPrivateKey.trimmed().isEmpty()) {
-            const int importRc = m_logos->logos_execution_zone.import_public_account(importPrivateKey);
-            if (importRc != 0) {
-                return JsonUtils::error(
-                    QStringLiteral("wallet.import_public_failed"),
-                    QStringLiteral("LEZ wallet public account import failed"),
-                    QJsonObject{{QStringLiteral("code"), importRc}});
-            }
-            m_logos->logos_execution_zone.save();
-
-            const QStringList publicAccountsAfterImport = ownedAccountHexes(true);
-            for (const QString& accountHex : publicAccountsAfterImport) {
-                if (!publicAccountsBeforeImport.contains(accountHex)) {
-                    importedPublicAccount = accountHex;
-                    break;
-                }
-            }
+            return JsonUtils::error(
+                QStringLiteral("wallet.import_public_unsupported"),
+                QStringLiteral("LEZ Core v0.2 does not expose private-key import; provision the wallet storage before starting the agent"));
         }
 
         const QString configuredAccount = walletCfg.value(QStringLiteral("public_import_account")).toString();
@@ -164,13 +151,13 @@ QJsonObject WalletAdapter::init(const QJsonObject& config)
             const QString type = walletCfg.value(QStringLiteral("create_agent_account_type")).toString(QStringLiteral("private"));
             const bool isPublic = type == QStringLiteral("public");
             const QString account = isPublic
-                ? m_logos->logos_execution_zone.create_account_public()
-                : m_logos->logos_execution_zone.create_account_private();
+                ? m_logos->lez_core.create_account_public()
+                : m_logos->lez_core.create_account_private();
             if (!account.isEmpty()) {
                 setAgentAccount(account, isPublic);
                 if (isPublic && walletCfg.value(QStringLiteral("register_agent_account")).toBool(false)) {
                     sync();
-                    const QJsonObject result = parseFfiResult(m_logos->logos_execution_zone.register_public_account(account));
+                    const QJsonObject result = parseFfiResult(m_logos->lez_core.register_public_account(account));
                     QJsonObject tx{
                         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
                         {QStringLiteral("type"), QStringLiteral("wallet.register_public_account")},
@@ -220,7 +207,7 @@ QJsonObject WalletAdapter::balance()
             normalizeErr.isEmpty() ? QStringLiteral("agent LEZ account is not configured") : normalizeErr);
     }
     sync();
-    const QString bal = m_logos->logos_execution_zone.get_balance(accountId, agentAccountIsPublic());
+    const QString bal = m_logos->lez_core.get_balance(accountId, agentAccountIsPublic());
     return JsonUtils::ok(QJsonObject{
         {QStringLiteral("account"), accountId},
         {QStringLiteral("is_public"), agentAccountIsPublic()},
@@ -276,7 +263,7 @@ QJsonObject WalletAdapter::send(const QJsonObject& params)
                     {QStringLiteral("wallet_accounts"), ownedAccountsDiagnostic()}
                 });
         }
-        response = m_logos->logos_execution_zone.transfer_public(fromForFfi, recipientForFfi, amountHex);
+        response = m_logos->lez_core.transfer_public(fromForFfi, recipientForFfi, amountHex);
     } else if (mode == QStringLiteral("private")) {
         QString keysPayload = recipient;
         if (!keysPayload.trimmed().startsWith(QLatin1Char('{'))) {
@@ -284,35 +271,35 @@ QJsonObject WalletAdapter::send(const QJsonObject& params)
             if (recipientForFfi.isEmpty()) {
                 return JsonUtils::error(QStringLiteral("wallet.invalid_recipient"), normalizeErr);
             }
-            const QString resolved = m_logos->logos_execution_zone.get_private_account_keys(recipientForFfi);
+            const QString resolved = m_logos->lez_core.get_private_account_keys(recipientForFfi);
             if (!resolved.isEmpty()) {
                 keysPayload = resolved;
             }
         }
-        response = m_logos->logos_execution_zone.transfer_private(fromForFfi, keysPayload, amountHex);
+        response = m_logos->lez_core.transfer_private(fromForFfi, keysPayload, amountHex);
     } else if (mode == QStringLiteral("shielded")) {
-        response = m_logos->logos_execution_zone.transfer_shielded(fromForFfi, recipient, amountHex);
+        response = m_logos->lez_core.transfer_shielded(fromForFfi, recipient, amountHex);
     } else if (mode == QStringLiteral("deshielded")) {
         const QString recipientForFfi = normalizeAccountIdForFfi(recipient, &normalizeErr);
         if (recipientForFfi.isEmpty()) {
             return JsonUtils::error(QStringLiteral("wallet.invalid_recipient"), normalizeErr);
         }
-        response = m_logos->logos_execution_zone.transfer_deshielded(fromForFfi, recipientForFfi, amountHex);
+        response = m_logos->lez_core.transfer_deshielded(fromForFfi, recipientForFfi, amountHex);
     } else if (mode == QStringLiteral("shielded_owned")) {
         const QString recipientForFfi = normalizeAccountIdForFfi(recipient, &normalizeErr);
         if (recipientForFfi.isEmpty()) {
             return JsonUtils::error(QStringLiteral("wallet.invalid_recipient"), normalizeErr);
         }
-        response = m_logos->logos_execution_zone.transfer_shielded_owned(fromForFfi, recipientForFfi, amountHex);
+        response = m_logos->lez_core.transfer_shielded_owned(fromForFfi, recipientForFfi, amountHex);
     } else {
         const QString recipientForFfi = normalizeAccountIdForFfi(recipient, &normalizeErr);
         if (recipientForFfi.isEmpty()) {
             return JsonUtils::error(QStringLiteral("wallet.invalid_recipient"), normalizeErr);
         }
-        response = m_logos->logos_execution_zone.transfer_private_owned(fromForFfi, recipientForFfi, amountHex);
+        response = m_logos->lez_core.transfer_private_owned(fromForFfi, recipientForFfi, amountHex);
     }
 
-    return parseTransferResult(response, amount, recipient);
+    return parseTransferResult(response, amount, recipient, params);
 }
 
 QJsonObject WalletAdapter::history() const
@@ -331,14 +318,14 @@ QJsonObject WalletAdapter::sync()
     if (!m_walletOpen) {
         return JsonUtils::error(QStringLiteral("wallet.not_open"), QStringLiteral("LEZ wallet is not open"));
     }
-    const int current = m_logos->logos_execution_zone.get_current_block_height();
+    const int current = m_logos->lez_core.get_current_block_height();
     int rc = 0;
     if (current > 0) {
-        rc = m_logos->logos_execution_zone.sync_to_block(QString::number(current));
+        rc = m_logos->lez_core.sync_to_block(current);
     }
     return JsonUtils::ok(QJsonObject{
         {QStringLiteral("current_block_height"), current},
-        {QStringLiteral("last_synced_block"), m_logos->logos_execution_zone.get_last_synced_block()},
+        {QStringLiteral("last_synced_block"), m_logos->lez_core.get_last_synced_block()},
         {QStringLiteral("sync_code"), rc}
     });
 }
@@ -351,7 +338,7 @@ QJsonObject WalletAdapter::account() const
     };
 }
 
-QJsonObject WalletAdapter::parseTransferResult(const QString& response, const QString& amount, const QString& recipient)
+QJsonObject WalletAdapter::parseTransferResult(const QString& response, const QString& amount, const QString& recipient, const QJsonObject& params)
 {
     QJsonObject parsed = parseFfiResult(response);
 
@@ -363,6 +350,12 @@ QJsonObject WalletAdapter::parseTransferResult(const QString& response, const QS
         {QStringLiteral("spending_controlled"), true},
         {QStringLiteral("result"), parsed}
     };
+    if (params.contains(QStringLiteral("run_id"))) {
+        tx.insert(QStringLiteral("run_id"), params.value(QStringLiteral("run_id")));
+    }
+    if (params.contains(QStringLiteral("invocation_id"))) {
+        tx.insert(QStringLiteral("invocation_id"), params.value(QStringLiteral("invocation_id")));
+    }
     if (m_state) {
         m_state->addTransaction(tx);
         m_state->save();
@@ -382,7 +375,7 @@ QStringList WalletAdapter::ownedAccountHexes(bool isPublic) const
     if (!m_logos || !m_walletOpen) {
         return accounts;
     }
-    const QJsonArray listed = m_logos->logos_execution_zone.list_accounts();
+    const QJsonArray listed = QJsonArray::fromVariantList(m_logos->lez_core.list_accounts());
     for (const QJsonValue& value : listed) {
         const QJsonObject account = value.toObject();
         if (account.value(QStringLiteral("is_public")).toBool(false) != isPublic) {
@@ -402,14 +395,14 @@ QJsonArray WalletAdapter::ownedAccountsDiagnostic() const
     if (!m_logos || !m_walletOpen) {
         return out;
     }
-    const QJsonArray listed = m_logos->logos_execution_zone.list_accounts();
+    const QJsonArray listed = QJsonArray::fromVariantList(m_logos->lez_core.list_accounts());
     for (const QJsonValue& value : listed) {
         const QJsonObject account = value.toObject();
         QJsonObject item = account;
         const QString accountHex = normalizeHexBytes32(account.value(QStringLiteral("account_id")).toString());
         if (!accountHex.isEmpty()) {
             item.insert(QStringLiteral("account_id"), accountHex);
-            const QString base58 = m_logos->logos_execution_zone.account_id_to_base58(accountHex);
+            const QString base58 = m_logos->lez_core.account_id_to_base58(accountHex);
             if (!base58.isEmpty()) {
                 item.insert(QStringLiteral("account"), base58);
             }
@@ -452,7 +445,7 @@ QJsonObject WalletAdapter::setAgentAccount(const QString& accountHex, bool isPub
     }
     QJsonObject nextConfig = m_state->config();
     QJsonObject identity = nextConfig.value(QStringLiteral("identity")).toObject();
-    const QString address = m_logos ? m_logos->logos_execution_zone.account_id_to_base58(accountHex) : QString();
+    const QString address = m_logos ? m_logos->lez_core.account_id_to_base58(accountHex) : QString();
     identity.insert(QStringLiteral("lez_account"), address.isEmpty() ? accountHex : address);
     identity.insert(QStringLiteral("lez_account_hex"), accountHex);
     identity.insert(QStringLiteral("lez_account_is_public"), isPublic);
@@ -486,7 +479,7 @@ QString WalletAdapter::normalizeAccountIdForFfi(const QString& account, QString*
         return normalizeHexBytes32(stripped);
     }
 
-    const QString converted = m_logos->logos_execution_zone.account_id_from_base58(stripped);
+    const QString converted = m_logos->lez_core.account_id_from_base58(stripped);
     if (converted.isEmpty()) {
         if (errorMessage) {
             *errorMessage = QStringLiteral("account id must be a 32-byte hex value or a valid LEZ base58 address");

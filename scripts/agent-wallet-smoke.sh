@@ -77,7 +77,7 @@ if [ ! -x "$LOGOSCORE" ]; then
   echo "logoscore not found or not executable: $LOGOSCORE" >&2
   exit 1
 fi
-for module in logos_execution_zone logos_agent; do
+for module in lez_core logos_agent; do
   if [ ! -d "$MODULES_DIR/$module" ]; then
     echo "missing module under modules dir: $MODULES_DIR/$module" >&2
     exit 1
@@ -251,7 +251,7 @@ prepare_wallet_files() {
 }
 
 write_config() {
-  python3 - "$CONFIG_JSON" "$RUN_ROOT" "$WALLET_DIR" "$FROM_ADDRESS" "$FROM_PRIVATE_KEY_HEX" "$POLICY_LIMIT" <<'PY'
+  python3 - "$CONFIG_JSON" "$RUN_ROOT" "$WALLET_DIR" "$POLICY_LIMIT" <<'PY'
 import json
 import pathlib
 import sys
@@ -259,15 +259,11 @@ import sys
 path = pathlib.Path(sys.argv[1])
 run_root = pathlib.Path(sys.argv[2])
 wallet_dir = pathlib.Path(sys.argv[3])
-from_address = sys.argv[4]
-from_private_key = sys.argv[5]
-policy_limit = sys.argv[6]
+policy_limit = sys.argv[4]
 config = {
     "identity": {
         "agent_id": "wallet-smoke-agent",
         "messaging_address": "wallet-smoke-agent",
-        "lez_account": from_address,
-        "lez_account_is_public": True,
     },
     "persistence_path": str(run_root / "agent-state"),
     "policy": {
@@ -284,12 +280,27 @@ config = {
         "storage_path": str(wallet_dir / "storage.json"),
         "password": "wallet-smoke",
         "create": True,
-        "public_import_account": from_address,
-        "public_import_private_key_hex": from_private_key,
-        "create_agent_account": False,
+        "create_agent_account": True,
+        "create_agent_account_type": "public",
+        "register_agent_account": True,
     },
 }
 path.write_text(json.dumps(config, separators=(",", ":")))
+PY
+}
+
+wallet_account_from_start() {
+  python3 - "$1" <<'PY'
+import json
+import pathlib
+import sys
+
+payload = json.loads(pathlib.Path(sys.argv[1]).read_text())
+account = payload.get("adapters", {}).get("wallet", {}).get("account", {})
+value = account.get("account") if isinstance(account, dict) else None
+if not isinstance(value, str) or not value:
+    raise SystemExit(f"wallet start result did not contain an account: {json.dumps(payload, indent=2)[:1600]}")
+print(value)
 PY
 }
 
@@ -593,11 +604,10 @@ normalize_public_address() {
 topup_sender() {
   local funded_address
   funded_address="$(normalize_public_address "$FROM_ADDRESS")"
-  (
-    cd "$SCAFFOLD_PROJECT"
-    LOGOS_BLOCKCHAIN_CIRCUITS="$LOGOS_BLOCKCHAIN_CIRCUITS" \
-      "$SCAFFOLD_BIN" wallet topup --json "$funded_address"
-  ) >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
+  "$ROOT/scripts/v02-local-faucet.sh" \
+    --scaffold-project "$SCAFFOLD_PROJECT" \
+    --address "$funded_address" \
+    >"$RUN_ROOT/wallet-topup.json" 2>"$RUN_ROOT/wallet-topup.err"
   python3 - "$RUN_ROOT/wallet-topup.json" "$funded_address" <<'PY'
 import json
 import pathlib
@@ -629,18 +639,20 @@ if [ "$START_LOCALNET" -eq 1 ]; then
   LOCALNET_STARTED=1
 fi
 wait_for_localnet
-capture_chain_balances "before_topup" "$RUN_ROOT/chain-balances-before-topup.json"
-if [ "$AUTO_TOPUP" -eq 1 ]; then
-  topup_sender
-fi
-capture_chain_balances "before_transfer_after_topup" "$RUN_ROOT/chain-balances-before-transfer.json"
 prepare_wallet_files
+
+"$ROOT/scripts/provision-v02-wallet.sh" \
+  --wallet-dir "$RUN_ROOT/recipient-wallet" \
+  --wallet-config "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" \
+  --run-root "$RUN_ROOT/provision-recipient" \
+  --agent-id wallet-smoke-recipient >"$RUN_ROOT/recipient-provision.json"
+TO_ADDRESS="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["account"])' "$RUN_ROOT/recipient-provision.json")"
 
 "$LOGOSCORE" --config-dir "$CORE_CFG" -D -m "$MODULES_DIR" >"$CORE_LOG" 2>&1 &
 CORE_PID=$!
 wait_for_daemon
 
-for module in logos_execution_zone logos_agent; do
+for module in lez_core logos_agent; do
   "$LOGOSCORE" --config-dir "$CORE_CFG" load-module "$module" >"$RUN_ROOT/load-$module.out"
 done
 
@@ -652,6 +664,13 @@ assert_json_ok "$RUN_ROOT/init.json" "init"
 call_agent start >"$RUN_ROOT/start.json"
 assert_json_ok "$RUN_ROOT/start.json" "start"
 assert_wallet_open "$RUN_ROOT/start.json"
+FROM_ADDRESS="$(wallet_account_from_start "$RUN_ROOT/start.json")"
+
+capture_chain_balances "before_topup" "$RUN_ROOT/chain-balances-before-topup.json"
+if [ "$AUTO_TOPUP" -eq 1 ]; then
+  topup_sender
+fi
+capture_chain_balances "before_transfer_after_topup" "$RUN_ROOT/chain-balances-before-transfer.json"
 
 call_agent invoke meta.configure '{"key":"policy","value":{"per_transaction_limit":"0","period_limit":"0","period_seconds":86400}}' >"$RUN_ROOT/policy-zero.json"
 assert_json_ok "$RUN_ROOT/policy-zero.json" "meta.configure policy zero"

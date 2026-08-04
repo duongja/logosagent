@@ -4,7 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CLI="$ROOT/cli/logos-agent-cli"
 WORK="$ROOT/.local/demo"
-LGX="$ROOT/result/logos-logos_agent-module-lib.lgx"
+LGX="$ROOT/.local/logos-agent-v020-portable-result/logos-logos_agent-module-lib.lgx"
 
 rm -rf "$WORK"
 mkdir -p "$WORK"
@@ -54,7 +54,7 @@ if [ -f "$LGX" ]; then
   ls -lh "$LGX"
 else
   echo "LGX not found at $LGX"
-  echo "Build it with: nix build --impure .#lgx -L"
+  echo "LGX is built and installed by ./scripts/prepare-v02-runtime.sh"
 fi
 
 cat <<EOF
@@ -64,8 +64,8 @@ Created demo workspace under:
   $WORK/agent-blockchain/agent-config.json
 
 For live Logos Core execution, build/install the LGX and run three isolated logoscore daemons:
-  nix build --impure .#lgx -L
-  lgpm --modules-dir ./modules install --file ./result/logos-logos_agent-module-lib.lgx
+  ./scripts/prepare-v02-runtime.sh
+  lgpm --modules-dir ./modules install --file ./.local/logos-agent-v020-portable-result/logos-logos_agent-module-lib.lgx
 
 Then initialize each daemon with its config and run:
   ./cli/logos-agent-cli --config-dir .local/core-storage init @$WORK/agent-storage/agent-config.json

@@ -1,5 +1,9 @@
 # LP-0008 Prize Submission Dossier
 
+> **Current resubmission map:** the authoritative integrated public proof is
+> `evidence/current/testnet-v02/`. Older hosted LEZ hashes retained below are
+> standalone historical evidence, not agent-on-testnet proof.
+
 This file is the public, committed review map for the current submission state.
 It avoids raw `.local` runtime state, wallet storage, and other local secrets.
 
@@ -35,20 +39,19 @@ the current sanitized evidence view:
 
 ## Hosted-Testnet Evidence
 
-Current hosted-testnet evidence was refreshed on 2026-07-01 after Logos
-announced the final LEZ `v0.2.0` tag. The run used LEZ commit
-`a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a` with `RISC0_DEV_MODE=0`.
-See `docs/testnet-v020-final-evidence-20260701.md`.
+The current integrated proof was captured on 2026-08-03 UTC with two isolated
+agents, Delivery and Storage on `logos.test`, LEZ Core `0.2.0`, and
+`logos_agent` `0.2.0`. It is independently validated from
+`evidence/current/testnet-v02/summary.json`.
 
 | Operation | Tx Hash | Status |
 | --- | --- | --- |
-| `wallet.send` | `7bdeea835624591f222da7ece3d6a58f3663d5e943ee28f57d0ab35c37824de1` | confirmed by transaction lookup and balance deltas: sender `10000 -> 9999`, recipient `20000 -> 20001` |
-| `agent.task` payment leg | `3d2d8a20b07c2df742078fbefdc18c6eb2e483e3ef9468681686e67f4d213894` | confirmed by transaction lookup and balance deltas: payer `9999 -> 9998`, recipient `20001 -> 20002` |
-| `program.deploy` | `e9c0d01039e9ccb1b4c3ab915b263a6b4a6c5b8244737bb063b33282093a7d02` | `hello_world_with_authorization.bin` deployment confirmed by hosted-testnet RPC lookup |
-| `program.call` | `ee2c922038fa225bb13d9dba9b8a9f63d48ccf23b8c1c6bd4ef1cb534f261e9f` | stable wallet-facade call to `authenticated_transfer` confirmed by transaction lookup and account nonce `1` |
+| `agent.task` payment through `logos_agent` | `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea` | direct `getTransaction` result; payer `7369 -> 7368`; task `task_c766adf8fb544dafa9d4eed2fe3faeb2` reached `TASK_STATE_COMPLETED` |
+| Storage upload/download | N/A | content address `zDvZRwzmAaw9AK9WMFPcWzhNKwHW4EdtuP62k5troeudkbCNRNvN`; matching plaintext SHA-256 `2e36f5d965e6b5eb6fae2fcfcb41976d274922ad0cbd872e83e1ea1df75d0f35` |
+| Delivery discovery/task/status | N/A | signed server Agent Card discovered by the client; task and terminal status crossed public `logos.test` topics |
 
-The June 26 `v0.2.0-rc5` hashes and June 19 pre-v0.2 hashes are retained in
-separate evidence docs as historical context only.
+The July standalone LEZ `v0.2.0`, June `v0.2.0-rc5`, and pre-v0.2 hashes are
+retained in separate evidence docs as historical context only.
 
 ## Narrated Demo Videos
 
@@ -58,10 +61,10 @@ separate evidence docs as historical context only.
 | Video 2 | Basecamp owner-to-agent Chat flow and owner-channel skill calls | https://www.youtube.com/watch?v=nS8928doTkE |
 | Video 3 | Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations | https://www.youtube.com/watch?v=hxRQejaBhxo |
 
-These videos demonstrate the implementation and end-to-end flows. They were
-recorded before the final hosted-testnet evidence refresh, so
-`docs/testnet-v020-final-evidence-20260701.md` is the source of truth for the
-current LEZ `v0.2.0` tx hashes.
+These videos demonstrate the earlier implementation and local end-to-end flows.
+They predate the integrated two-agent public proof, so
+`evidence/current/testnet-v02/` is the source of truth for current Testnet v0.2
+agent activity and transaction identifiers.
 
 ## Local Proof Highlights
 
@@ -82,9 +85,9 @@ current LEZ `v0.2.0` tx hashes.
 
 ## Known Scope Boundaries
 
-- The hosted-testnet A2A evidence proves the LEZ payment leg for a priced A2A
-  task. The full two-agent Delivery transport proof is localnet headless
-  evidence and should be shown in the final narrated recording.
+- The current hosted-testnet evidence proves signed Agent Card discovery, a
+  paid A2A task and terminal status over Delivery, Storage round-trip, and LEZ
+  confirmation through two running `logos_agent` modules.
 - The three-agent deployment evidence is headless CLI evidence. Basecamp
   owner-chat evidence is now captured separately with a headless agent and the
   Basecamp owner app.
@@ -102,4 +105,5 @@ current LEZ `v0.2.0` tx hashes.
 
 See `docs/manual-intervention-checklist.md`. In short:
 
-- Official clean package build on stable hardware or CI.
+- Record and publish the replacement continuous public-testnet demo.
+- Push the workflows and link the first public passing local E2E Actions run.

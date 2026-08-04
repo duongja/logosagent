@@ -103,7 +103,7 @@ logos_agent LGX not found at:
   $LGX
 
 Build it first:
-  nix build --impure .#lgx -L
+  nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L
 
 Or package the already installed local dev module:
   ./scripts/package-dev-lgx.sh

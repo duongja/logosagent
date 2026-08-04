@@ -1,5 +1,11 @@
 # Logos Agent Module
 
+> **Resubmission status:** this repository targets the integrated Logos Testnet
+> v0.2 stack. Earlier hosted LEZ hashes are wallet/program evidence, not proof
+> that `logos_agent` ran on testnet. The current correlated public proof is in
+> [evidence/current/testnet-v02](evidence/current/testnet-v02); see
+> [docs/v02-resubmission-status.md](docs/v02-resubmission-status.md) for scope.
+
 This repository is the LP-0008 implementation workspace for a Logos Core module
 that runs an autonomous agent with:
 
@@ -19,7 +25,7 @@ Current implementation:
 - Core module scaffold: `logos_agent`
 - Default LP-0008 skills registered behind `invoke(skill, paramsJson)`
 - Durable JSON state under the module instance persistence path
-- Wallet adapter using `logos_execution_zone`
+- Wallet adapter using the v0.2 `lez_core` module
 - Storage adapter using `storage_module`
 - Owner messaging adapter using `chat_module`
 - A2A/group transport using `delivery_module`
@@ -42,14 +48,27 @@ Known pre-submission gaps:
 - Chat groups are not exposed by `logos-chat-module`; group skills use Delivery
   topics and document that transport binding.
 
+## v0.2 Review Entrypoints
+
+```bash
+./demo.sh
+./demo.sh --verify-testnet-evidence
+./demo.sh --testnet --config /secure/testnet-v02.json
+```
+
+The default command executes local module flows. Public evidence is valid only
+when `scripts/verify-evidence.py` accepts one correlated `logos.test` run.
+The committed current bundle passes that validator and includes confirmed LEZ
+transaction `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`.
+
 ## Build
 
 With Logos tooling and Nix installed:
 
 ```bash
-nix build --impure .#unit-tests-fast -L
-nix build --impure .#unit-tests -L
-nix build --impure .#lgx -L
+nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L
+nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests -L
+nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L
 ```
 
 `unit-tests-fast` validates the local agent state, policy, amount encoding, and
@@ -167,7 +186,7 @@ prove the real `lgpm` profile install layer without building the Basecamp GUI.
 For the required three-agent prize deployment profiles, run:
 
 ```bash
-./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.dev
+./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.test
 ```
 
 For prize packaging status, see

@@ -9,10 +9,6 @@ on:
         description: "Run the full Logos dependency/package build"
         required: false
         default: "false"
-      localnet_integration:
-        description: "Run the standalone LEZ localnet integration harness"
-        required: false
-        default: "false"
 
 jobs:
   smoke:
@@ -39,7 +35,7 @@ jobs:
         run: ./scripts/bootstrap-workspace.sh
 
       - name: Run fast C++ tests
-        run: nix build --impure .#unit-tests-fast -L
+        run: nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L
 
   nix-full:
     runs-on: ubuntu-24.04
@@ -56,18 +52,28 @@ jobs:
         run: ./scripts/bootstrap-workspace.sh
 
       - name: Run full Logos module tests
-        run: nix build --impure .#unit-tests -L
+        run: nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests -L
 
       - name: Build LGX package
-        run: nix build --impure .#lgx -L
+        run: nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L
 
-  localnet-integration:
+  local-e2e:
     runs-on: ubuntu-24.04
-    if: github.event_name == 'workflow_dispatch' && inputs.localnet_integration == 'true'
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
       - uses: dtolnay/rust-toolchain@stable
+
+      - uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+
+      - name: Install official Logos v0.2 tools
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/logos-co/logos-docs/main/resources/scripts/install-node-tools.sh | sh
+          echo "$PWD/bin" >> "$GITHUB_PATH"
 
       - name: Bootstrap Logos workspace
         run: ./scripts/bootstrap-workspace.sh
@@ -76,5 +82,31 @@ jobs:
         run: cargo build --release --bin logos-scaffold
         working-directory: ../scaffold
 
-      - name: Run localnet integration harness
-        run: SCAFFOLD_BIN=../scaffold/target/release/logos-scaffold ./scripts/localnet-integration.sh --setup --prebuilt
+      - name: Prepare released v0.2 modules
+        run: ./scripts/prepare-v02-runtime.sh
+
+      - name: Run local two-agent E2E
+        env:
+          SCAFFOLD_BIN: ../scaffold/target/release/logos-scaffold
+          MODULES_DIR: ${{ github.workspace }}/.local/live-modules-v02
+        run: ./scripts/ci-local-e2e.sh
+
+      - name: Upload E2E evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-e2e-evidence
+          path: .local/ci-e2e
+          if-no-files-found: error
+          include-hidden-files: true
+
+      - name: Upload dependency and LGX locks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v02-dependencies-and-lgx
+          path: |
+            dependencies-v0.2.json
+            .local/dependencies-v0.2.resolved.json
+            .local/logos-agent-v020-portable-result/*.lgx
+          include-hidden-files: true

@@ -54,6 +54,7 @@ require_file LICENSE
 require_file README.md
 require_file metadata.json
 require_file module.json
+require_file dependencies-v0.2.json
 require_file demo.sh
 require_file docs/architecture.md
 require_file docs/skill-interface.md
@@ -97,12 +98,17 @@ bash -n \
   scripts/package-dev-lgx.sh \
   scripts/prepare-three-agent-deployment.sh \
   scripts/repair-live-modules.sh \
-  scripts/preflight-submission.sh
+  scripts/preflight-submission.sh \
+  scripts/prepare-v02-runtime.sh \
+  scripts/provision-v02-wallet.sh \
+  scripts/v02-local-faucet.sh \
+  scripts/ci-local-e2e.sh
 
 (cd agent_lez && cargo fmt --check && cargo check --locked)
 
 ./scripts/demo-local.sh
-./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.dev >/dev/null
+./scripts/test-evidence-validator.py
+./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.test >/dev/null
 ./scripts/create-submission-bundle.py --out-dir .local/preflight-submission-bundle >/dev/null
 
 if [ "$RUN_PACKAGE_DEV" -eq 1 ]; then
@@ -112,9 +118,9 @@ if [ "$RUN_PACKAGE_DEV" -eq 1 ]; then
 fi
 
 if [ "$RUN_FULL" -eq 1 ]; then
-  nix build --impure .#unit-tests-fast -L
-  nix build --impure .#unit-tests -L
-  nix build --impure .#lgx -L
+  nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests-fast -L
+  nix build --impure --no-write-lock-file --recreate-lock-file .#unit-tests -L
+  nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L
 fi
 
 if [ "$RUN_LOCALNET" -eq 1 ]; then

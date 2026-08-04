@@ -5,7 +5,9 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#include <QJsonDocument>
 #include <QMutexLocker>
+#include <QSet>
 
 namespace {
 
@@ -37,6 +39,51 @@ QJsonObject mergeObjects(QJsonObject base, const QJsonObject& overlay)
     return base;
 }
 
+bool isSecretAuditKey(QString key)
+{
+    key = key.toLower().replace(QLatin1Char('-'), QLatin1Char('_'));
+    static const QSet<QString> forbidden{
+        QStringLiteral("a2a_secret"),
+        QStringLiteral("api_key"),
+        QStringLiteral("file_key"),
+        QStringLiteral("key_hex"),
+        QStringLiteral("mnemonic"),
+        QStringLiteral("params"),
+        QStringLiteral("password"),
+        QStringLiteral("payload"),
+        QStringLiteral("plaintext"),
+        QStringLiteral("private_key"),
+        QStringLiteral("private_key_hex"),
+        QStringLiteral("seed"),
+        QStringLiteral("token"),
+        QStringLiteral("wallet_password"),
+        QStringLiteral("wallet_secret")
+    };
+    return forbidden.contains(key);
+}
+
+QJsonValue sanitizeAuditValue(const QJsonValue& value)
+{
+    if (value.isObject()) {
+        QJsonObject sanitized;
+        const QJsonObject object = value.toObject();
+        for (auto it = object.constBegin(); it != object.constEnd(); ++it) {
+            if (!isSecretAuditKey(it.key())) {
+                sanitized.insert(it.key(), sanitizeAuditValue(it.value()));
+            }
+        }
+        return sanitized;
+    }
+    if (value.isArray()) {
+        QJsonArray sanitized;
+        for (const QJsonValue& item : value.toArray()) {
+            sanitized.append(sanitizeAuditValue(item));
+        }
+        return sanitized;
+    }
+    return value;
+}
+
 } // namespace
 
 void AgentState::setPersistencePath(const QString& path)
@@ -56,6 +103,12 @@ QString AgentState::stateFilePath() const
 {
     QMutexLocker lock(&m_mutex);
     return m_persistencePath + QStringLiteral("/state.json");
+}
+
+QString AgentState::auditFilePath() const
+{
+    QMutexLocker lock(&m_mutex);
+    return m_persistencePath + QStringLiteral("/audit.jsonl");
 }
 
 bool AgentState::load(QString* errorMessage)
@@ -355,6 +408,35 @@ void AgentState::addReplayNonce(const QString& scope, const QString& nonce, cons
         arr.removeLast();
     }
     m_state.insert(QStringLiteral("replay_nonces"), arr);
+}
+
+bool AgentState::appendAuditEvent(const QJsonObject& event, QString* errorMessage) const
+{
+    QMutexLocker lock(&m_mutex);
+    if (m_persistencePath.isEmpty()) {
+        if (errorMessage) {
+            *errorMessage = QStringLiteral("persistence path is not configured");
+        }
+        return false;
+    }
+    QDir().mkpath(m_persistencePath);
+    QFile file(m_persistencePath + QStringLiteral("/audit.jsonl"));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        if (errorMessage) {
+            *errorMessage = file.errorString();
+        }
+        return false;
+    }
+    const QJsonObject sanitized = sanitizeAuditValue(event).toObject();
+    QByteArray line = QJsonDocument(sanitized).toJson(QJsonDocument::Compact);
+    line.append('\n');
+    if (file.write(line) != line.size()) {
+        if (errorMessage) {
+            *errorMessage = file.errorString();
+        }
+        return false;
+    }
+    return true;
 }
 
 QJsonObject AgentState::toJson() const

@@ -3,7 +3,7 @@
 `logos_agent` is a Logos Core module. It is built as a Qt plugin, loaded by
 Logos Core, and depends on existing Core modules:
 
-- `logos_execution_zone` for LEZ account and token operations,
+- `lez_core` for LEZ account and token operations,
 - `storage_module` for Logos Storage,
 - `chat_module` for owner private chat,
 - `delivery_module` for pub/sub discovery, groups, and A2A task transport.

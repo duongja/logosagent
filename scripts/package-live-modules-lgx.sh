@@ -12,7 +12,7 @@ modules=(
   delivery_module
   storage_module
   chat_module
-  logos_execution_zone
+  lez_core
   logos_agent
 )
 

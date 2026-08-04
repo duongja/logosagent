@@ -12,6 +12,7 @@ public:
     void setPersistencePath(const QString& path);
     QString persistencePath() const;
     QString stateFilePath() const;
+    QString auditFilePath() const;
 
     bool load(QString* errorMessage = nullptr);
     bool save(QString* errorMessage = nullptr) const;
@@ -47,6 +48,8 @@ public:
     QJsonArray replayNonces() const;
     bool hasReplayNonce(const QString& scope, const QString& nonce) const;
     void addReplayNonce(const QString& scope, const QString& nonce, const QString& createdAt);
+
+    bool appendAuditEvent(const QJsonObject& event, QString* errorMessage = nullptr) const;
 
     QJsonObject toJson() const;
 

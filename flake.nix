@@ -16,6 +16,14 @@
     nixpkgs.follows = "logos-nix/nixpkgs";
     logos-cpp-sdk.url = "path:/home/agate/Projects/logos/logos-cpp-sdk";
     logos-cpp-sdk.inputs.logos-nix.follows = "logos-nix";
+    logos-protocol.url = "github:logos-co/logos-protocol/d5d58e7e230768505c683150f651358612abd442";
+    logos-protocol.inputs.logos-nix.follows = "logos-nix";
+    logos-protocol.inputs.nixpkgs.follows = "nixpkgs";
+    logos-qt-sdk.url = "github:logos-co/logos-qt-sdk/6c9a0de131fee6a0fa2edff924913bb76caf0316";
+    logos-qt-sdk.inputs.logos-nix.follows = "logos-nix";
+    logos-qt-sdk.inputs.nixpkgs.follows = "nixpkgs";
+    logos-qt-sdk.inputs.logos-cpp-sdk.follows = "logos-cpp-sdk";
+    logos-qt-sdk.inputs.logos-protocol.follows = "logos-protocol";
     logos-module.url = "path:/home/agate/Projects/logos/logos-module";
     logos-module.inputs.logos-nix.follows = "logos-nix";
     logos-plugin-qt.url = "path:/home/agate/Projects/logos/logos-plugin-qt";
@@ -48,6 +56,8 @@
     logos-test-framework.url = "path:/home/agate/Projects/logos/logos-test-framework";
     logos-test-framework.inputs.logos-nix.follows = "logos-nix";
     logos-test-framework.inputs.logos-cpp-sdk.follows = "logos-cpp-sdk";
+    logos-test-framework.inputs.logos-qt-sdk.follows = "logos-qt-sdk";
+    logos-test-framework.inputs.logos-protocol.follows = "logos-protocol";
     logos-liblogos.url = "path:/home/agate/Projects/logos/logos-liblogos";
     logos-liblogos.inputs.logos-nix.follows = "logos-nix";
     logos-liblogos.inputs.logos-cpp-sdk.follows = "logos-cpp-sdk";
@@ -71,27 +81,18 @@
     logos-view-module-runtime.inputs.logos-cpp-sdk.follows = "logos-cpp-sdk";
     logos-qt-mcp.url = "path:/home/agate/Projects/logos/logos-qt-mcp";
     logos-qt-mcp.inputs.logos-nix.follows = "logos-nix";
-    logos_execution_zone.url = "path:/home/agate/Projects/logos/logos-execution-zone-module";
+    lez_core.url = "github:logos-blockchain/logos-execution-zone-module/92dd9e25bcc6be04f841671e8da7b94bd2449f39";
     storage_module.url = "path:/home/agate/Projects/logos/logos-storage-module";
     chat_module.url = "path:/home/agate/Projects/logos/logos-chat-module";
     delivery_module.url = "path:/home/agate/Projects/logos/logos-delivery-module";
-    logos_execution_zone.inputs.logos-module-builder.follows = "logos-module-builder";
-    logos_execution_zone.inputs.nix-bundle-lgx.follows = "nix-bundle-lgx";
-    logos_execution_zone.inputs.logos-execution-zone.follows = "logos-execution-zone-src";
+    lez_core.inputs.logos-module-builder.follows = "logos-module-builder";
+    lez_core.inputs.nix-bundle-lgx.follows = "nix-bundle-lgx";
     storage_module.inputs.logos-module-builder.follows = "logos-module-builder";
     storage_module.inputs.logos-storage.follows = "logos-storage-src";
     chat_module.inputs.logos-module-builder.follows = "logos-module-builder";
-    chat_module.inputs.nix-bundle-lgx.follows = "nix-bundle-lgx";
-    chat_module.inputs.logos-chat.follows = "logos-chat-src";
     delivery_module.inputs.logos-module-builder.follows = "logos-module-builder";
     delivery_module.inputs.nix-bundle-lgx.follows = "nix-bundle-lgx";
     delivery_module.inputs.logos-delivery.follows = "logos-delivery-src";
-    logos-execution-zone-src.url = "path:/home/agate/Projects/logos/logos-execution-zone";
-    logos-execution-zone-src.inputs.logos-liblogos.follows = "logos-liblogos";
-    logos-execution-zone-src.inputs.rust-overlay.follows = "rust-overlay";
-    logos-execution-zone-src.inputs.crane.follows = "crane";
-    logos-execution-zone-src.inputs.logos-blockchain-circuits.follows = "logos-blockchain-circuits";
-    logos-blockchain-circuits.url = "path:./nix/logos-blockchain-circuits-compat";
     logos-storage-src.url = "path:/home/agate/Projects/logos/logos-storage-nim";
     logos-storage-src.inputs.nixpkgs.follows = "nixpkgs";
     logos-chat-src.url = "git+file:///home/agate/Projects/logos/logos-chat?submodules=1";
@@ -108,7 +109,7 @@
     systems.url = "path:/home/agate/Projects/logos/nix-systems-default";
   };
 
-  outputs = inputs@{ logos-module-builder, nixpkgs, logos-cpp-sdk, logos-test-framework, ... }:
+  outputs = inputs@{ logos-module-builder, nixpkgs, logos-cpp-sdk, logos-protocol, logos-qt-sdk, logos-test-framework, ... }:
     let
       lib = nixpkgs.lib;
       systems = [ "aarch64-darwin" "x86_64-darwin" "aarch64-linux" "x86_64-linux" ];
@@ -142,11 +143,13 @@
         let
           pkgs = import nixpkgs { inherit system; };
           logosSdk = logos-cpp-sdk.packages.${system}.default;
+          logosProtocol = logos-protocol.packages.${system}.default;
+          logosQtSdk = logos-qt-sdk.packages.${system}.default;
           testFramework = logos-test-framework.packages.${system}.default;
         in
         pkgs.stdenv.mkDerivation {
           pname = "logos-agent-fast-tests";
-          version = "0.1.0";
+          version = "0.2.0";
           src = source;
 
           nativeBuildInputs = with pkgs; [
@@ -155,12 +158,16 @@
             pkg-config
             qt6.wrapQtAppsNoGuiHook
             logosSdk
+            logosProtocol
+            logosQtSdk
           ];
 
           buildInputs = with pkgs; [
             qt6.qtbase
             qt6.qtremoteobjects
             logosSdk
+            logosProtocol
+            logosQtSdk
             testFramework
           ];
 
@@ -170,6 +177,8 @@
             runHook preBuild
             cmake -S tests -B build -GNinja \
               -DLOGOS_CPP_SDK_ROOT=${logosSdk} \
+              -DLOGOS_QT_SDK_ROOT=${logosQtSdk} \
+              -DLOGOS_PROTOCOL_ROOT=${logosProtocol} \
               -DLOGOS_TEST_FRAMEWORK_ROOT=${testFramework} \
               -DCMAKE_MODULE_PATH=${testFramework}/cmake
             cmake --build build --parallel "$NIX_BUILD_CORES"

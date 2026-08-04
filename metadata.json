@@ -1,12 +1,12 @@
 {
   "name": "logos_agent",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "core",
   "category": "agent",
   "description": "Autonomous Logos-native AI agent runtime with LEZ wallet, Storage, Messaging, and A2A-compatible coordination.",
   "main": "logos_agent_plugin",
   "dependencies": [
-    "logos_execution_zone",
+    "lez_core",
     "storage_module",
     "chat_module",
     "delivery_module"

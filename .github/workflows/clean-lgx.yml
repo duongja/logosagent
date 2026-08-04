@@ -85,7 +85,7 @@ jobs:
             echo "== LGX build attempt ${attempt} =="
             free -h | tee ".local/ci-logs/headroom-before-attempt-${attempt}.log"
             df -h / /nix 2>/dev/null | tee -a ".local/ci-logs/headroom-before-attempt-${attempt}.log" || true
-            nix build --impure .#lgx -L --max-jobs 1 --cores 1 --option sandbox false --option max-substitution-jobs 1 --option http-connections 1 2>&1 | tee ".local/ci-logs/nix-build-attempt-${attempt}.log"
+            nix build --impure --no-write-lock-file --recreate-lock-file .#lgx-portable -L --max-jobs 1 --cores 1 --option sandbox false --option max-substitution-jobs 1 --option http-connections 1 2>&1 | tee ".local/ci-logs/nix-build-attempt-${attempt}.log"
             status=${PIPESTATUS[0]}
             if [ "$status" -eq 0 ]; then
               exit 0

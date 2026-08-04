@@ -4,6 +4,12 @@ This checklist maps LP-0008 success criteria to repo assets and remaining
 evidence work. Do not mark a live-network item complete until it has a
 reproducible command transcript, tx hashes where applicable, and demo footage.
 
+> **Evidence classification:** dated June/July localnet runs, standalone LEZ
+> transactions, and the three existing videos below are historical development
+> records. They do not prove integrated agent activity on Testnet v0.2. The
+> authoritative public proof is `evidence/current/testnet-v02/` and is summarized
+> in `docs/v02-resubmission-status.md`.
+
 ## Ready In Repo
 
 - MIT license: `LICENSE`.
@@ -270,16 +276,19 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 
 ## Evidence Status
 
-- CU status is documented in `docs/cu-report.md`. Hosted-testnet tx hashes
-  exist for final `v0.2.0` `wallet.send`, `program.deploy`, `program.call`,
-  and `agent.task` payment. CU remains `TBD` because the current wallet/RPC
-  output does not expose CU fields; the report names acceptable sources for
-  replacing `TBD`.
-- Official clean-machine LGX package build. A current dev LGX exists at
-  `result/logos-logos_agent-module-lib.lgx`, produced from the locally tested
-  module payload. Before final submission, also rerun the official clean Nix
-  package path (`nix build --impure .#lgx -L`) on a machine with enough memory or
-  after cache warmup.
+- The integrated public agent proof is run
+  `run_62d7e4e3fbc2439594822ec3ac835c1a` in
+  `evidence/current/testnet-v02/`. Its paid task transaction is
+  `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`.
+  Other hosted-testnet hashes listed above are standalone historical evidence.
+- CU status is documented in `docs/cu-report.md`. CU remains `TBD` because the
+  current wallet/RPC output does not expose CU fields; the report names
+  acceptable sources for replacing `TBD`.
+- Official Testnet v0.2 portable LGX package build completed through
+  `scripts/prepare-v02-runtime.sh`. The 4,139,661-byte artifact has SHA-256
+  `5e1de2c30d40c47804c4713bd753d4ca0334ef6df7a51c11ae8a5e82d5b3c78d`
+  and manifest root
+  `d9619ba8611fefd91a3777294285508573bbe53b5ae7480f46d11d2fd26ec15b`.
 
 ## Pre-Submission Command Set
 
