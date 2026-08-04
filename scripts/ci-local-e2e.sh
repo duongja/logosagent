@@ -5,6 +5,11 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 RUN_ROOT="${RUN_ROOT:-$ROOT/.local/ci-e2e/$(date -u +%Y%m%dT%H%M%SZ)}"
 export RISC0_DEV_MODE=0
 
+# Create the artifact root before localnet setup so early failures are retained
+# by the workflow's always-run evidence upload.
+mkdir -p "$RUN_ROOT"
+exec > >(tee "$RUN_ROOT/e2e.log") 2>&1
+
 if [ -z "${LOGOSCORE:-}" ]; then
   if [ -s "$ROOT/.local/tools-v02/logoscore.path" ]; then
     LOGOSCORE="$(<"$ROOT/.local/tools-v02/logoscore.path")"
@@ -38,9 +43,6 @@ if [ ! -f "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" ] \
   || ! grep -Fq 'pin = "a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a"' "$SCAFFOLD_PROJECT/scaffold.toml"; then
   TIMEOUT_SEC=240 "$ROOT/scripts/localnet-integration.sh" --setup --prebuilt
 fi
-
-mkdir -p "$RUN_ROOT"
-exec > >(tee "$RUN_ROOT/e2e.log") 2>&1
 
 "$ROOT/scripts/check-runtime-modules.sh"
 "$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"

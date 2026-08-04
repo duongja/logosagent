@@ -75,6 +75,14 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/logos-co/logos-docs/main/resources/scripts/install-node-tools.sh | sh
           echo "$PWD/bin" >> "$GITHUB_PATH"
 
+      - name: Install pinned RISC Zero executor
+        run: |
+          cargo install --locked rzup --version 0.5.0
+          rzup install r0vm 3.0.5
+          r0vm_path="$HOME/.risc0/extensions/v3.0.5-cargo-risczero-x86_64-unknown-linux-gnu/r0vm"
+          test -x "$r0vm_path"
+          echo "RISC0_SERVER_PATH=$r0vm_path" >> "$GITHUB_ENV"
+
       - name: Bootstrap Logos workspace
         run: ./scripts/bootstrap-workspace.sh
 
