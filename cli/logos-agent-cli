@@ -122,13 +122,8 @@ def build_agent_config(args, root):
             "name": args.chat_name or args.agent_name,
             "delivery_preset": delivery_preset,
             "log_level": args.delivery_log_level.lower(),
-            "port": args.chat_port,
-            "clusterId": args.chat_cluster_id,
-            "shardId": args.chat_shard_id,
-            "staticPeers": args.chat_static_peer,
-            "create_intro_bundle": args.create_intro_bundle,
+            "publish_address": args.publish_chat_address,
             "owner_conversation_id": args.owner_conversation_id,
-            "owner_intro_bundle": args.owner_intro_bundle,
         },
         "storage": {
             "data-dir": str(root / "storage"),
@@ -249,7 +244,8 @@ def add_config_args(p, output_required=True):
     p.add_argument("--chat-cluster-id", type=int, default=2)
     p.add_argument("--chat-shard-id", type=int, default=1)
     p.add_argument("--chat-static-peer", action="append", default=[])
-    p.add_argument("--create-intro-bundle", action="store_true")
+    p.add_argument("--publish-chat-address", dest="publish_chat_address", action="store_true")
+    p.add_argument("--create-intro-bundle", dest="publish_chat_address", action="store_true", help="Deprecated alias for --publish-chat-address.")
     p.add_argument("--owner-conversation-id", default="")
     p.add_argument("--owner-intro-bundle", default="")
 

@@ -153,7 +153,7 @@ in the final recording or rerun it on the final demo host.
 ./scripts/package-live-modules-lgx.sh
 ./scripts/basecamp-owner-channel.sh --capture-only
 ./scripts/basecamp-profile-install-smoke.sh
-./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.dev
+./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.test
 ./scripts/lez-testnet-a2a-payment-evidence.sh
 ./scripts/collect-prize-evidence.py --network localnet
 ```

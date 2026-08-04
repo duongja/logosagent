@@ -195,7 +195,7 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   and a manual-only checklist under `.local/submission-bundle/<timestamp>`
   without copying wallet state.
 - Three-agent prize deployment profiles available:
-  `./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.dev`.
+  `./scripts/prepare-three-agent-deployment.sh --network testnet --delivery-preset logos.test`.
   This creates `.local/testnet-agents/latest/manifest.json` plus Storage,
   Messaging, and Blockchain agent directories with `agent-config.json` and
   `deploy.sh` wrappers.

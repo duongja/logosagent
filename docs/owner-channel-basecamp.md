@@ -7,41 +7,38 @@ for A2A discovery, group topics, and agent-to-agent task transport.
 ## Agent Config
 
 `logos-agent-cli make-config` writes a `chat` section compatible with
-`chat_module.initChat`:
+the released `chat_module` v0.2.1 `init` method:
 
 ```json
 {
   "chat": {
     "name": "Storage Agent",
-    "port": 60002,
-    "clusterId": 2,
-    "shardId": 1,
-    "staticPeers": [],
-    "create_intro_bundle": false,
-    "owner_conversation_id": "",
-    "owner_intro_bundle": ""
+    "delivery_preset": "logos.test",
+    "log_level": "info",
+    "publish_address": true,
+    "owner_conversation_id": ""
   }
 }
 ```
 
-For a real owner conversation, pass at least one Waku bootstrap ENR:
+For a real owner conversation, publish the agent's Chat installation address:
 
 ```bash
 ./cli/logos-agent-cli make-config \
   --output-dir .local/agent-a \
   --agent-name "Storage Agent" \
-  --chat-static-peer "$BOOTSTRAP_ENR" \
-  --create-intro-bundle
+  --delivery-preset logos.test \
+  --publish-chat-address
 ```
 
-The chat schema follows the current `logos-chat-module` e2e config shape:
-`name`, `port`, `clusterId`, `shardId`, and `staticPeers`.
+The adapter passes `delivery_preset` and `log_level` to Chat v0.2.1, sets the
+installation name, and exposes `get_address()` as
+`messaging.chat_address`.
 
 ## Message Format
 
-The owner sends JSON in the chat message body. The runtime accepts both direct
-JSON objects and the real `chat_module` push-event wrapper where message
-content is hex-encoded.
+The owner sends JSON in the chat message body. Chat v0.2.1 delivers the
+plain-text body through its typed `message_received` event.
 
 Skill call:
 
@@ -181,12 +178,11 @@ testnet agents and LEZ funding are ready.
 The lowest-memory way to prove the owner channel is to run the agent headless
 and use Basecamp only as the owner app:
 
-1. Start the agent with Chat enabled, `create_intro_bundle: true`, and Storage
+1. Start the agent with Chat enabled, `publish_address: true`, and Storage
    autostart disabled.
-2. Call `status()` on `logos_agent` until `messaging.chat_intro_bundle` appears.
+2. Call `status()` on `logos_agent` until `messaging.chat_address` appears.
 3. Open Basecamp as the owner.
-4. In Chat, create a private conversation by pasting the agent
-   `chat_intro_bundle`.
+4. In Chat, create a private conversation using the agent's `chat_address`.
 5. Send this message:
 
 ```json

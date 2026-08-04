@@ -33,10 +33,10 @@ listed under the open items below.
 ## Completed Package Verification
 
 The official v0.2 portable package build completed from the bootstrapped pinned
-workspace. The generated LGX is 4,139,661 bytes with SHA-256
-`5e1de2c30d40c47804c4713bd753d4ca0334ef6df7a51c11ae8a5e82d5b3c78d`.
+workspace. The generated LGX is 4,138,893 bytes with SHA-256
+`01b93371a28d00b658d0177c0e11572e5996cd1d7ca2154f4d498f7037a72db3`.
 Its manifest root is
-`d9619ba8611fefd91a3777294285508573bbe53b5ae7480f46d11d2fd26ec15b`.
+`1c7b162f7b1bed7a65c45e9fe57e3586ac05367893c3a3a1df50b709d2e7e9a0`.
 
 ## Manual/External Items Still Open
 

@@ -6,7 +6,7 @@ LOGOSCORE="${LOGOSCORE:-}"
 LGPM="${LGPM:-}"
 BASECAMP_LGX_ROOT="${BASECAMP_LGX_ROOT:-$ROOT/.local/artifacts/basecamp-lgx}"
 RUN_ROOT="${RUN_ROOT:-$ROOT/.local/owner-chat-agent/$(date -u +%Y%m%dT%H%M%SZ)-live}"
-CHAT_PORT="${CHAT_PORT:-60115}"
+DELIVERY_PRESET="${DELIVERY_PRESET:-logos.test}"
 SYSTEMD_UNIT="${SYSTEMD_UNIT:-logos-agent-owner-chat-$(date -u +%Y%m%dT%H%M%SZ)}"
 AGENT_ID="${AGENT_ID:-owner-chat-agent}"
 AGENT_NAME="${AGENT_NAME:-Owner Chat Agent}"
@@ -17,18 +17,18 @@ usage() {
 Usage: scripts/start-owner-chat-agent.sh [options]
 
 Starts a live headless logos_agent instance for the Basecamp owner-chat proof
-and prints a fresh chat intro bundle for Basecamp.
+and prints its Testnet v0.2 Chat address for Basecamp.
 
 Options:
   --run-root PATH       Output/run directory. Default: .local/owner-chat-agent/<timestamp>-live
-  --chat-port PORT      First Chat port to try. Default: 60115
+  --delivery-preset P   Chat Delivery preset. Default: logos.test
   --logoscore PATH      logoscore binary path.
   --lgpm PATH           lgpm binary path.
   --basecamp-lgx-root P Basecamp LGX artifact root. Default: .local/artifacts/basecamp-lgx
   --no-systemd          Use nohup instead of systemd-run --user.
 
 Environment variables with the same names are also supported:
-  RUN_ROOT, CHAT_PORT, LOGOSCORE, LGPM, BASECAMP_LGX_ROOT, SYSTEMD_UNIT
+  RUN_ROOT, DELIVERY_PRESET, LOGOSCORE, LGPM, BASECAMP_LGX_ROOT, SYSTEMD_UNIT
 USAGE
 }
 
@@ -40,9 +40,9 @@ while [ "$#" -gt 0 ]; do
       shift
       RUN_ROOT="${1:-}"
       ;;
-    --chat-port)
+    --delivery-preset)
       shift
-      CHAT_PORT="${1:-}"
+      DELIVERY_PRESET="${1:-}"
       ;;
     --logoscore)
       shift
@@ -139,20 +139,13 @@ done
 
 mkdir -p "$RUN_ROOT/core" "$RUN_ROOT/modules"
 
-port="$CHAT_PORT"
-if command -v ss >/dev/null 2>&1; then
-  while ss -ltn "sport = :$port" | grep -q LISTEN; do
-    port=$((port + 1))
-  done
-fi
-
 for module in "${modules[@]}"; do
   "$LGPM" --modules-dir "$RUN_ROOT/modules" install \
     --file "$BASECAMP_LGX_ROOT/$module/$module.lgx" \
     >"$RUN_ROOT/install-$module.out" 2>&1
 done
 
-python3 - "$RUN_ROOT/agent-config.json" "$RUN_ROOT" "$AGENT_ID" "$AGENT_NAME" "$AGENT_DESCRIPTION" "$port" <<'PY'
+python3 - "$RUN_ROOT/agent-config.json" "$RUN_ROOT" "$AGENT_ID" "$AGENT_NAME" "$AGENT_DESCRIPTION" "$DELIVERY_PRESET" <<'PY'
 import json
 import pathlib
 import sys
@@ -162,7 +155,7 @@ root = pathlib.Path(sys.argv[2])
 agent_id = sys.argv[3]
 agent_name = sys.argv[4]
 description = sys.argv[5]
-port = int(sys.argv[6])
+delivery_preset = sys.argv[6]
 
 config = {
     "identity": {
@@ -186,12 +179,10 @@ config = {
     "autostart_storage": False,
     "chat": {
         "name": agent_name,
-        "port": port,
-        "clusterId": 2,
-        "shardId": 1,
-        "create_intro_bundle": True,
+        "delivery_preset": delivery_preset,
+        "log_level": "info",
+        "publish_address": True,
         "owner_conversation_id": "",
-        "owner_intro_bundle": "",
     },
     "agent_card": {
         "name": agent_name,
@@ -248,11 +239,11 @@ done
 "$LOGOSCORE" --config-dir "$RUN_ROOT/core" call logos_agent start \
   >"$RUN_ROOT/start.raw.json"
 
-bundle_ready=0
+address_ready=0
 for _ in $(seq 1 30); do
   "$LOGOSCORE" --config-dir "$RUN_ROOT/core" call logos_agent status \
     >"$RUN_ROOT/status.raw.json" 2>"$RUN_ROOT/status.err" || true
-  if python3 - "$RUN_ROOT/status.raw.json" "$RUN_ROOT/chat-intro-bundle.txt" <<'PY'
+  if python3 - "$RUN_ROOT/status.raw.json" "$RUN_ROOT/chat-address.txt" <<'PY'
 import json
 import pathlib
 import sys
@@ -260,20 +251,20 @@ import sys
 outer = json.loads(pathlib.Path(sys.argv[1]).read_text(encoding="utf-8"))
 inner = json.loads(outer.get("result", "{}"))
 messaging = inner.get("messaging", {})
-bundle = messaging.get("chat_intro_bundle", "")
-if not bundle or not messaging.get("chat_started", False):
+address = messaging.get("chat_address", "")
+if not address or not messaging.get("chat_started", False):
     raise SystemExit(1)
-pathlib.Path(sys.argv[2]).write_text(bundle + "\n", encoding="utf-8")
+pathlib.Path(sys.argv[2]).write_text(address + "\n", encoding="utf-8")
 PY
   then
-    bundle_ready=1
+    address_ready=1
     break
   fi
   sleep 1
 done
 
-if [ "$bundle_ready" -ne 1 ]; then
-  echo "chat intro bundle was not created. Log tail:" >&2
+if [ "$address_ready" -ne 1 ]; then
+  echo "chat address was not created. Log tail:" >&2
   tail -n 120 "$RUN_ROOT/logoscore.log" >&2 || true
   exit 1
 fi
@@ -288,14 +279,14 @@ fi
 
 printf '%s\n' "$RUN_ROOT" >"$ROOT/.local/owner-chat-agent/latest-run-root.txt"
 
-python3 - "$RUN_ROOT" "$port" <<'PY'
+python3 - "$RUN_ROOT" "$DELIVERY_PRESET" <<'PY'
 import json
 import pathlib
 import sys
 
 run = pathlib.Path(sys.argv[1])
-port = sys.argv[2]
-bundle = (run / "chat-intro-bundle.txt").read_text(encoding="utf-8").strip()
+delivery_preset = sys.argv[2]
+address = (run / "chat-address.txt").read_text(encoding="utf-8").strip()
 daemon_status = json.loads((run / "daemon-status-after.json").read_text(encoding="utf-8"))
 outer = json.loads((run / "status.raw.json").read_text(encoding="utf-8"))
 inner = json.loads(outer["result"])
@@ -307,11 +298,11 @@ summary = {
     "pid": daemon_status.get("daemon", {}).get("pid"),
     "launcher": "systemd-run" if unit_file.exists() else "nohup",
     "systemd_unit": unit_file.read_text(encoding="utf-8").strip() if unit_file.exists() else "",
-    "chat_port": port,
+    "delivery_preset": delivery_preset,
     "modules_loaded": daemon_status.get("modules_summary", {}).get("loaded"),
     "chat_started": inner.get("messaging", {}).get("chat_started"),
-    "intro_bundle_file": str(run / "chat-intro-bundle.txt"),
-    "intro_bundle": bundle,
+    "chat_address_file": str(run / "chat-address.txt"),
+    "chat_address": address,
 }
 (run / "owner-chat-live-summary.json").write_text(
     json.dumps(summary, indent=2) + "\n",

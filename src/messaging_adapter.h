@@ -34,8 +34,6 @@ private:
     QJsonObject initChat(const QJsonObject& chatCfg);
     QJsonObject initDelivery(const QJsonObject& deliveryCfg, bool asyncStart, StartCallback callback = {});
     QString ownerConversationIdFromPayload(const QJsonObject& payload) const;
-    void recordChatIntroBundleEvent(const QJsonObject& event);
-    void recordChatConversationEvent(const QJsonObject& event);
     void recordMessage(const QJsonObject& message);
     void recordDeliveryConnectionState(const QString& status);
 
@@ -48,11 +46,9 @@ private:
     bool m_deliveryStarted = false;
     QString m_deliveryConnectionStatus;
     QString m_ownerConversationId;
-    QString m_chatIntroBundle;
-    QString m_chatIntroBundleLastError;
+    QString m_chatAddress;
     QString m_chatLastError;
     QString m_deliveryLastError;
-    bool m_createChatIntroBundleOnStart = false;
 };
 
 #endif

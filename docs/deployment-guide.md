@@ -86,7 +86,7 @@ with:
 ```bash
 ./scripts/prepare-three-agent-deployment.sh \
   --network testnet \
-  --delivery-preset logos.dev
+  --delivery-preset logos.test
 ```
 
 The script writes:

@@ -66,9 +66,9 @@ configure_flake_paths() {
   for repo in "${repos[@]}"; do
     local repo_dir="${REPO_DIRS[$repo]:-$WORKSPACE/$repo}"
     perl -0pi -e "s#path:(?:\\./)?\\.\\./$repo#path:$repo_dir#g" "$flake"
-    perl -0pi -e "s#path:/[^\\\"]*/$repo#path:$repo_dir#g" "$flake" "$circuits_flake"
+    perl -0pi -e "s#path:/[^\\\"]*/$repo(?=\\\")#path:$repo_dir#g" "$flake" "$circuits_flake"
     perl -0pi -e "s#git\\+file:(?:\\./)?\\.\\./$repo#git+file://$repo_dir#g" "$flake"
-    perl -0pi -e "s#git\\+file://[^\\\"?]*/$repo#git+file://$repo_dir#g" "$flake"
+    perl -0pi -e "s#git\\+file://[^\\\"?]*/$repo(?=[\\\"?])#git+file://$repo_dir#g" "$flake"
   done
 
   local circuits_dir="${REPO_DIRS[logos-blockchain-circuits]:-$WORKSPACE/logos-blockchain-circuits}"

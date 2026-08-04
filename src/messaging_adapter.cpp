@@ -14,55 +14,6 @@
 #include <QVariantList>
 #include <utility>
 
-namespace {
-
-QJsonObject parseEventObject(const QVariantList& data)
-{
-    if (data.isEmpty()) {
-        return {};
-    }
-    QString err;
-    return JsonUtils::parseObject(data.at(0).toString(), &err);
-}
-
-QString decodeChatContent(const QString& content)
-{
-    const QByteArray encoded = content.toLatin1();
-    if (encoded.isEmpty() || encoded.size() % 2 != 0) {
-        return content;
-    }
-    const QByteArray decoded = QByteArray::fromHex(encoded);
-    if (decoded.toHex().compare(encoded, Qt::CaseInsensitive) != 0) {
-        return content;
-    }
-    return QString::fromUtf8(decoded);
-}
-
-QJsonObject objectFromJsonString(const QString& raw)
-{
-    QString err;
-    return JsonUtils::parseObject(raw, &err);
-}
-
-QJsonObject nestedPayloadObject(const QJsonObject& payload)
-{
-    const QJsonValue wrapped = payload.value(QStringLiteral("payload"));
-    if (wrapped.isObject()) {
-        return wrapped.toObject();
-    }
-    if (wrapped.isString()) {
-        return objectFromJsonString(wrapped.toString());
-    }
-    return {};
-}
-
-QString conversationIdFromObject(const QJsonObject& obj)
-{
-    return OwnerMessageUtils::ownerConversationId(obj);
-}
-
-} // namespace
-
 void MessagingAdapter::setLogosModules(LogosModules* modules)
 {
     m_logos = modules;
@@ -84,54 +35,16 @@ void MessagingAdapter::wireEvents()
         return;
     }
 
-    m_logos->chat_module.on("chatInitResult", [this](const QVariantList& data) {
-        const QJsonObject event = parseEventObject(data);
-        if (!event.value(QStringLiteral("success")).toBool()) {
-            m_chatStarting = false;
-            m_chatStarted = false;
-            m_chatLastError = event.value(QStringLiteral("message")).toString(
-                QStringLiteral("chat initialization failed"));
+    m_logos->chat_module.on("message_received", [this](const QVariantList& data) {
+        if (data.size() < 4) {
             return;
         }
-
-        if (!m_logos->chat_module.setEventCallback()) {
-            m_chatStarting = false;
-            m_chatLastError = QStringLiteral("chat event callback registration was rejected");
-            return;
-        }
-        if (!m_logos->chat_module.startChat()) {
-            m_chatStarting = false;
-            m_chatLastError = QStringLiteral("chat start was rejected");
-        }
-    });
-
-    m_logos->chat_module.on("chatStartResult", [this](const QVariantList& data) {
-        const QJsonObject event = parseEventObject(data);
-        m_chatStarting = false;
-        m_chatStarted = event.value(QStringLiteral("success")).toBool();
-        if (!m_chatStarted) {
-            m_chatLastError = event.value(QStringLiteral("message")).toString(
-                QStringLiteral("chat start failed"));
-            return;
-        }
-        m_chatLastError.clear();
-        if (m_createChatIntroBundleOnStart && !m_logos->chat_module.createIntroBundle()) {
-            m_chatIntroBundleLastError = QStringLiteral("chat intro bundle request was rejected");
-        }
-    });
-
-    m_logos->chat_module.on("chatNewMessage", [this](const QVariantList& data) {
-        const QJsonObject event = parseEventObject(data);
-        const QJsonObject payload = nestedPayloadObject(event);
-        if (payload.isEmpty()) {
-            return;
-        }
-        const QString conversationId = conversationIdFromObject(payload);
+        const QString conversationId = data.at(0).toString();
         const QJsonObject message{
             {QStringLiteral("conversation_id"), conversationId},
-            {QStringLiteral("content"), decodeChatContent(payload.value(QStringLiteral("content")).toString())},
-            {QStringLiteral("timestamp_ms"), payload.value(QStringLiteral("timestamp")).toVariant().toLongLong()},
-            {QStringLiteral("sender"), payload.value(QStringLiteral("sender")).toString()}
+            {QStringLiteral("content"), data.at(1).toString()},
+            {QStringLiteral("timestamp_ms"), data.at(2).toLongLong()},
+            {QStringLiteral("sender"), data.at(3).toString()}
         };
         if (!conversationId.isEmpty()) {
             m_ownerConversationId = conversationId;
@@ -148,12 +61,40 @@ void MessagingAdapter::wireEvents()
         }
     });
 
-    m_logos->chat_module.on("chatNewConversation", [this](const QVariantList& data) {
-        recordChatConversationEvent(parseEventObject(data));
+    m_logos->chat_module.on("conversation_created", [this](const QVariantList& data) {
+        if (data.size() < 6) {
+            return;
+        }
+        const QString conversationId = data.at(0).toString();
+        if (!conversationId.isEmpty()) {
+            m_ownerConversationId = conversationId;
+        }
+        recordMessage(QJsonObject{
+            {QStringLiteral("transport"), QStringLiteral("chat")},
+            {QStringLiteral("direction"), QStringLiteral("event")},
+            {QStringLiteral("event"), QStringLiteral("conversation_created")},
+            {QStringLiteral("conversation_id"), conversationId},
+            {QStringLiteral("is_outgoing"), data.at(1).toBool()},
+            {QStringLiteral("peer_label"), data.at(2).toString()},
+            {QStringLiteral("kind"), data.at(3).toString()},
+            {QStringLiteral("name"), data.at(4).toString()},
+            {QStringLiteral("description"), data.at(5).toString()},
+            {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+        });
     });
 
-    m_logos->chat_module.on("chatCreateIntroBundleResult", [this](const QVariantList& data) {
-        recordChatIntroBundleEvent(parseEventObject(data));
+    m_logos->chat_module.on("delivery_state_changed", [this](const QVariantList& data) {
+        if (data.isEmpty()) {
+            return;
+        }
+        const QString state = data.at(0).toString();
+        const QString detail = data.size() > 1 ? data.at(1).toString() : QString();
+        if (state.compare(QStringLiteral("connected"), Qt::CaseInsensitive) == 0) {
+            m_chatStarted = true;
+            m_chatLastError.clear();
+        } else if (!detail.isEmpty()) {
+            m_chatLastError = detail;
+        }
     });
 
     m_logos->delivery_module.on("messageReceived", [this](const QVariantList& data) {
@@ -246,8 +187,8 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
         recipient = m_ownerConversationId;
     }
 
-    const QString contentHex = QString::fromLatin1(message.toUtf8().toHex());
-    const bool accepted = m_logos->chat_module.sendMessage(recipient, contentHex);
+    const LogosResult sent = m_logos->chat_module.send_message(recipient, message);
+    const bool accepted = sent.success;
     recordMessage(QJsonObject{
         {QStringLiteral("transport"), QStringLiteral("chat")},
         {QStringLiteral("direction"), QStringLiteral("out")},
@@ -257,11 +198,17 @@ QJsonObject MessagingAdapter::send(const QJsonObject& params)
         {QStringLiteral("accepted_immediately"), accepted},
         {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
     });
+    if (!accepted) {
+        return JsonUtils::error(
+            QStringLiteral("chat.send_failed"), sent.getError(),
+            QJsonObject{
+                {QStringLiteral("recipient"), recipient},
+                {QStringLiteral("requested_recipient"), requestedRecipient}
+            });
+    }
     return JsonUtils::ok(QJsonObject{
         {QStringLiteral("accepted_immediately"), accepted},
-        {QStringLiteral("note"), accepted
-            ? QStringLiteral("chat_module accepted send synchronously")
-            : QStringLiteral("chat_module queued send asynchronously; confirm delivery in the owner conversation")},
+        {QStringLiteral("note"), QStringLiteral("chat_module send_message completed")},
         {QStringLiteral("recipient"), recipient},
         {QStringLiteral("requested_recipient"), requestedRecipient}
     });
@@ -316,11 +263,9 @@ QJsonObject MessagingAdapter::status() const
     if (!m_ownerConversationId.isEmpty()) {
         out.insert(QStringLiteral("owner_conversation_id"), m_ownerConversationId);
     }
-    if (!m_chatIntroBundle.isEmpty()) {
-        out.insert(QStringLiteral("chat_intro_bundle"), m_chatIntroBundle);
-    }
-    if (!m_chatIntroBundleLastError.isEmpty()) {
-        out.insert(QStringLiteral("chat_intro_bundle_last_error"), m_chatIntroBundleLastError);
+    if (!m_chatAddress.isEmpty()) {
+        out.insert(QStringLiteral("chat_address"), m_chatAddress);
+        out.insert(QStringLiteral("chat_intro_bundle"), m_chatAddress);
     }
     if (!m_deliveryLastError.isEmpty()) {
         out.insert(QStringLiteral("delivery_last_error"), m_deliveryLastError);
@@ -378,26 +323,43 @@ QJsonObject MessagingAdapter::deliverySubscribe(const QString& topic)
 QJsonObject MessagingAdapter::initChat(const QJsonObject& chatCfg)
 {
     m_ownerConversationId = chatCfg.value(QStringLiteral("owner_conversation_id")).toString();
-    m_createChatIntroBundleOnStart = chatCfg.value(QStringLiteral("create_intro_bundle")).toBool();
+    const QString installationName = chatCfg.value(QStringLiteral("name")).toString();
 
-    QJsonObject config = chatCfg;
-    config.remove(QStringLiteral("owner_conversation_id"));
-    config.remove(QStringLiteral("owner_intro_bundle"));
-    config.remove(QStringLiteral("create_intro_bundle"));
-    if (!config.contains(QStringLiteral("logLevel"))) {
-        config.insert(QStringLiteral("logLevel"), QStringLiteral("INFO"));
+    QJsonObject config;
+    config.insert(
+        QStringLiteral("delivery_preset"),
+        chatCfg.value(QStringLiteral("delivery_preset")).toString(QStringLiteral("logos.dev")));
+    QString logLevel = chatCfg.value(QStringLiteral("log_level")).toString();
+    if (logLevel.isEmpty()) {
+        logLevel = chatCfg.value(QStringLiteral("logLevel")).toString(QStringLiteral("INFO"));
     }
+    config.insert(QStringLiteral("log_level"), logLevel.toLower());
 
-    if (!m_logos->chat_module.initChat(JsonUtils::toString(config))) {
-        m_chatLastError = QStringLiteral("chat initialization request was rejected");
+    const LogosResult initialized = m_logos->chat_module.init(config.toVariantMap());
+    if (!initialized.success) {
+        m_chatStarting = false;
+        m_chatStarted = false;
+        m_chatLastError = initialized.getError();
         return JsonUtils::error(QStringLiteral("chat.init_failed"), m_chatLastError);
     }
-    m_chatStarting = true;
-    m_chatStarted = false;
+
+    if (!installationName.isEmpty()) {
+        const LogosResult named = m_logos->chat_module.set_installation_name(installationName);
+        if (!named.success) {
+            m_chatLastError = named.getError();
+            return JsonUtils::error(QStringLiteral("chat.name_failed"), m_chatLastError);
+        }
+    }
+
+    m_chatStarting = false;
+    m_chatStarted = true;
     m_chatLastError.clear();
+    m_chatAddress = m_logos->chat_module.get_address();
     return JsonUtils::ok(QJsonObject{
-        {QStringLiteral("starting"), true},
-        {QStringLiteral("note"), QStringLiteral("Chat v0.2 initialization is asynchronous; inspect messaging status for the terminal result")}
+        {QStringLiteral("started"), true},
+        {QStringLiteral("address"), m_chatAddress},
+        {QStringLiteral("config"), config},
+        {QStringLiteral("note"), QStringLiteral("Chat v0.2 initialized through the released LIDL interface")}
     });
 }
 
@@ -408,58 +370,6 @@ QString MessagingAdapter::ownerConversationIdFromPayload(const QJsonObject& payl
         return direct;
     }
     return m_ownerConversationId;
-}
-
-void MessagingAdapter::recordChatIntroBundleEvent(const QJsonObject& event)
-{
-    QJsonObject body = event;
-    const QJsonObject nested = nestedPayloadObject(event);
-    if (!nested.isEmpty()) {
-        body = nested;
-    }
-
-    const QString introBundle = body.value(QStringLiteral("introBundle")).toString(
-        body.value(QStringLiteral("intro_bundle")).toString());
-    if (!introBundle.isEmpty()) {
-        m_chatIntroBundle = introBundle;
-        m_chatIntroBundleLastError.clear();
-    }
-
-    if (!body.value(QStringLiteral("success")).toBool(true)) {
-        m_chatIntroBundleLastError = body.value(QStringLiteral("error")).toString(
-            body.value(QStringLiteral("message")).toString(QStringLiteral("chat intro bundle creation failed")));
-    }
-
-    recordMessage(QJsonObject{
-        {QStringLiteral("transport"), QStringLiteral("chat")},
-        {QStringLiteral("direction"), QStringLiteral("event")},
-        {QStringLiteral("event"), QStringLiteral("chatCreateIntroBundleResult")},
-        {QStringLiteral("payload"), body},
-        {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
-    });
-}
-
-void MessagingAdapter::recordChatConversationEvent(const QJsonObject& event)
-{
-    QJsonObject body = event;
-    const QJsonObject nested = nestedPayloadObject(event);
-    if (!nested.isEmpty()) {
-        body = nested;
-    }
-
-    const QString conversationId = conversationIdFromObject(body);
-    if (!conversationId.isEmpty()) {
-        m_ownerConversationId = conversationId;
-    }
-
-    recordMessage(QJsonObject{
-        {QStringLiteral("transport"), QStringLiteral("chat")},
-        {QStringLiteral("direction"), QStringLiteral("event")},
-        {QStringLiteral("event"), QStringLiteral("chatNewConversation")},
-        {QStringLiteral("conversation_id"), conversationId},
-        {QStringLiteral("payload"), body},
-        {QStringLiteral("created_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
-    });
 }
 
 QJsonObject MessagingAdapter::initDelivery(const QJsonObject& deliveryCfg, bool asyncStart, StartCallback callback)
