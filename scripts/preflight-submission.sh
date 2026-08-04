@@ -87,6 +87,7 @@ bash -n \
   scripts/agent-core-smoke.sh \
   scripts/agent-messaging-smoke.sh \
   scripts/agent-program-smoke.sh \
+  scripts/prepare-v02-program-fixture.sh \
   scripts/agent-storage-smoke.sh \
   scripts/agent-wallet-smoke.sh \
   scripts/delivery-smoke.sh \

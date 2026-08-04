@@ -44,12 +44,16 @@ if [ ! -f "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" ] \
   TIMEOUT_SEC=240 "$ROOT/scripts/localnet-integration.sh" --setup --prebuilt
 fi
 
+PROGRAM_BINARY="${PROGRAM_BINARY:-$("$ROOT/scripts/prepare-v02-program-fixture.sh")}"
+export PROGRAM_BINARY
+
 "$ROOT/scripts/check-runtime-modules.sh"
 "$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"
 "$ROOT/scripts/agent-messaging-smoke.sh" --run-root "$RUN_ROOT/messaging" --preset logos.dev --message-timeout 90 --daemon-timeout 45
 "$ROOT/scripts/agent-a2a-smoke.sh" --run-root "$RUN_ROOT/a2a" --preset logos.dev
 "$ROOT/scripts/agent-wallet-smoke.sh" --run-root "$RUN_ROOT/wallet" --localnet-timeout 240
 "$ROOT/scripts/agent-a2a-paid-smoke.sh" --run-root "$RUN_ROOT/a2a-paid" --localnet-timeout 240
-"$ROOT/scripts/agent-program-smoke.sh" --run-root "$RUN_ROOT/program" --localnet-timeout 240 --daemon-timeout 45
+"$ROOT/scripts/agent-program-smoke.sh" \
+  --run-root "$RUN_ROOT/program" --localnet-timeout 240 --daemon-timeout 45
 
 echo "local two-agent E2E completed: $RUN_ROOT"
