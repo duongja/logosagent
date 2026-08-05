@@ -19,27 +19,36 @@ resolve_tool() {
   local name="$2"
   local source="$3"
   local expected_commit="$4"
+  local output="${5:-cli}"
+  local expected_flavor="${6:-}"
   local out_link="$ROOT/.local/tools-v02/$name"
   local cached="$ROOT/.local/official-v02/bin/$name"
 
   if command -v "$requested" >/dev/null 2>&1; then
     local candidate
     candidate="$(command -v "$requested")"
-    if "$candidate" --version 2>&1 | grep -Fq "commit: $expected_commit"; then
+    if "$candidate" --version 2>&1 | grep -Fq "commit: $expected_commit" \
+      && { [ -z "$expected_flavor" ] || "$candidate" --version 2>&1 | grep -Fq "$expected_flavor"; }; then
       echo "$candidate"
       return
     fi
     echo "ignoring non-v0.2 $name on PATH: $candidate" >&2
   fi
-  if [ -x "$cached" ] && "$cached" --version 2>&1 | grep -Fq "commit: $expected_commit"; then
+  if [ -x "$cached" ] && "$cached" --version 2>&1 | grep -Fq "commit: $expected_commit" \
+    && { [ -z "$expected_flavor" ] || "$cached" --version 2>&1 | grep -Fq "$expected_flavor"; }; then
     echo "$cached"
     return
   fi
 
   mkdir -p "$(dirname "$out_link")"
-  nix build --no-write-lock-file "$source#cli" --out-link "$out_link" >&2
+  nix build --no-write-lock-file "$source#$output" --out-link "$out_link" >&2
   if [ ! -x "$out_link/bin/$name" ]; then
     echo "pinned $name build did not produce bin/$name" >&2
+    exit 1
+  fi
+  if [ -n "$expected_flavor" ] \
+    && ! "$out_link/bin/$name" --version 2>&1 | grep -Fq "$expected_flavor"; then
+    echo "pinned $name build does not report expected flavor: $expected_flavor" >&2
     exit 1
   fi
   echo "$out_link/bin/$name"
@@ -67,7 +76,7 @@ EOF
 }
 
 LGPD="$(resolve_tool "$LGPD" lgpd github:logos-co/logos-package-downloader/cf814220bfd78a0e07e042a8d29fae026bf652fd cf814220bfd78a0e07e042a8d29fae026bf652fd)"
-LGPM="$(resolve_tool "$LGPM" lgpm github:logos-co/logos-package-manager/7a1f1cf35b22dc1a3407d6b5cafce333321be584 7a1f1cf35b22dc1a3407d6b5cafce333321be584)"
+LGPM="$(resolve_tool "$LGPM" lgpm github:logos-co/logos-package-manager/7a1f1cf35b22dc1a3407d6b5cafce333321be584 7a1f1cf35b22dc1a3407d6b5cafce333321be584 cli-portable "portable build")"
 LOGOSCORE="$(resolve_tool "$LOGOSCORE" logoscore github:logos-co/logos-logoscore-cli/797b98a02bb009c477cfe82a7bb75f5fc6cb75d7 797b98a02bb009c477cfe82a7bb75f5fc6cb75d7)"
 verify_tool "$LGPD" lgpd 0.2.0 cf814220bfd78a0e07e042a8d29fae026bf652fd
 verify_tool "$LGPM" lgpm 0.2.0 7a1f1cf35b22dc1a3407d6b5cafce333321be584

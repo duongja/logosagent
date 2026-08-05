@@ -94,7 +94,10 @@ jobs:
         working-directory: ../scaffold
 
       - name: Prepare released v0.2 modules
-        run: ./scripts/prepare-v02-runtime.sh
+        run: |
+          mkdir -p .local/ci-e2e
+          set -o pipefail
+          ./scripts/prepare-v02-runtime.sh 2>&1 | tee .local/ci-e2e/prepare-v02-runtime.log
 
       - name: Run local two-agent E2E
         env:
