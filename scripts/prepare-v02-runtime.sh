@@ -14,6 +14,32 @@ if ! command -v nix >/dev/null 2>&1; then
   exit 1
 fi
 
+tool_matches() {
+  local tool="$1"
+  local expected_commit="$2"
+  local expected_flavor="${3:-}"
+  local version_output
+
+  [ -x "$tool" ] || return 1
+  version_output="$("$tool" --version 2>&1)" || return 1
+  grep -Fq "commit: $expected_commit" <<<"$version_output" || return 1
+
+  case "$expected_flavor" in
+    "")
+      return 0
+      ;;
+    "portable core")
+      if "$tool" --appimage-version 2>&1 | grep -Fq "AppImage runtime version:"; then
+        return 0
+      fi
+      [ -d "$(dirname "$tool")/../lib" ]
+      ;;
+    *)
+      grep -Fq "$expected_flavor" <<<"$version_output"
+      ;;
+  esac
+}
+
 resolve_tool() {
   local requested="$1"
   local name="$2"
@@ -27,15 +53,13 @@ resolve_tool() {
   if command -v "$requested" >/dev/null 2>&1; then
     local candidate
     candidate="$(command -v "$requested")"
-    if "$candidate" --version 2>&1 | grep -Fq "commit: $expected_commit" \
-      && { [ -z "$expected_flavor" ] || "$candidate" --version 2>&1 | grep -Fq "$expected_flavor"; }; then
+    if tool_matches "$candidate" "$expected_commit" "$expected_flavor"; then
       echo "$candidate"
       return
     fi
     echo "ignoring non-v0.2 $name on PATH: $candidate" >&2
   fi
-  if [ -x "$cached" ] && "$cached" --version 2>&1 | grep -Fq "commit: $expected_commit" \
-    && { [ -z "$expected_flavor" ] || "$cached" --version 2>&1 | grep -Fq "$expected_flavor"; }; then
+  if tool_matches "$cached" "$expected_commit" "$expected_flavor"; then
     echo "$cached"
     return
   fi
@@ -46,9 +70,8 @@ resolve_tool() {
     echo "pinned $name build did not produce bin/$name" >&2
     exit 1
   fi
-  if [ -n "$expected_flavor" ] \
-    && ! "$out_link/bin/$name" --version 2>&1 | grep -Fq "$expected_flavor"; then
-    echo "pinned $name build does not report expected flavor: $expected_flavor" >&2
+  if ! tool_matches "$out_link/bin/$name" "$expected_commit" "$expected_flavor"; then
+    echo "pinned $name build does not match commit/flavor: $expected_commit / $expected_flavor" >&2
     exit 1
   fi
   echo "$out_link/bin/$name"
@@ -77,7 +100,7 @@ EOF
 
 LGPD="$(resolve_tool "$LGPD" lgpd github:logos-co/logos-package-downloader/cf814220bfd78a0e07e042a8d29fae026bf652fd cf814220bfd78a0e07e042a8d29fae026bf652fd)"
 LGPM="$(resolve_tool "$LGPM" lgpm github:logos-co/logos-package-manager/7a1f1cf35b22dc1a3407d6b5cafce333321be584 7a1f1cf35b22dc1a3407d6b5cafce333321be584 cli-portable "portable build")"
-LOGOSCORE="$(resolve_tool "$LOGOSCORE" logoscore github:logos-co/logos-logoscore-cli/797b98a02bb009c477cfe82a7bb75f5fc6cb75d7 797b98a02bb009c477cfe82a7bb75f5fc6cb75d7)"
+LOGOSCORE="$(resolve_tool "$LOGOSCORE" logoscore github:logos-co/logos-logoscore-cli/797b98a02bb009c477cfe82a7bb75f5fc6cb75d7 797b98a02bb009c477cfe82a7bb75f5fc6cb75d7 cli-bundle-dir "portable core")"
 verify_tool "$LGPD" lgpd 0.2.0 cf814220bfd78a0e07e042a8d29fae026bf652fd
 verify_tool "$LGPM" lgpm 0.2.0 7a1f1cf35b22dc1a3407d6b5cafce333321be584
 verify_tool "$LOGOSCORE" logoscore 0.2.0 797b98a02bb009c477cfe82a7bb75f5fc6cb75d7

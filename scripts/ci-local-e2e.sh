@@ -26,6 +26,9 @@ if [ ! -x "$LOGOSCORE" ]; then
 fi
 export LOGOSCORE
 
+"$ROOT/scripts/check-runtime-modules.sh"
+"$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"
+
 SCAFFOLD_REPO="${SCAFFOLD_REPO:-$ROOT/../scaffold}"
 SCAFFOLD_PROJECT="${SCAFFOLD_PROJECT:-$ROOT/.local/localnet-integration/scaffold-project}"
 if [ ! -x "$SCAFFOLD_REPO/target/release/logos-scaffold" ]; then
@@ -47,8 +50,6 @@ if [ ! -f "$SCAFFOLD_PROJECT/.scaffold/wallet/wallet_config.json" ] \
   TIMEOUT_SEC=240 "$ROOT/scripts/localnet-integration.sh" --setup --prebuilt
 fi
 
-"$ROOT/scripts/check-runtime-modules.sh"
-"$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"
 "$ROOT/scripts/agent-messaging-smoke.sh" --run-root "$RUN_ROOT/messaging" --preset logos.dev --message-timeout 90 --daemon-timeout 45
 "$ROOT/scripts/agent-a2a-smoke.sh" --run-root "$RUN_ROOT/a2a" --preset logos.dev
 "$ROOT/scripts/agent-wallet-smoke.sh" --run-root "$RUN_ROOT/wallet" --localnet-timeout 240
