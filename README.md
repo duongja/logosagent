@@ -2,9 +2,12 @@
 
 > **Resubmission status:** this repository targets the integrated Logos Testnet
 > v0.2 stack. Earlier hosted LEZ hashes are wallet/program evidence, not proof
-> that `logos_agent` ran on testnet. The current correlated public proof is in
+> that `logos_agent` ran on testnet. The latest correlated public capture is in
 > [evidence/current/testnet-v02](evidence/current/testnet-v02); see
 > [docs/v02-resubmission-status.md](docs/v02-resubmission-status.md) for scope.
+> The LEZ chain reset again after that capture, so its transaction is no longer
+> returned by the live RPC; see
+> [docs/testnet-chain-status-20260805.md](docs/testnet-chain-status-20260805.md).
 
 This repository is the LP-0008 implementation workspace for a Logos Core module
 that runs an autonomous agent with:
@@ -58,8 +61,11 @@ Known pre-submission gaps:
 
 The default command executes local module flows. Public evidence is valid only
 when `scripts/verify-evidence.py` accepts one correlated `logos.test` run.
-The committed current bundle passes that validator and includes confirmed LEZ
-transaction `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`.
+The committed bundle passes that validator and includes LEZ transaction
+`ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`,
+which was confirmed by the sequencer at capture time. A later chain reset means
+the hash is not currently explorer/RPC-verifiable and must be replaced before
+resubmission.
 
 ## Build
 
@@ -140,7 +146,9 @@ Railway is optional. To keep the same headless agent online continuously while
 preserving the local workflow, see
 [docs/railway-deployment.md](docs/railway-deployment.md). The hosted container
 is pinned to Testnet v0.2 and refuses localnet/`logos.dev` configuration;
-`./demo.sh` remains the default clean-clone local E2E path.
+`./demo.sh` remains the default clean-clone local E2E path. The maintained
+instance reports sanitized readiness and its signed Agent Card at
+`https://logos-agent-production.up.railway.app`.
 
 Call a skill:
 

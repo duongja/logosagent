@@ -10,6 +10,11 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
 > authoritative public proof is `evidence/current/testnet-v02/` and is summarized
 > in `docs/v02-resubmission-status.md`.
 
+> **2026-08-05 update:** the authoritative capture remains internally valid,
+> but its LEZ transaction disappeared after another public chain reset. It is
+> historical until a fresh run replaces it. See
+> `docs/testnet-chain-status-20260805.md`.
+
 ## Ready In Repo
 
 - MIT license: `LICENSE`.
@@ -280,7 +285,9 @@ reproducible command transcript, tx hashes where applicable, and demo footage.
   `run_62d7e4e3fbc2439594822ec3ac835c1a` in
   `evidence/current/testnet-v02/`. Its paid task transaction is
   `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`.
-  Other hosted-testnet hashes listed above are standalone historical evidence.
+  It was confirmed at capture time but is no longer returned after the current
+  chain reset. Other hosted-testnet hashes listed above are standalone
+  historical evidence.
 - CU status is documented in `docs/cu-report.md`. CU remains `TBD` because the
   current wallet/RPC output does not expose CU fields; the report names
   acceptable sources for replacing `TBD`.

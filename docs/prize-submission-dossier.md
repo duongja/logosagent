@@ -4,6 +4,11 @@
 > `evidence/current/testnet-v02/`. Older hosted LEZ hashes retained below are
 > standalone historical evidence, not agent-on-testnet proof.
 
+> **Not ready to resubmit:** the integrated proof's transaction was confirmed
+> on 2026-08-03 but is absent from the reset chain as of 2026-08-05. A fresh
+> explorer-verifiable run must replace it. See
+> `docs/testnet-chain-status-20260805.md`.
+
 This file is the public, committed review map for the current submission state.
 It avoids raw `.local` runtime state, wallet storage, and other local secrets.
 
@@ -46,7 +51,7 @@ agents, Delivery and Storage on `logos.test`, LEZ Core `0.2.0`, and
 
 | Operation | Tx Hash | Status |
 | --- | --- | --- |
-| `agent.task` payment through `logos_agent` | `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea` | direct `getTransaction` result; payer `7369 -> 7368`; task `task_c766adf8fb544dafa9d4eed2fe3faeb2` reached `TASK_STATE_COMPLETED` |
+| `agent.task` payment through `logos_agent` | `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea` | capture-time `getTransaction` result; payer `7369 -> 7368`; task completed; current reset-chain lookup returns `null` |
 | Storage upload/download | N/A | content address `zDvZRwzmAaw9AK9WMFPcWzhNKwHW4EdtuP62k5troeudkbCNRNvN`; matching plaintext SHA-256 `2e36f5d965e6b5eb6fae2fcfcb41976d274922ad0cbd872e83e1ea1df75d0f35` |
 | Delivery discovery/task/status | N/A | signed server Agent Card discovered by the client; task and terminal status crossed public `logos.test` topics |
 

@@ -34,21 +34,47 @@ to Git.
 
 ## Deploy
 
-Create or link an isolated Railway project, add a service, and deploy the
-staged context:
+Create or link an isolated Railway project and add a service. Link the service
+explicitly before creating its volume; current Railway CLI releases otherwise
+fail to resolve the service instance:
 
 ```bash
 railway init --name logos-agent-v02
 railway add --service logos-agent
-railway volume add --service logos-agent --mount-path /data
+railway service link logos-agent
 railway variable set --service logos-agent \
   AGENT_ID=logos-agent-v02-online \
   AGENT_NAME="Logos Agent v0.2"
 openssl rand -base64 48 | \
   railway variable set --service logos-agent LOGOS_WALLET_PASSWORD --stdin
-railway up .local/railway-deployment --path-as-root --service logos-agent
+```
+
+If the service has never deployed, connect a small temporary image so Railway
+creates its service instance. This changes only the new service:
+
+```bash
+railway service source connect --image nginx:alpine --service logos-agent
+railway volume add --mount-path /data
+railway volume list --json
+```
+
+Upload the checksum-pinned archive to the returned volume ID, then replace only
+the selected temporary service with the pinned image deployment:
+
+```bash
+./scripts/deploy-railway-volume.sh --volume-id <volume-id> \
+  --service logos-agent --dry-run
+./scripts/deploy-railway-volume.sh --volume-id <volume-id> \
+  --service logos-agent --yes
 railway domain --service logos-agent
 ```
+
+The helper first confirms that the volume belongs to the selected service and
+is mounted at `/data`. It uploads the runtime plus two small tracked bootstrap
+files, records the public archive checksum, and updates only that service. The
+bootstrap verifies SHA-256 before extracting the runtime. The tracked
+self-contained `deploy/railway/Dockerfile` remains available for deployments
+through an authenticated image registry.
 
 Railway supplies `PORT`. The container refuses `localnet` and `logos.dev`, so a
 hosted deployment cannot silently be mislabeled as public-testnet activity.
@@ -70,3 +96,20 @@ payloads.
 Use the reported Chat address to create a private conversation in Basecamp.
 For local-only operation, use `scripts/start-owner-chat-agent.sh` instead; the
 owner message format is identical in both modes.
+
+## Current Public Instance
+
+The maintained instance is available at
+`https://logos-agent-production.up.railway.app`. Its `/healthz` response is the
+current online-status view, not the authoritative paid-task evidence. The
+captured two-agent public Testnet v0.2 run, including transaction
+`ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`,
+remains under `evidence/current/testnet-v02/`.
+
+The instance was restarted after first deployment to verify volume persistence.
+Its public LEZ account and signed Agent Card key remained stable; the Chat
+address rotated as expected for Chat v0.2.1. The hosted wallet currently has a
+zero balance, so this availability endpoint must not be presented as a new paid
+transaction run until it is funded and the full two-agent harness is rerun.
+The older transaction is also absent from the reset chain as of 2026-08-05;
+see `docs/testnet-chain-status-20260805.md`.

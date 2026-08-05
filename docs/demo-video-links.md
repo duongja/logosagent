@@ -14,9 +14,10 @@ These are the narrated videos recorded for the LP-0008 submission.
 | Video 3 | Live skill proofs: Storage, wallet spending controls and transfer history, Messaging/Delivery, paid A2A, and program operations | https://www.youtube.com/watch?v=hxRQejaBhxo |
 
 The videos demonstrate the earlier module behavior and local flows. The current
-source of truth is `evidence/current/testnet-v02/`, including the integrated
-public transaction
+capture is `evidence/current/testnet-v02/`, including the integrated public
+transaction
 `ee5b41972e315f0bca0d2c7745048dfe6e875418ccef1b132160f35995d9d9ea`.
-A replacement continuous recording of that workflow is still required.
+That transaction is no longer returned after the 2026-08-05 chain reset. A
+fresh continuous recording and replacement transaction are still required.
 
 The videos are split to match `docs/final-demo-recording-guide.md`.

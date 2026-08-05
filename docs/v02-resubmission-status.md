@@ -22,6 +22,11 @@ Exact source revisions are recorded in `dependencies-v0.2.json`.
 
 ## Acceptance status
 
+Current-chain acceptance is **not complete**. The 2026-08-03 run completed and
+was independently validated, but the public LEZ chain reset afterward. On
+2026-08-05, `getLastBlockId` returned `59` and `getTransaction` returned `null`
+for the captured payment. See `docs/testnet-chain-status-20260805.md`.
+
 - Repository migration and evidence tooling: implemented.
 - Automatic local module E2E workflow: complete. Public Actions run
   [30932258747](https://github.com/duongja/logosagent/actions/runs/30932258747)
@@ -30,7 +35,8 @@ Exact source revisions are recorded in `dependencies-v0.2.json`.
   sanitized [E2E evidence artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988192)
   and [v0.2 dependency/LGX artifact](https://github.com/duongja/logosagent/actions/runs/30932258747/artifacts/8903988755)
   are available from the run.
-- Public two-agent Testnet v0.2 proof: complete. The authoritative run is
+- Captured two-agent Testnet v0.2 proof: complete for its 2026-08-03 chain. The
+  run is
   `run_62d7e4e3fbc2439594822ec3ac835c1a` under
   `evidence/current/testnet-v02/`.
 - The paid task reached `TASK_STATE_COMPLETED`; LEZ transaction
@@ -43,9 +49,10 @@ Exact source revisions are recorded in `dependencies-v0.2.json`.
 - Replacement narrated video: pending a continuous recording of the successful
   public run and evidence validator.
 
-The public proof is committed and independently verifiable. The automatic local
-E2E run is publicly linked above. Do not describe the replacement video as
-complete until its link is added.
+The capture is committed and independently verifiable offline. It is no longer
+independently queryable from the current chain, so do not submit it as a current
+explorer-verifiable transaction. The automatic local E2E run is publicly linked
+above. A fresh paid two-agent run and its replacement recording remain required.
 
 ## LEZ compatibility resolution
 

@@ -67,10 +67,13 @@ require_file docs/testnet-evidence-runbook.md
 require_file docs/testnet-redeploy-note-20260625.md
 require_file docs/testnet-v020-compatibility-evidence-20260625.md
 require_file docs/testnet-v020-final-evidence-20260701.md
+require_file docs/testnet-chain-status-20260805.md
 require_file docs/submission-readiness.md
 require_file docs/prize-submission-dossier.md
 require_file docs/manual-intervention-checklist.md
 require_file docs/railway-deployment.md
+require_file deploy/railway/Dockerfile
+require_file deploy/railway/start-from-volume.sh
 
 python3 -m py_compile cli/logos-agent-cli deploy/railway/entrypoint.py scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/lez-v020-endpoint-diagnose.py scripts/summarize-three-agent-deployment.py scripts/test-railway-entrypoint.py
 ./cli/logos-agent-cli --help >/dev/null
@@ -100,7 +103,9 @@ bash -n \
   scripts/package-dev-lgx.sh \
   scripts/prepare-three-agent-deployment.sh \
   scripts/repair-live-modules.sh \
+  scripts/deploy-railway-volume.sh \
   scripts/stage-railway-deployment.sh \
+  deploy/railway/start-from-volume.sh \
   scripts/preflight-submission.sh \
   scripts/prepare-v02-runtime.sh \
   scripts/provision-v02-wallet.sh \
