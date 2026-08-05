@@ -136,6 +136,12 @@ Or provision a local headless instance in one command after building the LGX:
   --start-daemon
 ```
 
+Railway is optional. To keep the same headless agent online continuously while
+preserving the local workflow, see
+[docs/railway-deployment.md](docs/railway-deployment.md). The hosted container
+is pinned to Testnet v0.2 and refuses localnet/`logos.dev` configuration;
+`./demo.sh` remains the default clean-clone local E2E path.
+
 Call a skill:
 
 ```bash

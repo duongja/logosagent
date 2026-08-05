@@ -1,6 +1,7 @@
 .direnv/
 .local/
 .cache/
+.railway/
 
 build/
 cmake-build-*/

@@ -70,8 +70,9 @@ require_file docs/testnet-v020-final-evidence-20260701.md
 require_file docs/submission-readiness.md
 require_file docs/prize-submission-dossier.md
 require_file docs/manual-intervention-checklist.md
+require_file docs/railway-deployment.md
 
-python3 -m py_compile cli/logos-agent-cli scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/lez-v020-endpoint-diagnose.py scripts/summarize-three-agent-deployment.py
+python3 -m py_compile cli/logos-agent-cli deploy/railway/entrypoint.py scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/lez-v020-endpoint-diagnose.py scripts/summarize-three-agent-deployment.py scripts/test-railway-entrypoint.py
 ./cli/logos-agent-cli --help >/dev/null
 
 bash -n \
@@ -99,6 +100,7 @@ bash -n \
   scripts/package-dev-lgx.sh \
   scripts/prepare-three-agent-deployment.sh \
   scripts/repair-live-modules.sh \
+  scripts/stage-railway-deployment.sh \
   scripts/preflight-submission.sh \
   scripts/prepare-v02-runtime.sh \
   scripts/provision-v02-wallet.sh \
@@ -109,6 +111,7 @@ bash -n \
 
 ./scripts/demo-local.sh
 ./scripts/test-evidence-validator.py
+./scripts/test-railway-entrypoint.py
 ./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.test >/dev/null
 ./scripts/create-submission-bundle.py --out-dir .local/preflight-submission-bundle >/dev/null
 
