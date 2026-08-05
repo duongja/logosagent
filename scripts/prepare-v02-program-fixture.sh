@@ -3,11 +3,22 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKSPACE="$(cd "$ROOT/.." && pwd)"
-LOGOS_EXECUTION_ZONE="${LOGOS_EXECUTION_ZONE:-$WORKSPACE/logos-execution-zone}"
 FIXTURE_DIR="${PROGRAM_FIXTURE_DIR:-$ROOT/.local/v02-program-fixture}"
 FIXTURE="$FIXTURE_DIR/hello_world.bin"
 EXPECTED_COMMIT="a58fbce2ff48c58b7bb5001b1a27e64b9596ee3a"
 EXPECTED_SHA256="707e8f1a3f86b2e44fcc2247aa5b97f2d59932d2ad1c34a9dfc9bfec6e600c52"
+
+LOGOS_EXECUTION_ZONE="${LOGOS_EXECUTION_ZONE:-}"
+if [ -z "$LOGOS_EXECUTION_ZONE" ]; then
+  for candidate in "$WORKSPACE/logos-execution-zone" "$ROOT/.local/v02-workspace/logos-execution-zone"; do
+    if [ -d "$candidate/.git" ] \
+      && [ "$(git -C "$candidate" rev-parse HEAD 2>/dev/null || true)" = "$EXPECTED_COMMIT" ]; then
+      LOGOS_EXECUTION_ZONE="$candidate"
+      break
+    fi
+  done
+fi
+LOGOS_EXECUTION_ZONE="${LOGOS_EXECUTION_ZONE:-$WORKSPACE/logos-execution-zone}"
 BUILT_FIXTURE="$LOGOS_EXECUTION_ZONE/target/riscv32im-risc0-zkvm-elf/docker/hello_world.bin"
 
 verify_fixture() {

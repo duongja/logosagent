@@ -27,7 +27,11 @@ fi
 export LOGOSCORE
 
 "$ROOT/scripts/check-runtime-modules.sh"
-"$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"
+if ! "$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage"; then
+  echo "Storage startup failed; preserving the first attempt and retrying once after readiness delay" >&2
+  sleep 5
+  "$ROOT/scripts/agent-storage-smoke.sh" --run-root "$RUN_ROOT/storage-retry"
+fi
 
 SCAFFOLD_REPO="${SCAFFOLD_REPO:-$ROOT/../scaffold}"
 SCAFFOLD_PROJECT="${SCAFFOLD_PROJECT:-$ROOT/.local/localnet-integration/scaffold-project}"
