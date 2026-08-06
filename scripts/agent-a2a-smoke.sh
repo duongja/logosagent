@@ -530,11 +530,11 @@ PY
 }
 
 discover_params() {
-  python3 - "$DISCOVERY_TOPIC" <<'PY'
+  python3 - "$DISCOVERY_TOPIC" "$SERVER_ADDRESS" <<'PY'
 import json
 import sys
 
-print(json.dumps({"topic": sys.argv[1]}, separators=(",", ":")))
+print(json.dumps({"topic": sys.argv[1], "agent_address": sys.argv[2]}, separators=(",", ":")))
 PY
 }
 
@@ -592,11 +592,11 @@ PY
 }
 
 subscribe_params() {
-  python3 - "$TASK_ID" <<'PY'
+  python3 - "$TASK_ID" "$SERVER_ADDRESS" <<'PY'
 import json
 import sys
 
-print(json.dumps({"task_id": sys.argv[1]}, separators=(",", ":")))
+print(json.dumps({"task_id": sys.argv[1], "agent_address": sys.argv[2]}, separators=(",", ":")))
 PY
 }
 
@@ -604,6 +604,8 @@ wait_for_completed_task() {
   local cfg="$1"
   local label="$2"
   local latest="$3"
+  local replay_cfg="${4:-}"
+  local replay_count=0
   local deadline=$((SECONDS + TASK_TIMEOUT_SEC))
   while [ "$SECONDS" -lt "$deadline" ]; do
     fetch_status_snapshot "$cfg" "$label" "$latest"
@@ -624,6 +626,11 @@ PY
     then
       return 0
     fi
+    if [ -n "$replay_cfg" ] && [ $((replay_count % 5)) -eq 0 ]; then
+      call_agent "$replay_cfg" invoke agent.task "$(task_params)" >"$RUN_ROOT/client-task-replay-$replay_count.json"
+      assert_json_ok "$RUN_ROOT/client-task-replay-$replay_count.json" "client agent.task replay"
+    fi
+    replay_count=$((replay_count + 1))
     sleep 1
   done
   echo "timed out waiting for $label to record completed task $TASK_ID" >&2
@@ -635,6 +642,8 @@ wait_for_task_state() {
   local label="$2"
   local state="$3"
   local latest="$4"
+  local replay_cfg="${5:-}"
+  local replay_count=0
   local deadline=$((SECONDS + TASK_TIMEOUT_SEC))
   while [ "$SECONDS" -lt "$deadline" ]; do
     fetch_status_snapshot "$cfg" "$label" "$latest"
@@ -653,6 +662,11 @@ PY
     then
       return 0
     fi
+    if [ -n "$replay_cfg" ] && [ $((replay_count % 5)) -eq 0 ]; then
+      call_agent "$replay_cfg" invoke agent.task "$(task_params)" >"$RUN_ROOT/client-task-replay-$replay_count.json"
+      assert_json_ok "$RUN_ROOT/client-task-replay-$replay_count.json" "client agent.task replay"
+    fi
+    replay_count=$((replay_count + 1))
     sleep 1
   done
   echo "timed out waiting for $label to record task $TASK_ID state $state" >&2
@@ -776,13 +790,15 @@ call_agent "$CLIENT_CFG" invoke agent.task "$(task_params)" >"$RUN_ROOT/client-t
 assert_json_ok "$RUN_ROOT/client-task-submit.json" "client agent.task"
 
 if [ "$CANCEL_AFTER_SUBMIT" -eq 1 ]; then
-  wait_for_task_state "$SERVER_CFG" "server" "TASK_STATE_INPUT_REQUIRED" "$RUN_ROOT/server-meta-status-input-required.json"
+  wait_for_task_state "$SERVER_CFG" "server" "TASK_STATE_INPUT_REQUIRED" "$RUN_ROOT/server-meta-status-input-required.json" "$CLIENT_CFG"
   call_agent "$CLIENT_CFG" invoke agent.cancel "$(cancel_params)" >"$RUN_ROOT/client-cancel.json"
   assert_json_ok "$RUN_ROOT/client-cancel.json" "client agent.cancel"
   wait_for_task_state "$SERVER_CFG" "server" "TASK_STATE_CANCELED" "$RUN_ROOT/server-meta-status-canceled.json"
   assert_refunded_task "$RUN_ROOT/server-meta-status-canceled.json"
 else
-  wait_for_completed_task "$SERVER_CFG" "server" "$RUN_ROOT/server-meta-status-completed.json"
+  wait_for_completed_task "$SERVER_CFG" "server" "$RUN_ROOT/server-meta-status-completed.json" "$CLIENT_CFG"
+  call_agent "$CLIENT_CFG" invoke agent.subscribe "$(subscribe_params)" >"$RUN_ROOT/client-status-recovery.json"
+  assert_json_ok "$RUN_ROOT/client-status-recovery.json" "client terminal status recovery"
   wait_for_completed_task "$CLIENT_CFG" "client" "$RUN_ROOT/client-meta-status-completed.json"
   assert_paid_task "$RUN_ROOT/client-meta-status-completed.json" "$RUN_ROOT/server-meta-status-completed.json"
 fi
@@ -808,6 +824,7 @@ print(json.dumps({
         "client_start": f"{run_root}/client-start.json",
         "server_start": f"{run_root}/server-start.json",
         "client_discover_subscribe": f"{run_root}/client-discover-subscribe.json",
+        "client_status_recovery": f"{run_root}/client-status-recovery.json",
         "client_discover_final": f"{run_root}/client-discover-final.json",
         "client_subscribe": f"{run_root}/client-subscribe.json",
         "client_task_submit": f"{run_root}/client-task-submit.json",

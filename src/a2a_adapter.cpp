@@ -29,6 +29,23 @@ QString valueAsString(const QJsonValue& value)
     return {};
 }
 
+QString statusKindForState(const QString& state)
+{
+    if (state == QStringLiteral("TASK_STATE_COMPLETED")) {
+        return QStringLiteral("task.completed");
+    }
+    if (state == QStringLiteral("TASK_STATE_INPUT_REQUIRED")) {
+        return QStringLiteral("task.input-required");
+    }
+    if (state == QStringLiteral("TASK_STATE_FAILED")) {
+        return QStringLiteral("task.failed");
+    }
+    if (state == QStringLiteral("TASK_STATE_CANCELED")) {
+        return QStringLiteral("task.canceled");
+    }
+    return QStringLiteral("task.status");
+}
+
 } // namespace
 
 void A2AAdapter::setState(AgentState* state)
@@ -165,11 +182,27 @@ QJsonObject A2AAdapter::discover(const QJsonObject& params)
     if (!sub.value(QStringLiteral("ok")).toBool()) {
         return sub;
     }
-    return JsonUtils::ok(QJsonObject{
+    QJsonObject result{
         {QStringLiteral("topic"), topic},
         {QStringLiteral("agents"), m_state->discoveredAgents()},
         {QStringLiteral("note"), QStringLiteral("discovery is live pub/sub; call again after cards are received")}
-    });
+    };
+    const QString agentAddress = params.value(QStringLiteral("agent_address")).toString();
+    if (!agentAddress.isEmpty()) {
+        const QJsonObject request{
+            {QStringLiteral("agent_address"), agentAddress},
+            {QStringLiteral("requester_address"), localAgentAddress()},
+            {QStringLiteral("requested_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+        };
+        const QJsonObject sent = m_messaging->deliverySend(
+            topic,
+            envelope(QStringLiteral("agent.discovery-request"), request));
+        if (!sent.value(QStringLiteral("ok")).toBool(false)) {
+            return sent;
+        }
+        result.insert(QStringLiteral("discovery_request"), sent);
+    }
+    return JsonUtils::ok(result);
 }
 
 QJsonObject A2AAdapter::task(const QJsonObject& params)
@@ -182,6 +215,29 @@ QJsonObject A2AAdapter::task(const QJsonObject& params)
     if (agentAddress.isEmpty() || skill.isEmpty()) {
         return JsonUtils::error(QStringLiteral("a2a.invalid_params"), QStringLiteral("agent_address and skill are required"));
     }
+    const QString requestedTaskId = params.value(QStringLiteral("task_id")).toString();
+    if (!requestedTaskId.isEmpty()) {
+        const QJsonObject stored = m_state->taskById(requestedTaskId);
+        if (!stored.isEmpty()) {
+            if (stored.value(QStringLiteral("agent_address")).toString() != agentAddress
+                || stored.value(QStringLiteral("skill")).toString() != skill) {
+                return JsonUtils::error(
+                    QStringLiteral("a2a.task_id_conflict"),
+                    QStringLiteral("task_id is already bound to a different agent or skill"));
+            }
+            const QJsonObject sent = m_messaging->deliverySend(
+                taskTopic(agentAddress),
+                envelope(QStringLiteral("task.submit"), stored));
+            if (!sent.value(QStringLiteral("ok")).toBool(false)) {
+                return sent;
+            }
+            return JsonUtils::ok(QJsonObject{
+                {QStringLiteral("task"), stored},
+                {QStringLiteral("transport"), sent},
+                {QStringLiteral("replayed"), true}
+            });
+        }
+    }
     const QString amount = valueAsString(params.value(QStringLiteral("amount")));
     QJsonObject payment;
     if (amountIsPositive(amount)) {
@@ -190,7 +246,7 @@ QJsonObject A2AAdapter::task(const QJsonObject& params)
             return payment;
         }
     }
-    const QString taskId = params.value(QStringLiteral("task_id")).toString(CryptoUtils::randomId(QStringLiteral("task")));
+    const QString taskId = requestedTaskId.isEmpty() ? CryptoUtils::randomId(QStringLiteral("task")) : requestedTaskId;
     QJsonObject task{
         {QStringLiteral("task_id"), taskId},
         {QStringLiteral("run_id"), params.value(QStringLiteral("run_id"))},
@@ -224,7 +280,33 @@ QJsonObject A2AAdapter::subscribe(const QJsonObject& params)
     if (taskId.isEmpty()) {
         return JsonUtils::error(QStringLiteral("a2a.invalid_params"), QStringLiteral("task_id is required"));
     }
-    return m_messaging->deliverySubscribe(statusTopic(taskId));
+    QJsonObject subscribed = m_messaging->deliverySubscribe(statusTopic(taskId));
+    if (!subscribed.value(QStringLiteral("ok")).toBool(false)) {
+        return subscribed;
+    }
+
+    QString agentAddress = params.value(QStringLiteral("agent_address")).toString();
+    if (agentAddress.isEmpty() && m_state) {
+        agentAddress = m_state->taskById(taskId).value(QStringLiteral("agent_address")).toString();
+    }
+    if (agentAddress.isEmpty()) {
+        return subscribed;
+    }
+
+    const QJsonObject request{
+        {QStringLiteral("task_id"), taskId},
+        {QStringLiteral("agent_address"), agentAddress},
+        {QStringLiteral("requester_address"), localAgentAddress()},
+        {QStringLiteral("requested_at"), QDateTime::currentDateTimeUtc().toString(Qt::ISODate)}
+    };
+    const QJsonObject sent = m_messaging->deliverySend(
+        taskTopic(agentAddress),
+        envelope(QStringLiteral("task.status-request"), request));
+    if (!sent.value(QStringLiteral("ok")).toBool(false)) {
+        return sent;
+    }
+    subscribed.insert(QStringLiteral("status_request"), sent);
+    return subscribed;
 }
 
 QJsonObject A2AAdapter::cancel(const QJsonObject& params)
@@ -260,12 +342,43 @@ void A2AAdapter::handleInbound(const QString& topic, const QJsonObject& payload)
         m_state->save();
         return;
     }
+    if (kind == QStringLiteral("agent.discovery-request")) {
+        const QString requestedAddress = body.value(QStringLiteral("agent_address")).toString();
+        if (topic == discoveryTopic() && requestedAddress == localAgentAddress()) {
+            publishCard();
+        }
+        return;
+    }
+    if (kind == QStringLiteral("task.status-request")) {
+        if (!isTaskTopicForSelf(topic) || !m_messaging) {
+            return;
+        }
+        const QString taskId = body.value(QStringLiteral("task_id")).toString();
+        const QJsonObject stored = m_state->taskById(taskId);
+        if (taskId.isEmpty() || stored.isEmpty()) {
+            return;
+        }
+        m_messaging->deliverySend(
+            statusTopic(taskId),
+            envelope(statusKindForState(stored.value(QStringLiteral("state")).toString()), stored));
+        return;
+    }
     if (kind.startsWith(QStringLiteral("task."))) {
         if (kind == QStringLiteral("task.submit") && !isTaskSubmitAddressedToSelf(topic, body)) {
             return;
         }
         if (kind == QStringLiteral("task.cancel") && !isTaskTopicForSelf(topic)) {
             return;
+        }
+        if (kind == QStringLiteral("task.submit")) {
+            const QString taskId = body.value(QStringLiteral("task_id")).toString();
+            const QJsonObject stored = m_state->taskById(taskId);
+            if (!taskId.isEmpty() && !stored.isEmpty()) {
+                m_messaging->deliverySend(
+                    statusTopic(taskId),
+                    envelope(statusKindForState(stored.value(QStringLiteral("state")).toString()), stored));
+                return;
+            }
         }
         QJsonObject task = body;
         if (kind == QStringLiteral("task.cancel")) {
@@ -559,13 +672,7 @@ void A2AAdapter::executeSubmittedTask(const QString&, const QJsonObject& task)
     const QJsonObject completed = statusEnvelopePayload(task, finalState, result);
     m_state->upsertTask(completed);
     m_state->save();
-    QString finalKind = QStringLiteral("task.failed");
-    if (finalState == QStringLiteral("TASK_STATE_COMPLETED")) {
-        finalKind = QStringLiteral("task.completed");
-    } else if (finalState == QStringLiteral("TASK_STATE_INPUT_REQUIRED")) {
-        finalKind = QStringLiteral("task.input-required");
-    }
-    m_messaging->deliverySend(statusTopic(taskId), envelope(finalKind, completed));
+    m_messaging->deliverySend(statusTopic(taskId), envelope(statusKindForState(finalState), completed));
 }
 
 bool A2AAdapter::verifyEnvelope(const QJsonObject& envelope) const

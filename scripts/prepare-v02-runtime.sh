@@ -144,7 +144,13 @@ cp --remove-destination "$LEZ_PACKAGE" "$PACKAGES_DIR/lez_core-0.2.0.lgx"
 "$LGPM" --modules-dir "$MODULES_DIR" --allow-unsigned install \
   --file "$PACKAGES_DIR/lez_core-0.2.0.lgx"
 
+CHAT_MODULE_SOURCE="$(sed -n 's/^[[:space:]]*chat_module\.url = "path:\([^"]*\)";.*/\1/p' "$ROOT/flake.nix" | head -1)"
+if [ -z "$CHAT_MODULE_SOURCE" ] || [ ! -d "$CHAT_MODULE_SOURCE" ]; then
+  echo "unable to resolve the pinned Chat module source from flake.nix" >&2
+  exit 1
+fi
 (cd "$ROOT" && nix build --impure --no-write-lock-file --recreate-lock-file \
+  --override-input chat_module "path:$CHAT_MODULE_SOURCE" \
   .#lgx-portable -L --out-link "$AGENT_RESULT")
 "$LGPM" --modules-dir "$MODULES_DIR" --allow-unsigned install \
   --file "$AGENT_RESULT/logos-logos_agent-module-lib.lgx"
