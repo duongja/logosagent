@@ -75,6 +75,7 @@ mkdir -p "$AGENT_CFG" "$RECEIVER_CFG"
 AGENT_PID=""
 RECEIVER_PID=""
 WATCH_PID=""
+MESSAGE_REPLAY_COUNT=0
 
 cleanup() {
   if [ -n "$WATCH_PID" ]; then
@@ -321,6 +322,7 @@ PY
 }
 
 wait_for_delivery_message() {
+  local poll_count=0
   local deadline=$((SECONDS + MESSAGE_TIMEOUT_SEC))
   while [ "$SECONDS" -lt "$deadline" ]; do
     if python3 - "$AGENT_CFG" "$RECEIVER_LOG" "$GROUP_ID" <<'PY'
@@ -354,6 +356,14 @@ raise SystemExit(0 if inbound and receiver_received else 1)
 PY
     then
       return 0
+    fi
+    poll_count=$((poll_count + 1))
+    if [ $((poll_count % 5)) -eq 0 ]; then
+      MESSAGE_REPLAY_COUNT=$((MESSAGE_REPLAY_COUNT + 1))
+      local replay_file="$RUN_ROOT/messaging-send-replay-$MESSAGE_REPLAY_COUNT.json"
+      call_agent invoke messaging.send "$(send_params)" >"$replay_file"
+      assert_json_ok "$replay_file" "messaging.send replay $MESSAGE_REPLAY_COUNT"
+      assert_send_result "$replay_file"
     fi
     sleep 1
   done
@@ -448,12 +458,12 @@ fi
 call_agent invoke meta.status '{}' >"$RUN_ROOT/meta-status.json"
 assert_json_ok "$RUN_ROOT/meta-status.json" "meta.status"
 
-python3 - "$RUN_ROOT" "$PRESET" "$MODE" "$GROUP_ID" "$EVENTS" "$RECEIVER_LOG" "$RAW_WATCH_CAPTURED" <<'PY'
+python3 - "$RUN_ROOT" "$PRESET" "$MODE" "$GROUP_ID" "$EVENTS" "$RECEIVER_LOG" "$RAW_WATCH_CAPTURED" "$MESSAGE_REPLAY_COUNT" <<'PY'
 import json
 import pathlib
 import sys
 
-run_root, preset, mode, group_id, events, receiver_log, raw_watch_captured = sys.argv[1:8]
+run_root, preset, mode, group_id, events, receiver_log, raw_watch_captured, replay_count = sys.argv[1:9]
 meta_status = json.loads((pathlib.Path(run_root) / "meta-status.json").read_text())
 persistence_path = pathlib.Path(meta_status["persistence_path"])
 state_path = persistence_path / "state.json"
@@ -493,10 +503,12 @@ print(json.dumps({
     "events": events,
     "message_hash": inbound[-1]["message_hash"],
     "raw_watch_captured": raw_watch_captured == "true",
+    "send_attempts": int(replay_count) + 1,
     "proofs": {
         "create_group": f"{run_root}/messaging-create-group.json",
         "join": f"{run_root}/messaging-join.json",
         "send": f"{run_root}/messaging-send.json",
+        "send_replays": [str(path) for path in sorted(pathlib.Path(run_root).glob("messaging-send-replay-*.json"))],
         "meta_status": f"{run_root}/meta-status.json",
         "state": str(state_path),
         "receiver_log": receiver_log,
