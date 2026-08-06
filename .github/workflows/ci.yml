@@ -105,12 +105,16 @@ jobs:
           MODULES_DIR: ${{ github.workspace }}/.local/live-modules-v02
         run: ./scripts/ci-local-e2e.sh
 
+      - name: Sanitize E2E evidence
+        if: always()
+        run: ./scripts/sanitize-local-e2e.py .local/ci-e2e .local/ci-e2e-public
+
       - name: Upload E2E evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: local-e2e-evidence
-          path: .local/ci-e2e
+          path: .local/ci-e2e-public
           if-no-files-found: error
           include-hidden-files: true
 

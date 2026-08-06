@@ -75,7 +75,7 @@ require_file docs/railway-deployment.md
 require_file deploy/railway/Dockerfile
 require_file deploy/railway/start-from-volume.sh
 
-python3 -m py_compile cli/logos-agent-cli deploy/railway/entrypoint.py scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/lez-v020-endpoint-diagnose.py scripts/summarize-three-agent-deployment.py scripts/test-railway-entrypoint.py
+python3 -m py_compile cli/logos-agent-cli deploy/railway/entrypoint.py scripts/collect-prize-evidence.py scripts/create-submission-bundle.py scripts/lez-v020-endpoint-diagnose.py scripts/sanitize-local-e2e.py scripts/summarize-three-agent-deployment.py scripts/test-railway-entrypoint.py scripts/test-sanitize-local-e2e.py
 ./cli/logos-agent-cli --help >/dev/null
 
 bash -n \
@@ -117,6 +117,7 @@ bash -n \
 ./scripts/demo-local.sh
 ./scripts/test-evidence-validator.py
 ./scripts/test-railway-entrypoint.py
+./scripts/test-sanitize-local-e2e.py
 ./scripts/prepare-three-agent-deployment.sh --out-dir .local/preflight-three-agents --network testnet --delivery-preset logos.test >/dev/null
 ./scripts/create-submission-bundle.py --out-dir .local/preflight-submission-bundle >/dev/null
 
